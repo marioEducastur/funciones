@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Límites Interactivos - 1º Bachillerato</title>
+    
+    <!-- Cargar Tailwind CSS para los estilos (Versión de desarrollo/PC) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Cargar React y ReactDOM -->
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+    
+    <!-- Cargar Babel para poder usar JSX puro y limpio -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <!-- KaTeX para las matemáticas -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+</head>
+<body class="bg-slate-50">
+
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
+
+        // --- Componente auxiliar para renderizar LaTeX ---
+        const Latex = ({ math, display = false }) => {
+            const containerRef = useRef(null);
+
+            useEffect(() => {
+                if (window.katex && containerRef.current) {
+                    window.katex.render(math, containerRef.current, {
+                        displayMode: display,
+                        throwOnError: false,
+                    });
+                }
+            }, [math, display]);
+
+            return <span ref={containerRef} className={display ? "my-4 block text-center" : ""} />;
+        };
+
+        // --- Componente Principal ---
+        function App() {
+            return (
+                <div className="min-h-screen bg-slate-50 text-slate-800 font-sans pb-20">
+                    <header className="bg-blue-600 text-white p-6 shadow-md">
+                        <div className="max-w-4xl mx-auto">
+                            <h2 className="text-sm font-semibold tracking-wider text-blue-200 uppercase mb-1">Matemáticas I - 1º Bachillerato</h2>
+                            <h1 className="text-3xl font-bold">Tema 10: Límites y Continuidad</h1>
+                        </div>
+                    </header>
+
+                    <main className="max-w-4xl mx-auto mt-8 p-6 bg-white rounded-xl shadow-sm border border-slate-200">
+                        
+                        {/* Sección 1: Teoría */}
+                        <section className="mb-12">
+                            <h2 className="text-2xl font-bold text-slate-800 mb-6 pb-2 border-b-2 border-blue-100">
+                                1. Concepto y definición de límite
+                            </h2>
+                            <p className="mb-4 text-lg">
+                                Si queremos estudiar hacia qué valor se aproxima una función cuando la variable independiente toma valores próximos a un número real dado, resulta imprescindible introducir el concepto de <strong>límite</strong>.
+                            </p>
+                            
+                            <div className="bg-blue-50 p-6 rounded-lg mb-6 border-l-4 border-blue-500">
+                                <h3 className="font-bold text-blue-800 mb-2">Definición intuitiva:</h3>
+                                <p className="text-lg">
+                                    Si <Latex math="a" /> y <Latex math="b" /> son números reales, la expresión:
+                                </p>
+                                <Latex math="\displaystyle \lim_{x \to a} f(x) = b" display={true} />
+                                <p className="text-lg">
+                                    quiere decir que siempre que <Latex math="x" /> tome valores próximos al número <Latex math="a" />, tanto menores como mayores, los correspondientes valores de <Latex math="f" /> se aproximan al número <Latex math="b" />.
+                                </p>
+                            </div>
+
+                            <div className="bg-amber-50 p-4 rounded-lg border border-amber-200 mb-6 text-amber-900">
+                                <strong>* Ojo:</strong> <Latex math="f(x)" /> puede <strong>no estar definida</strong> en <Latex math="x = a" />.
+                            </div>
+
+                            <p className="text-lg mb-2">
+                                <strong>Se lee:</strong> "El límite de <Latex math="f(x)" /> cuando <Latex math="x" /> tiende a <Latex math="a" /> es <Latex math="b" />".
+                            </p>
+                            <p className="text-lg text-slate-600 italic">
+                                (Si <Latex math="a" /> es <Latex math="+\infty" /> o <Latex math="-\infty" />, hablamos de límite en el infinito).
+                            </p>
+                        </section>
+
+                        <h3 className="text-xl font-bold text-slate-800 mb-6">Explora los ejemplos:</h3>
+                        
+                        <InteractiveExample1 />
+                        <InteractiveExample2 />
+                        <InteractiveExample3 />
+
+                    </main>
+                </div>
+            );
+        }
+
+        // --- Componente para el Ejemplo 1 ---
+        const InteractiveExample1 = () => {
+            const [step, setStep] = useState(0);
+            const steps = [0.1, 0.01, 0.001];
+            const targetX = 2;
+            const func = (x) => x * x + 1;
+
+            return (
+                <div className="mb-12 border border-slate-200 rounded-xl overflow-hidden">
+                    <div className="bg-slate-100 p-4 border-b border-slate-200 flex justify-between items-center">
+                        <h4 className="font-bold text-lg text-slate-700">Ejemplo 1: Función continua</h4>
+                        <div className="text-xl font-bold text-blue-700 bg-white px-4 py-3 rounded-lg shadow-sm">
+                            <Latex math="\displaystyle \lim_{x \to 2} (x^2 + 1) = 5" />
+                        </div>
+                    </div>
+                    
+                    <div className="p-6">
+                        <p className="mb-6 text-lg">
+                            Si tomamos valores de <Latex math="x" /> cada vez más próximos a <Latex math="2" /> por la derecha y por la izquierda, los valores de la función se acercan a <Latex math="5" />.
+                        </p>
+
+                        <LimitInteractive targetX={targetX} targetY={5} func={func} step={step} setStep={setStep} steps={steps} graphDomain={[0, 4]} graphRange={[0, 7]} />
+                        
+                        {step === steps.length && (
+                            <div className="mt-6 p-4 bg-green-50 text-green-800 rounded-lg border border-green-200 transition-all text-center text-lg">
+                                En este caso coincide con <Latex math="f(2)" />. ¡El límite es 5!
+                            </div>
+                        )}
+                    </div>
+                </div>
+            );
+        };
+
+        // --- Componente para el Ejemplo 2 ---
+        const InteractiveExample2 = () => {
+            const [step, setStep] = useState(0);
+            const steps = [0.1, 0.01, 0.001];
+            const targetX = 1;
+            const func = (x) => {
+                if (Math.abs(x - 1) < 0.0000001) return null; // No definida en x=1
+                return (x * x - 1) / (x - 1);
+            };
+
+            return (
+                <div className="mb-12 border border-slate-200 rounded-xl overflow-hidden">
+                    <div className="bg-slate-100 p-4 border-b border-slate-200 flex justify-between items-center">
+                        <h4 className="font-bold text-lg text-slate-700">Ejemplo 2: Función no definida en el punto</h4>
+                        <div className="text-xl font-bold text-blue-700 bg-white px-4 py-3 rounded-lg shadow-sm flex items-center">
+                            <Latex math="\displaystyle \lim_{x \to 1} \frac{x^2 - 1}{x - 1} = 2" />
+                        </div>
+                    </div>
+                    
+                    <div className="p-6">
+                        <p className="mb-6 text-lg">
+                            Si tomamos valores de <Latex math="x" /> cada vez más próximos a <Latex math="1" /> (por ambos lados), la función se acerca a <Latex math="2" />. Fíjate que en este caso <Latex math="f(1)" /> <strong>no está definida</strong>.
+                        </p>
+
+                        <LimitInteractive targetX={targetX} targetY={2} func={func} step={step} setStep={setStep} steps={steps} holeAtTarget={true} graphDomain={[-1, 3]} graphRange={[-1, 4]} />
+                        
+                        {step === steps.length && (
+                            <div className="mt-6 p-4 bg-green-50 text-green-800 rounded-lg border border-green-200 transition-all text-center text-lg">
+                                Es el límite en ambos casos, pero fíjate que aquí <Latex math="f(1)" /> no está definida. ¡El límite es 2!
+                            </div>
+                        )}
+                    </div>
+                </div>
+            );
+        };
+
+        // --- Componente para el Ejemplo 3 ---
+        const InteractiveExample3 = () => {
+            const [step, setStep] = useState(0);
+            const steps = [0.1, 0.01, 0.000001];
+            const targetX = 3;
+            const func = (x) => Math.floor(x);
+
+            return (
+                <div className="mb-12 border border-slate-200 rounded-xl overflow-hidden">
+                    <div className="bg-slate-100 p-4 border-b border-slate-200 flex justify-between items-center">
+                        <h4 className="font-bold text-lg text-slate-700">Ejemplo 3: Función "Parte Entera"</h4>
+                        <div className="text-xl font-bold text-red-700 bg-white px-4 py-3 rounded-lg shadow-sm">
+                            <Latex math="\displaystyle \lim_{x \to 3} [x] \to \text{No existe}" />
+                        </div>
+                    </div>
+                    
+                    <div className="p-6">
+                        <p className="mb-6 text-lg">
+                            La función "parte entera" asigna a cada número el mayor entero menor o igual que él. Observa qué pasa al acercarnos a <Latex math="3" />.
+                        </p>
+
+                        <LimitInteractive targetX={targetX} targetY={3} func={func} step={step} setStep={setStep} steps={steps} isStepFunction={true} graphDomain={[0, 5]} graphRange={[0, 5]} />
+                        
+                        {step === steps.length && (
+                            <div className="mt-6 p-4 bg-red-50 text-red-800 rounded-lg border border-red-200 transition-all text-center text-lg">
+                                Cuando la <Latex math="x" /> se aproxima a 3 por la izquierda la función es 2, y por la derecha es 3.<br/>
+                                <strong>NO EXISTE UN ÚNICO VALOR AL QUE SE ACERCA "f". Decimos que "No existe el límite".</strong>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            );
+        };
+
+
+        // --- Componente de Interfaz Común (Tablas y Gráficas) ---
+        const LimitInteractive = ({ targetX, targetY, func, step, setStep, steps, holeAtTarget = false, isStepFunction = false, graphDomain, graphRange }) => {
+            
+            const [isZoomed, setIsZoomed] = useState(false);
+
+            const formatNum = (num) => {
+                if (num === null || isNaN(num)) return "Indefinido";
+                return parseFloat(num.toFixed(6)).toString().replace('.', ',');
+            };
+
+            const getLeftRows = () => {
+                let rows = [];
+                for (let i = 0; i < step; i++) {
+                    let x = targetX - steps[i];
+                    rows.push({ x: formatNum(x), y: formatNum(func(x)) });
+                }
+                return rows;
+            };
+
+            const getRightRows = () => {
+                let rows = [];
+                for (let i = 0; i < step; i++) {
+                    let x = targetX + steps[i];
+                    rows.push({ x: formatNum(x), y: formatNum(func(x)) });
+                }
+                return rows;
+            };
+
+            return (
+                <div>
+                    <div className="flex justify-center mb-8 flex-wrap gap-4">
+                        <button 
+                            onClick={() => { setStep(Math.min(steps.length, step + 1)); setIsZoomed(false); }}
+                            disabled={step === steps.length}
+                            className="bg-blue-600 hover:bg-blue-700 disabled:bg-slate-300 text-white font-bold py-3 px-6 rounded-lg shadow transition-colors flex items-center gap-2"
+                        >
+                            {step === steps.length ? "Límite alcanzado" : `Acercarse más a x = ${targetX}`}
+                        </button>
+                        
+                        {step === steps.length && (
+                            <button 
+                                onClick={() => setIsZoomed(!isZoomed)}
+                                className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-lg shadow transition-colors flex items-center gap-2"
+                            >
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line><line x1="11" y1="8" x2="11" y2="14"></line><line x1="8" y1="11" x2="14" y2="11"></line></svg>
+                                {isZoomed ? "Quitar Zoom" : "Ver detalle del punto (Zoom)"}
+                            </button>
+                        )}
+
+                        {step > 0 && (
+                            <button 
+                                onClick={() => { setStep(0); setIsZoomed(false); }}
+                                className="bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold py-3 px-6 rounded-lg transition-colors"
+                            >
+                                Reiniciar
+                            </button>
+                        )}
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div className="flex flex-col gap-6">
+                            {/* Tabla Izquierda */}
+                            <div className="bg-white rounded-lg border border-slate-200 shadow-sm overflow-hidden">
+                                <div className="bg-blue-50 py-2 text-center text-sm font-semibold text-blue-800 border-b border-blue-100">
+                                    Acercándose por la izquierda (<Latex math={`x \\to ${targetX}^-`} />)
+                                </div>
+                                <table className="w-full text-center">
+                                    <thead className="bg-slate-50 border-b border-slate-200">
+                                        <tr>
+                                            <th className="py-2 px-4 w-1/2 border-r border-slate-200"><Latex math="x" /></th>
+                                            <th className="py-2 px-4 w-1/2"><Latex math="f(x)" /></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {getLeftRows().map((r, i) => (
+                                            <tr key={i} className="border-b border-slate-100 bg-blue-50/20">
+                                                <td className="py-2 px-4 border-r border-slate-200 font-mono text-sm">{r.x}</td>
+                                                <td className="py-2 px-4 font-mono text-sm font-semibold text-blue-700">{r.y}</td>
+                                            </tr>
+                                        ))}
+                                        {step === 0 && (
+                                            <tr><td colSpan="2" className="py-4 text-slate-400 italic text-sm">Haz clic en acercarse...</td></tr>
+                                        )}
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            {/* Tabla Derecha */}
+                            <div className="bg-white rounded-lg border border-slate-200 shadow-sm overflow-hidden">
+                                <div className="bg-rose-50 py-2 text-center text-sm font-semibold text-rose-800 border-b border-rose-100">
+                                    Acercándose por la derecha (<Latex math={`x \\to ${targetX}^+`} />)
+                                </div>
+                                <table className="w-full text-center">
+                                    <thead className="bg-slate-50 border-b border-slate-200">
+                                        <tr>
+                                            <th className="py-2 px-4 w-1/2 border-r border-slate-200"><Latex math="x" /></th>
+                                            <th className="py-2 px-4 w-1/2"><Latex math="f(x)" /></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {getRightRows().map((r, i) => (
+                                            <tr key={i} className="border-b border-slate-100 bg-rose-50/20">
+                                                <td className="py-2 px-4 border-r border-slate-200 font-mono text-sm">{r.x}</td>
+                                                <td className="py-2 px-4 font-mono text-sm font-semibold text-rose-700">{r.y}</td>
+                                            </tr>
+                                        ))}
+                                        {step === 0 && (
+                                            <tr><td colSpan="2" className="py-4 text-slate-400 italic text-sm">Haz clic en acercarse...</td></tr>
+                                        )}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        {/* Contenedor Gráfica SVG */}
+                        <div className="bg-white rounded-lg border border-slate-200 shadow-sm p-4 relative flex items-center justify-center min-h-[350px] overflow-hidden">
+                            <SvgGraph 
+                                baseDomain={graphDomain} 
+                                baseRange={graphRange} 
+                                func={func} 
+                                targetX={targetX}
+                                targetY={targetY}
+                                currentStep={step > 0 ? steps[step - 1] : null}
+                                holeAtTarget={holeAtTarget}
+                                isStepFunction={isStepFunction}
+                                isZoomed={isZoomed}
+                            />
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        // --- Componente de la Gráfica SVG interactiva ---
+        const SvgGraph = ({ baseDomain, baseRange, func, targetX, targetY, currentStep, holeAtTarget, isStepFunction, isZoomed }) => {
+            const width = 350;
+            const height = 350;
+            const padding = 40;
+
+            const [animProgress, setAnimProgress] = useState(0);
+
+            useEffect(() => {
+                let startTime;
+                const duration = 600;
+                let frame;
+                const startProgress = animProgress;
+                const endProgress = isZoomed ? 1 : 0;
+
+                if (startProgress === endProgress) return;
+
+                const animate = (time) => {
+                    if (!startTime) startTime = time;
+                    const elapsed = time - startTime;
+                    let t = Math.min(elapsed / duration, 1);
+                    
+                    t = t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
+                    
+                    setAnimProgress(startProgress + (endProgress - startProgress) * t);
+
+                    if (t < 1) {
+                        frame = requestAnimationFrame(animate);
+                    }
+                };
+                frame = requestAnimationFrame(animate);
+                return () => cancelAnimationFrame(frame);
+            // eslint-disable-next-line react-hooks/exhaustive-deps
+            }, [isZoomed]);
+
+            const zoomDomain = [targetX - 0.05, targetX + 0.05];
+            const zoomRange = isStepFunction ? [targetY - 1.5, targetY + 0.5] : [targetY - 0.1, targetY + 0.1];
+
+            const currentDomain = [
+                baseDomain[0] + (zoomDomain[0] - baseDomain[0]) * animProgress,
+                baseDomain[1] + (zoomDomain[1] - baseDomain[1]) * animProgress
+            ];
+            
+            const currentRange = [
+                baseRange[0] + (zoomRange[0] - baseRange[0]) * animProgress,
+                baseRange[1] + (zoomRange[1] - baseRange[1]) * animProgress
+            ];
+
+            const [minX, maxX] = currentDomain;
+            const [minY, maxY] = currentRange;
+
+            const mapX = (x) => padding + ((x - minX) / (maxX - minX)) * (width - 2 * padding);
+            const mapY = (y) => height - padding - ((y - minY) / (maxY - minY)) * (height - 2 * padding);
+
+            const getTicks = (min, max) => {
+                const range = max - min;
+                const roughStep = range / 5;
+                if (roughStep <= 0) return [min];
+                
+                const magnitude = Math.pow(10, Math.floor(Math.log10(roughStep)));
+                const normalized = roughStep / magnitude;
+                
+                let step = magnitude;
+                if (normalized > 3.5) step = 5 * magnitude;
+                else if (normalized > 1.5) step = 2 * magnitude;
+                
+                const start = Math.ceil(min / step) * step;
+                const ticks = [];
+                for (let i = start; i <= max + step/10; i += step) {
+                    ticks.push(parseFloat(i.toFixed(5)));
+                }
+                return ticks;
+            };
+
+            const xTicks = getTicks(minX, maxX);
+            const yTicks = getTicks(minY, maxY);
+
+            const formatTick = (val) => val.toString().replace('.', ',');
+
+            let pathD = "";
+            if (isStepFunction) {
+                for (let x = Math.floor(minX) - 1; x <= Math.ceil(maxX); x++) {
+                    let y = func(x);
+                    let startX = mapX(x);
+                    let endX = mapX(x + 1);
+                    let svgY = mapY(y);
+                    pathD += `M ${startX} ${svgY} L ${endX} ${svgY} `;
+                }
+            } else {
+                for (let i = 0; i <= 100; i++) {
+                    let x = minX + (i / 100) * (maxX - minX);
+                    if (holeAtTarget && Math.abs(x - targetX) < ((maxX-minX)/100)) continue; 
+                    let y = func(x);
+                    if (y !== null && !isNaN(y)) {
+                        if (i === 0) pathD += `M ${mapX(x)} ${mapY(y)} `;
+                        else pathD += `L ${mapX(x)} ${mapY(y)} `;
+                    }
+                }
+            }
+
+            let points = [];
+            if (currentStep && !isZoomed) {
+                let xLeft = targetX - currentStep;
+                let yLeft = func(xLeft);
+                let xRight = targetX + currentStep;
+                let yRight = func(xRight);
+                
+                if (yLeft !== null) points.push({ cx: mapX(xLeft), cy: mapY(yLeft), color: "#1d4ed8" });
+                if (yRight !== null) points.push({ cx: mapX(xRight), cy: mapY(yRight), color: "#be123c" });
+            }
+
+            return (
+                <svg width="100%" height="100%" viewBox={`0 0 ${width} ${height}`} className="max-w-full">
+                    {/* Cuadrículas */}
+                    {yTicks.map(y => (
+                        <g key={`hy${y}`}>
+                            <line x1={padding} y1={mapY(y)} x2={width - padding} y2={mapY(y)} stroke="#e2e8f0" strokeWidth="1" />
+                            <text x={padding - 5} y={mapY(y) + 4} fontSize="10" fill="#64748b" textAnchor="end">{formatTick(y)}</text>
+                        </g>
+                    ))}
+                    {xTicks.map(x => (
+                        <g key={`hx${x}`}>
+                            <line x1={mapX(x)} y1={padding} x2={mapX(x)} y2={height - padding} stroke="#e2e8f0" strokeWidth="1" />
+                            <text x={mapX(x)} y={height - padding + 15} fontSize="10" fill="#64748b" textAnchor="middle">{formatTick(x)}</text>
+                        </g>
+                    ))}
+
+                    {/* Ejes principales */}
+                    {minY <= 0 && maxY >= 0 && <line x1={padding} y1={mapY(0)} x2={width-padding} y2={mapY(0)} stroke="#64748b" strokeWidth="2" />}
+                    {minX <= 0 && maxX >= 0 && <line x1={mapX(0)} y1={padding} x2={mapX(0)} y2={height-padding} stroke="#64748b" strokeWidth="2" />}
+
+                    {/* Curva de la función */}
+                    <path d={pathD} fill="none" stroke="#0ea5e9" strokeWidth="3" />
+                    
+                    {/* Detalles para función a trozos */}
+                    {isStepFunction && [...Array(Math.ceil(maxX) - Math.floor(minX) + 1).keys()].map(i => {
+                        const x = Math.floor(minX) + i;
+                        const y = func(x);
+                        return (
+                            <g key={`step-${x}`}>
+                                <circle cx={mapX(x)} cy={mapY(y)} r="5" fill="#0ea5e9" />
+                                <circle cx={mapX(x+1)} cy={mapY(y)} r="5" fill="white" stroke="#0ea5e9" strokeWidth="2" />
+                            </g>
+                        )
+                    })}
+
+                    {/* Indicador visual grande durante el zoom */}
+                    {animProgress > 0.8 && !isStepFunction && (
+                        <g className="transition-opacity duration-300">
+                            {holeAtTarget ? (
+                                <>
+                                    <circle cx={mapX(targetX)} cy={mapY(targetY)} r="8" fill="white" stroke="#0ea5e9" strokeWidth="3" />
+                                    <text x={mapX(targetX)} y={mapY(targetY) - 15} fontSize="12" fontWeight="bold" fill="#0284c7" textAnchor="middle">
+                                        ¡HUECO! (No definida)
+                                    </text>
+                                </>
+                            ) : (
+                                <>
+                                    <circle cx={mapX(targetX)} cy={mapY(targetY)} r="8" fill="#0ea5e9" />
+                                    <text x={mapX(targetX)} y={mapY(targetY) - 15} fontSize="12" fontWeight="bold" fill="#0284c7" textAnchor="middle">
+                                        Punto Definido
+                                    </text>
+                                </>
+                            )}
+                        </g>
+                    )}
+
+                    {animProgress > 0.8 && isStepFunction && (
+                        <g className="transition-opacity duration-300">
+                            <text x={mapX(targetX)} y={mapY(targetY) - 30} fontSize="12" fontWeight="bold" fill="#0284c7" textAnchor="middle">
+                                Salto inevitable
+                            </text>
+                            <text x={mapX(targetX)} y={mapY(targetY) - 15} fontSize="10" fill="#64748b" textAnchor="middle">
+                                Límites laterales distintos
+                            </text>
+                        </g>
+                    )}
+
+                    {/* Puntos dinámicos acercándose */}
+                    {points.map((p, i) => (
+                        <circle key={i} cx={p.cx} cy={p.cy} r="6" fill={p.color} className="transition-all duration-300 ease-in-out" />
+                    ))}
+                </svg>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
