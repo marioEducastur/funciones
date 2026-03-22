@@ -42,6 +42,25 @@
             return <span ref={containerRef} className={display ? "my-4 block text-center" : ""} />;
         };
 
+        // --- Componente Acordeón Desplegable ---
+        const Accordion = ({ title, children, defaultOpen = false }) => {
+            const [isOpen, setIsOpen] = useState(defaultOpen);
+            return (
+                <div className="mb-6 border border-slate-200 rounded-xl bg-white shadow-sm overflow-hidden">
+                    <button
+                        onClick={() => setIsOpen(!isOpen)}
+                        className="w-full bg-slate-100 hover:bg-slate-200 p-4 flex justify-between items-center transition-colors"
+                    >
+                        <h2 className="text-2xl font-bold text-slate-800 text-left">{title}</h2>
+                        <svg className={`w-6 h-6 transform transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </button>
+                    {isOpen && <div className="p-6 border-t border-slate-200 animate-fade-in">{children}</div>}
+                </div>
+            );
+        };
+
         // --- Componente Principal ---
         function App() {
             return (
@@ -53,13 +72,10 @@
                         </div>
                     </header>
 
-                    <main className="max-w-4xl mx-auto mt-8 p-6 bg-white rounded-xl shadow-sm border border-slate-200">
+                    <main className="max-w-4xl mx-auto mt-8 p-4 md:p-6">
                         
-                        {/* Sección 1: Teoría */}
-                        <section className="mb-12">
-                            <h2 className="text-2xl font-bold text-slate-800 mb-6 pb-2 border-b-2 border-blue-100">
-                                1. Concepto y definición de límite
-                            </h2>
+                        {/* APARTADO 1 */}
+                        <Accordion title="1. Concepto y definición de límite" defaultOpen={true}>
                             <p className="mb-4 text-lg">
                                 Si queremos estudiar hacia qué valor se aproxima una función cuando la variable independiente toma valores próximos a un número real dado, resulta imprescindible introducir el concepto de <strong>límite</strong>.
                             </p>
@@ -82,16 +98,98 @@
                             <p className="text-lg mb-2">
                                 <strong>Se lee:</strong> "El límite de <Latex math="f(x)" /> cuando <Latex math="x" /> tiende a <Latex math="a" /> es <Latex math="b" />".
                             </p>
-                            <p className="text-lg text-slate-600 italic">
+                            <p className="text-lg text-slate-600 italic mb-8">
                                 (Si <Latex math="a" /> es <Latex math="+\infty" /> o <Latex math="-\infty" />, hablamos de límite en el infinito).
                             </p>
-                        </section>
 
-                        <h3 className="text-xl font-bold text-slate-800 mb-6">Explora los ejemplos:</h3>
-                        
-                        <InteractiveExample1 />
-                        <InteractiveExample2 />
-                        <InteractiveExample3 />
+                            <h3 className="text-xl font-bold text-slate-800 mb-6 border-b border-slate-200 pb-2">Explora los ejemplos:</h3>
+                            
+                            <InteractiveExample1 />
+                            <InteractiveExample2 />
+                            <InteractiveExample3 />
+                        </Accordion>
+
+                        {/* APARTADO 2 */}
+                        <Accordion title="2. Límites laterales" defaultOpen={false}>
+                            <div className="mb-6">
+                                <p className="text-lg mb-4">
+                                    El límite de una función <Latex math="f(x)" /> cuando <Latex math="x" /> toma valores próximos a <Latex math="a" /> pero <strong>menores</strong> se denomina <strong>"límite por la izquierda"</strong>:
+                                </p>
+                                <div className="bg-white p-4 rounded-lg shadow-sm border border-slate-200 mb-6 flex justify-center text-xl font-bold text-blue-700">
+                                    <Latex math="\displaystyle \lim_{x \to a^-} f(x) = b" />
+                                </div>
+
+                                <p className="text-lg mb-4">
+                                    El límite de una función <Latex math="f(x)" /> cuando <Latex math="x" /> toma valores próximos a <Latex math="a" /> pero <strong>mayores</strong> se denomina <strong>"límite por la derecha"</strong>:
+                                </p>
+                                <div className="bg-white p-4 rounded-lg shadow-sm border border-slate-200 mb-8 flex justify-center text-xl font-bold text-rose-700">
+                                    <Latex math="\displaystyle \lim_{x \to a^+} f(x) = c" />
+                                </div>
+                                
+                                <div className="bg-slate-100 p-4 rounded-lg border border-slate-300 text-slate-700 mb-8">
+                                    <p className="italic">Fíjate que en los 2 primeros ejemplos (del apartado anterior) el límite por la izquierda y por la derecha coinciden, pero en el 3º no.</p>
+                                </div>
+                            </div>
+
+                            <div className="bg-blue-50 p-6 rounded-lg mb-8 border-l-4 border-blue-500">
+                                <h3 className="font-bold text-blue-800 mb-4 text-lg">Condición de existencia de límite</h3>
+                                <p className="text-lg mb-4">
+                                    Se dice que una función <Latex math="f(x)" /> tiene límite <Latex math="L" /> en el punto <Latex math="x = a" /> si y solo si <strong>existen los límites laterales y son iguales</strong>.
+                                </p>
+                                <div className="bg-white p-4 rounded border border-blue-200 flex justify-center mb-4 text-lg font-bold">
+                                    <Latex math="\displaystyle \lim_{x \to a} f(x) = L \iff \lim_{x \to a^-} f(x) = \lim_{x \to a^+} f(x) = L" />
+                                </div>
+                                <ul className="list-disc pl-6 text-lg space-y-2 text-blue-900">
+                                    <li>El límite de una función en un punto, si existe, es <strong>ÚNICO</strong>.</li>
+                                    <li>Es <strong>independiente del valor</strong> de la función en el punto (recuerda el Ejemplo 2).</li>
+                                </ul>
+                            </div>
+
+                            <h3 className="text-xl font-bold text-slate-800 mb-6 border-b border-slate-200 pb-2">Veamos qué pasa con las funciones de los ejemplos anteriores:</h3>
+                            
+                            <div className="space-y-6">
+                                {/* Revisión Ejemplo 1 */}
+                                <div className="bg-white p-5 rounded-lg border border-slate-200 shadow-sm">
+                                    <h4 className="font-bold text-lg mb-3">Ejemplo 1: <Latex math="f(x) = x^2 + 1" /></h4>
+                                    <div className="flex flex-col md:flex-row justify-center items-center gap-8 mb-4">
+                                        <div className="text-lg"><Latex math="\displaystyle \lim_{x \to 2^-} (x^2 + 1) = 5" /></div>
+                                        <div className="text-lg"><Latex math="\displaystyle \lim_{x \to 2^+} (x^2 + 1) = 5" /></div>
+                                    </div>
+                                    <p className="text-center text-lg text-green-700 font-semibold mb-2">
+                                        ¡Coinciden! Por lo que existe el límite: <Latex math="\displaystyle \lim_{x \to 2} (x^2 + 1) = 5" />
+                                    </p>
+                                    <p className="text-center text-slate-600 text-sm">En este caso coincide con <Latex math="f(2)" />. (Es continua en <Latex math="x = 2" />).</p>
+                                </div>
+
+                                {/* Revisión Ejemplo 2 */}
+                                <div className="bg-white p-5 rounded-lg border border-slate-200 shadow-sm">
+                                    <h4 className="font-bold text-lg mb-3">Ejemplo 2: <Latex math="f(x) = \frac{x^2 - 1}{x - 1}" /></h4>
+                                    <div className="flex flex-col md:flex-row justify-center items-center gap-8 mb-4">
+                                        <div className="text-lg"><Latex math="\displaystyle \lim_{x \to 1^-} f(x) = 2" /></div>
+                                        <div className="text-lg"><Latex math="\displaystyle \lim_{x \to 1^+} f(x) = 2" /></div>
+                                    </div>
+                                    <p className="text-center text-lg text-green-700 font-semibold mb-2">
+                                        ¡Coinciden! Por lo que existe el límite en <Latex math="x=1" /> y es <Latex math="2" />.
+                                    </p>
+                                    <p className="text-center text-slate-600 text-sm">Pero no coincide con el valor de la función en <Latex math="x=1" /> porque la función no está definida en ese punto.</p>
+                                </div>
+
+                                {/* Revisión Ejemplo 3 */}
+                                <div className="bg-white p-5 rounded-lg border border-slate-200 shadow-sm">
+                                    <h4 className="font-bold text-lg mb-3">Ejemplo 3: Función Parte Entera <Latex math="f(x) = [x]" /></h4>
+                                    <div className="flex flex-col md:flex-row justify-center items-center gap-8 mb-4">
+                                        <div className="text-lg"><Latex math="\displaystyle \lim_{x \to 4^-} [x] = 3" /></div>
+                                        <div className="text-lg"><Latex math="\displaystyle \lim_{x \to 4^+} [x] = 4" /></div>
+                                    </div>
+                                    <p className="text-center text-lg text-red-700 font-semibold mb-2">
+                                        ¡NO coinciden! Por lo tanto: <Latex math="\displaystyle \not\exists \lim_{x \to 4} [x]" />
+                                    </p>
+                                    <p className="text-center text-slate-600 text-sm">No existe el límite de <Latex math="f(x)" /> en <Latex math="x=4" />.</p>
+                                </div>
+                            </div>
+                            
+                            <InteractiveExample4 />
+                        </Accordion>
 
                     </main>
                 </div>
@@ -201,9 +299,48 @@
             );
         };
 
+        // --- Componente para el Ejemplo 4 (Límites Laterales) ---
+        const InteractiveExample4 = () => {
+            const [step, setStep] = useState(0);
+            const steps = [0.1, 0.01, 0.001];
+            const targetX = 2;
+            
+            // Función con salto finito: x+1 si x<2, x-1 si x>2
+            const func = (x) => {
+                if (Math.abs(x - 2) < 0.000001) return null; // No definida exactamente en el salto
+                if (x < 2) return x + 1;
+                return x - 1;
+            };
+
+            return (
+                <div className="mb-8 border border-slate-200 rounded-xl overflow-hidden mt-8">
+                    <div className="bg-slate-100 p-4 border-b border-slate-200 flex justify-between items-center">
+                        <h4 className="font-bold text-lg text-slate-700">Ejemplo 4: Salto Finito (Límites laterales distintos)</h4>
+                        <div className="text-lg font-bold text-purple-700 bg-white px-4 py-2 rounded-lg shadow-sm">
+                            <Latex math="f(x) = \begin{cases} x+1 & x < 2 \\ x-1 & x > 2 \end{cases}" />
+                        </div>
+                    </div>
+                    
+                    <div className="p-6">
+                        <p className="mb-6 text-lg">
+                            En esta función definida a trozos, observa cómo los valores se acercan a <strong>destinos completamente diferentes</strong> dependiendo de si nos aproximamos por la izquierda o por la derecha de <Latex math="x=2" />.
+                        </p>
+
+                        <LimitInteractive targetX={targetX} targetY={2} func={func} step={step} setStep={setStep} steps={steps} breakAtTarget={true} graphDomain={[0, 4]} graphRange={[0, 4]} />
+                        
+                        {step === steps.length && (
+                            <div className="mt-6 p-4 bg-red-50 text-red-800 rounded-lg border border-red-200 transition-all text-center text-lg animate-fade-in">
+                                Límite por la izquierda: <strong>3</strong>. Límite por la derecha: <strong>1</strong>.<br/>
+                                Al no coincidir los límites laterales, concluimos que <Latex math="\displaystyle \not\exists \lim_{x \to 2} f(x)" />.
+                            </div>
+                        )}
+                    </div>
+                </div>
+            );
+        };
 
         // --- Componente de Interfaz Común (Tablas y Gráficas) ---
-        const LimitInteractive = ({ targetX, targetY, func, step, setStep, steps, holeAtTarget = false, isStepFunction = false, graphDomain, graphRange }) => {
+        const LimitInteractive = ({ targetX, targetY, func, step, setStep, steps, holeAtTarget = false, isStepFunction = false, breakAtTarget = false, graphDomain, graphRange }) => {
             
             const [isZoomed, setIsZoomed] = useState(false);
 
@@ -327,6 +464,7 @@
                                 currentStep={step > 0 ? steps[step - 1] : null}
                                 holeAtTarget={holeAtTarget}
                                 isStepFunction={isStepFunction}
+                                breakAtTarget={breakAtTarget}
                                 isZoomed={isZoomed}
                             />
                         </div>
@@ -336,7 +474,7 @@
         };
 
         // --- Componente de la Gráfica SVG interactiva ---
-        const SvgGraph = ({ baseDomain, baseRange, func, targetX, targetY, currentStep, holeAtTarget, isStepFunction, isZoomed }) => {
+        const SvgGraph = ({ baseDomain, baseRange, func, targetX, targetY, currentStep, holeAtTarget, isStepFunction, breakAtTarget, isZoomed }) => {
             const width = 350;
             const height = 350;
             const padding = 40;
@@ -371,7 +509,15 @@
             }, [isZoomed]);
 
             const zoomDomain = [targetX - 0.05, targetX + 0.05];
-            const zoomRange = isStepFunction ? [targetY - 1.5, targetY + 0.5] : [targetY - 0.1, targetY + 0.1];
+            
+            let zoomRange;
+            if (isStepFunction) {
+                zoomRange = [targetY - 1.5, targetY + 0.5];
+            } else if (breakAtTarget) {
+                zoomRange = [targetY - 1.5, targetY + 1.5]; // Ampliamos el zoom vertical para ver el salto entero (de 1 a 3)
+            } else {
+                zoomRange = [targetY - 0.1, targetY + 0.1];
+            }
 
             const currentDomain = [
                 baseDomain[0] + (zoomDomain[0] - baseDomain[0]) * animProgress,
@@ -424,13 +570,27 @@
                     pathD += `M ${startX} ${svgY} L ${endX} ${svgY} `;
                 }
             } else {
+                let isFirstPoint = true;
                 for (let i = 0; i <= 100; i++) {
                     let x = minX + (i / 100) * (maxX - minX);
+                    
                     if (holeAtTarget && Math.abs(x - targetX) < ((maxX-minX)/100)) continue; 
+                    
+                    if (breakAtTarget && Math.abs(x - targetX) < ((maxX-minX)/80)) {
+                        isFirstPoint = true;
+                        continue;
+                    }
+
                     let y = func(x);
                     if (y !== null && !isNaN(y)) {
-                        if (i === 0) pathD += `M ${mapX(x)} ${mapY(y)} `;
-                        else pathD += `L ${mapX(x)} ${mapY(y)} `;
+                        if (isFirstPoint || i === 0) {
+                            pathD += `M ${mapX(x)} ${mapY(y)} `;
+                            isFirstPoint = false;
+                        } else {
+                            pathD += `L ${mapX(x)} ${mapY(y)} `;
+                        }
+                    } else {
+                        isFirstPoint = true;
                     }
                 }
             }
@@ -482,7 +642,7 @@
                     })}
 
                     {/* Indicador visual grande durante el zoom */}
-                    {animProgress > 0.8 && !isStepFunction && (
+                    {animProgress > 0.8 && !isStepFunction && !breakAtTarget && (
                         <g className="transition-opacity duration-300">
                             {holeAtTarget ? (
                                 <>
@@ -509,6 +669,29 @@
                             </text>
                             <text x={mapX(targetX)} y={mapY(targetY) - 15} fontSize="10" fill="#64748b" textAnchor="middle">
                                 Límites laterales distintos
+                            </text>
+                        </g>
+                    )}
+
+                    {/* Detalles para función con salto (breakAtTarget) */}
+                    {breakAtTarget && animProgress > 0.8 && (
+                        <g className="transition-opacity duration-300">
+                            <circle cx={mapX(targetX)} cy={mapY(func(targetX - 0.001))} r="6" fill="white" stroke="#1d4ed8" strokeWidth="3" />
+                            <text x={mapX(targetX) - 15} y={mapY(func(targetX - 0.001)) - 10} fontSize="12" fontWeight="bold" fill="#1d4ed8" textAnchor="end">
+                                Límite Izq. (3)
+                            </text>
+
+                            <circle cx={mapX(targetX)} cy={mapY(func(targetX + 0.001))} r="6" fill="white" stroke="#be123c" strokeWidth="3" />
+                            <text x={mapX(targetX) + 15} y={mapY(func(targetX + 0.001)) + 16} fontSize="12" fontWeight="bold" fill="#be123c" textAnchor="start">
+                                Límite Der. (1)
+                            </text>
+                            
+                            {/* Línea discontinua que muestra el salto */}
+                            <line x1={mapX(targetX)} y1={mapY(func(targetX - 0.001))} x2={mapX(targetX)} y2={mapY(func(targetX + 0.001))} stroke="#64748b" strokeWidth="2" strokeDasharray="4 4" />
+                            
+                            {/* Marca de función no definida en el centro */}
+                            <text x={mapX(targetX) + 8} y={mapY(targetY) + 4} fontSize="11" fill="#64748b" textAnchor="start">
+                                No definida
                             </text>
                         </g>
                     )}
