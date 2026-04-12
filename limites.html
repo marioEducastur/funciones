@@ -7,6 +7,17 @@
     
     <!-- Cargar Tailwind CSS para los estilos -->
     <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+        /* Ocultar barras de desplazamiento feas en contenedores con fórmulas grandes */
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
     
     <!-- Cargar React y ReactDOM -->
     <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
@@ -269,12 +280,12 @@
                                     <div className="mb-8">
                                         <h3 className="text-xl font-bold text-slate-800 mb-4 border-b border-slate-200 pb-2">El método matemático formal</h3>
                                         <p className="text-lg mb-4 text-slate-700">
-                                            Para resolver esta indeterminación, el método riguroso consiste en <strong>dividir todos los términos del numerador y del denominador por la <Latex math="x" /> elevada al mayor grado</strong> que aparezca en la fracción.
+                                            Para resolver esta indeterminación, el método riguroso consiste en <strong>dividir todos los términos del numerador y del denominador por la <Latex math="x" /> elevada al mayor grado</strong> que aparezca en toda la fracción.
                                         </p>
                                         <div className="bg-slate-50 p-6 rounded-lg border border-slate-200 shadow-sm overflow-x-auto text-center text-lg">
                                             <div className="mb-2 font-semibold text-slate-600 text-left">Ejemplo paso a paso:</div>
                                             <Latex math="\displaystyle \lim_{x \to +\infty} \frac{2x^2 + 3x - 1}{x^2 + 5} = \left[ \frac{\infty}{\infty} \right]" display={true} />
-                                            <p className="text-slate-500 italic my-4">Dividimos todo entre <Latex math="x^2" /> (el mayor grado presente):</p>
+                                            <p className="text-slate-500 italic my-4">Dividimos todo entre <Latex math="x^2" /> (el mayor grado presente en la fracción):</p>
                                             <Latex math="\displaystyle \lim_{x \to +\infty} \frac{\frac{2x^2}{x^2} + \frac{3x}{x^2} - \frac{1}{x^2}}{\frac{x^2}{x^2} + \frac{5}{x^2}} = \lim_{x \to +\infty} \frac{2 + \frac{3}{x} - \frac{1}{x^2}}{1 + \frac{5}{x^2}}" display={true} />
                                             <p className="text-slate-500 italic my-4">Como cualquier número dividido entre infinito da cero (<Latex math="\frac{k}{\infty} = 0" />):</p>
                                             <Latex math="\displaystyle \frac{2 + 0 - 0}{1 + 0} = \mathbf{2}" display={true} />
@@ -284,10 +295,10 @@
                                     <div className="bg-blue-50 p-6 rounded-lg mb-8 border-l-4 border-blue-500">
                                         <h3 className="font-bold text-blue-800 mb-4 text-lg">En la práctica: La regla de los grados (Términos dominantes)</h3>
                                         <p className="text-lg mb-4 text-slate-700">
-                                            Si te fijas en el ejemplo anterior, los términos de menor grado acabaron siendo divididos por alguna potencia de <Latex math="x" /> (como <Latex math="x" />, <Latex math="x^2" />...) y se convirtieron en ceros. 
+                                            Si te fijas en el ejemplo anterior, los términos de menor grado acabaron siendo divididos por alguna potencia de <Latex math="x" /> (como <Latex math="x" />, <Latex math="x^2" />...) y terminaron anulándose y convirtiéndose en ceros al aplicar el límite. 
                                         </p>
                                         <p className="text-lg mb-4 text-slate-700">
-                                            Por lo tanto, para ir mucho más rápido, <strong>podemos ignorar directamente el resto del polinomio y quedarnos solo con el término de mayor grado del numerador y del denominador</strong>.
+                                            Por lo tanto, para resolverlo de forma inmediata, <strong>podemos ignorar directamente el resto del polinomio y quedarnos solo con el término de mayor grado del numerador y del denominador</strong>.
                                         </p>
                                         <p className="text-lg text-blue-900 font-semibold">
                                             Al simplificar la fracción resultante, siempre nos encontraremos con uno de estos 3 casos:
@@ -295,6 +306,15 @@
                                     </div>
 
                                     <InteractiveInfOverInf />
+
+                                    {/* LISTA DE EJERCICIOS A - H */}
+                                    <div className="mt-12">
+                                        <h3 className="text-xl font-bold text-slate-800 mb-6 border-b border-slate-200 pb-2">Ejercicios resueltos:</h3>
+                                        <ExerciseListInfOverInf />
+                                    </div>
+
+                                    {/* GRADOS DE INFINITO (NUEVO) */}
+                                    <InfinityDegrees />
                                 </div>
                             </div>
 
@@ -534,6 +554,278 @@
                                 infinitySteps={infinitySteps} 
                                 horizontalAsymptote={current.asymptote} 
                             />
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        // --- COMPONENTES NUEVOS: LISTA DE EJERCICIOS ---
+        const ExerciseCard = ({ letter, limit, indet, formalSteps, trickSteps, directSteps, isDirect, finalResult }) => {
+            const [showSol, setShowSol] = useState(false);
+            return (
+                <div className="mb-6 border border-slate-200 rounded-xl overflow-hidden shadow-sm bg-white">
+                    <div className="flex justify-between items-center bg-slate-50 p-4 border-b border-slate-200">
+                        <div className="flex items-center gap-4 overflow-x-auto hide-scrollbar overflow-y-hidden py-1">
+                            <span className="font-bold text-xl text-slate-700">{letter})</span>
+                            <div className="text-lg"><Latex math={limit} /></div>
+                        </div>
+                        <button
+                            onClick={() => setShowSol(!showSol)}
+                            className={`ml-4 shrink-0 px-4 py-2 rounded-lg font-semibold transition-colors ${showSol ? 'bg-slate-200 text-slate-700 hover:bg-slate-300' : 'bg-blue-600 text-white hover:bg-blue-700'}`}
+                        >
+                            {showSol ? 'Ocultar' : 'Ver solución'}
+                        </button>
+                    </div>
+                    {showSol && (
+                        <div className="p-6 animate-fade-in bg-white">
+                            <div className="text-center mb-6 text-lg text-red-600 font-bold border-b border-slate-100 pb-4">
+                                {isDirect ? (
+                                    <>Al sustituir observamos que no hay indeterminación: <Latex math={indet} /></>
+                                ) : indet.includes("frac") ? (
+                                    <>Al sustituir obtenemos la indeterminación: <Latex math={indet} /></>
+                                ) : (
+                                    <>Al sustituir observamos: <Latex math={indet} /></>
+                                )}
+                            </div>
+                            
+                            {!isDirect ? (
+                                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                                    {/* Método Tradicional */}
+                                    <div className="bg-slate-50 p-5 rounded-xl border border-slate-200">
+                                        <h5 className="font-bold text-slate-700 mb-4 text-center border-b border-slate-300 pb-2">Método Tradicional</h5>
+                                        <p className="text-sm text-slate-500 text-center mb-4">Dividimos todos los términos entre la <Latex math="x" /> de mayor grado.</p>
+                                        <div className="flex flex-col items-center gap-4 overflow-x-auto hide-scrollbar text-lg py-2">
+                                            {formalSteps.map((step, i) => (
+                                                <div key={i} className="text-slate-700"><Latex math={step} /></div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                    {/* Regla Práctica */}
+                                    <div className="bg-blue-50 p-5 rounded-xl border border-blue-200">
+                                        <h5 className="font-bold text-blue-800 mb-4 text-center border-b border-blue-300 pb-2">Regla Práctica (Truco)</h5>
+                                        <p className="text-sm text-blue-600 text-center mb-4">Nos quedamos solo con los términos dominantes de mayor grado.</p>
+                                        <div className="flex flex-col items-center gap-4 overflow-x-auto hide-scrollbar text-lg py-2">
+                                            {trickSteps.map((step, i) => (
+                                                <div key={i} className="text-slate-700"><Latex math={step} /></div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                </div>
+                            ) : (
+                                <div className="bg-slate-50 p-5 rounded-xl border border-slate-200 max-w-2xl mx-auto">
+                                    <h5 className="font-bold text-slate-700 mb-4 text-center border-b border-slate-300 pb-2">Cálculo Directo</h5>
+                                    <p className="text-sm text-slate-500 text-center mb-4">Al no haber indeterminación, aplicamos la aritmética del infinito directamente.</p>
+                                    <div className="flex flex-col items-center gap-4 overflow-x-auto hide-scrollbar text-lg py-2">
+                                        {directSteps.map((step, i) => (
+                                            <div key={i} className="text-slate-700"><Latex math={step} /></div>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+
+                            <div className="mt-8 text-center text-2xl font-bold text-blue-800 bg-blue-100 p-4 rounded-lg shadow-sm border border-blue-200">
+                                Solución: <Latex math={`\\mathbf{${finalResult}}`} />
+                            </div>
+                        </div>
+                    )}
+                </div>
+            );
+        };
+
+        const ExerciseListInfOverInf = () => {
+            const exercises = [
+                {
+                    letter: 'a',
+                    limit: "\\displaystyle \\lim_{x \\to +\\infty} \\frac{3x - 2}{2x + 5}",
+                    indet: "\\left[ \\frac{\\infty}{\\infty} \\right]",
+                    formalSteps: [
+                        "\\displaystyle = \\lim_{x \\to +\\infty} \\frac{\\frac{3x}{x} - \\frac{2}{x}}{\\frac{2x}{x} + \\frac{5}{x}}",
+                        "\\displaystyle = \\lim_{x \\to +\\infty} \\frac{3 - \\frac{2}{x}}{2 + \\frac{5}{x}}",
+                        "\\displaystyle = \\frac{3 - 0}{2 + 0}"
+                    ],
+                    trickSteps: [
+                        "\\displaystyle \\approx \\lim_{x \\to +\\infty} \\frac{3x}{2x}",
+                        "\\text{Simplificamos las } x",
+                        "\\displaystyle = \\lim_{x \\to +\\infty} \\frac{3}{2}"
+                    ],
+                    finalResult: "\\frac{3}{2}"
+                },
+                {
+                    letter: 'b',
+                    limit: "\\displaystyle \\lim_{x \\to -\\infty} \\frac{x^2 - 3}{7x - 2}",
+                    indet: "\\left[ \\frac{+\\infty}{-\\infty} \\right]",
+                    formalSteps: [
+                        "\\displaystyle = \\lim_{x \\to -\\infty} \\frac{\\frac{x^2}{x^2} - \\frac{3}{x^2}}{\\frac{7x}{x^2} - \\frac{2}{x^2}}",
+                        "\\displaystyle = \\lim_{x \\to -\\infty} \\frac{1 - \\frac{3}{x^2}}{\\frac{7}{x} - \\frac{2}{x^2}}",
+                        "\\displaystyle = \\frac{1 - 0}{0^- - 0} = \\frac{1}{0^-}"
+                    ],
+                    trickSteps: [
+                        "\\displaystyle \\approx \\lim_{x \\to -\\infty} \\frac{x^2}{7x}",
+                        "\\text{Simplificamos las } x",
+                        "\\displaystyle = \\lim_{x \\to -\\infty} \\frac{x}{7} = \\frac{-\\infty}{7}"
+                    ],
+                    finalResult: "-\\infty"
+                },
+                {
+                    letter: 'c',
+                    limit: "\\displaystyle \\lim_{x \\to -\\infty} \\frac{5 - x}{x + 5}",
+                    indet: "\\left[ \\frac{+\\infty}{-\\infty} \\right]",
+                    formalSteps: [
+                        "\\displaystyle = \\lim_{x \\to -\\infty} \\frac{\\frac{5}{x} - \\frac{x}{x}}{\\frac{x}{x} + \\frac{5}{x}}",
+                        "\\displaystyle = \\lim_{x \\to -\\infty} \\frac{\\frac{5}{x} - 1}{1 + \\frac{5}{x}}",
+                        "\\displaystyle = \\frac{0 - 1}{1 + 0}"
+                    ],
+                    trickSteps: [
+                        "\\displaystyle \\approx \\lim_{x \\to -\\infty} \\frac{-x}{x}",
+                        "\\text{Simplificamos las } x",
+                        "\\displaystyle = \\lim_{x \\to -\\infty} -1"
+                    ],
+                    finalResult: "-1"
+                },
+                {
+                    letter: 'd',
+                    limit: "\\displaystyle \\lim_{x \\to -\\infty} \\frac{3 - 2x}{x^2 + 1}",
+                    indet: "\\left[ \\frac{+\\infty}{+\\infty} \\right]",
+                    formalSteps: [
+                        "\\displaystyle = \\lim_{x \\to -\\infty} \\frac{\\frac{3}{x^2} - \\frac{2x}{x^2}}{\\frac{x^2}{x^2} + \\frac{1}{x^2}}",
+                        "\\displaystyle = \\lim_{x \\to -\\infty} \\frac{\\frac{3}{x^2} - \\frac{2}{x}}{1 + \\frac{1}{x^2}}",
+                        "\\displaystyle = \\frac{0 - 0}{1 + 0}"
+                    ],
+                    trickSteps: [
+                        "\\displaystyle \\approx \\lim_{x \\to -\\infty} \\frac{-2x}{x^2}",
+                        "\\text{Simplificamos las } x",
+                        "\\displaystyle = \\lim_{x \\to -\\infty} \\frac{-2}{x} = \\frac{-2}{-\\infty}"
+                    ],
+                    finalResult: "0"
+                },
+                {
+                    letter: 'e',
+                    limit: "\\displaystyle \\lim_{x \\to -\\infty} \\frac{3}{x^2 + 5}",
+                    indet: "\\frac{3}{+\\infty}",
+                    isDirect: true,
+                    directSteps: [
+                        "\\displaystyle = \\frac{3}{(-\\infty)^2 + 5}",
+                        "\\displaystyle = \\frac{3}{+\\infty + 5}",
+                        "\\displaystyle = \\frac{3}{+\\infty}"
+                    ],
+                    finalResult: "0"
+                },
+                {
+                    letter: 'f',
+                    limit: "\\displaystyle \\lim_{x \\to -\\infty} \\frac{-x}{x^2 - 4}",
+                    indet: "\\left[ \\frac{+\\infty}{+\\infty} \\right]",
+                    formalSteps: [
+                        "\\displaystyle = \\lim_{x \\to -\\infty} \\frac{\\frac{-x}{x^2}}{\\frac{x^2}{x^2} - \\frac{4}{x^2}}",
+                        "\\displaystyle = \\lim_{x \\to -\\infty} \\frac{-\\frac{1}{x}}{1 - \\frac{4}{x^2}}",
+                        "\\displaystyle = \\frac{0}{1 - 0}"
+                    ],
+                    trickSteps: [
+                        "\\displaystyle \\approx \\lim_{x \\to -\\infty} \\frac{-x}{x^2}",
+                        "\\text{Simplificamos las } x",
+                        "\\displaystyle = \\lim_{x \\to -\\infty} \\frac{-1}{x} = \\frac{-1}{-\\infty}"
+                    ],
+                    finalResult: "0"
+                },
+                {
+                    letter: 'g',
+                    limit: "\\displaystyle \\lim_{x \\to -\\infty} \\frac{2x^2 + 1}{4x^2 - 3}",
+                    indet: "\\left[ \\frac{+\\infty}{+\\infty} \\right]",
+                    formalSteps: [
+                        "\\displaystyle = \\lim_{x \\to -\\infty} \\frac{\\frac{2x^2}{x^2} + \\frac{1}{x^2}}{\\frac{4x^2}{x^2} - \\frac{3}{x^2}}",
+                        "\\displaystyle = \\lim_{x \\to -\\infty} \\frac{2 + \\frac{1}{x^2}}{4 - \\frac{3}{x^2}}",
+                        "\\displaystyle = \\frac{2 + 0}{4 - 0}"
+                    ],
+                    trickSteps: [
+                        "\\displaystyle \\approx \\lim_{x \\to -\\infty} \\frac{2x^2}{4x^2}",
+                        "\\text{Simplificamos las } x^2",
+                        "\\displaystyle = \\lim_{x \\to -\\infty} \\frac{2}{4} = \\frac{1}{2}"
+                    ],
+                    finalResult: "\\frac{1}{2}"
+                },
+                {
+                    letter: 'h',
+                    limit: "\\displaystyle \\lim_{x \\to -\\infty} \\frac{5x^3 - x^2}{x^5 + x^2}",
+                    indet: "\\left[ \\frac{-\\infty}{-\\infty} \\right]",
+                    formalSteps: [
+                        "\\displaystyle = \\lim_{x \\to -\\infty} \\frac{\\frac{5x^3}{x^5} - \\frac{x^2}{x^5}}{\\frac{x^5}{x^5} + \\frac{x^2}{x^5}}",
+                        "\\displaystyle = \\lim_{x \\to -\\infty} \\frac{\\frac{5}{x^2} - \\frac{1}{x^3}}{1 + \\frac{1}{x^3}}",
+                        "\\displaystyle = \\frac{0 - 0}{1 + 0}"
+                    ],
+                    trickSteps: [
+                        "\\displaystyle \\approx \\lim_{x \\to -\\infty} \\frac{5x^3}{x^5}",
+                        "\\text{Simplificamos las } x^3",
+                        "\\displaystyle = \\lim_{x \\to -\\infty} \\frac{5}{x^2} = \\frac{5}{+\\infty}"
+                    ],
+                    finalResult: "0"
+                }
+            ];
+            
+            return (
+                <div>
+                    {exercises.map(ex => <ExerciseCard key={ex.letter} {...ex} />)}
+                </div>
+            );
+        }
+
+        // --- COMPONENTE NUEVO: GRADOS DE INFINITO ---
+        const InfinityDegrees = () => {
+            return (
+                <div className="mt-16 bg-gradient-to-br from-slate-50 to-blue-50 p-6 md:p-8 rounded-xl border border-blue-200 shadow-sm">
+                    <h3 className="text-2xl font-bold text-blue-900 mb-4">Grados de infinito (Otras funciones elementales)</h3>
+                    <p className="text-lg text-slate-700 mb-4">
+                        Si en vez de 2 polinomios tenemos otras funciones elementales, debemos tener en cuenta que <strong>los infinitos pueden ser "distintos"</strong>.
+                    </p>
+                    <p className="text-lg text-slate-700 mb-8">
+                        No todos los infinitos son iguales. Debemos determinar cuál es el término dominante en cada caso, es decir, <strong>qué término crece más rápidamente que los demás</strong> y determina el valor del límite.
+                    </p>
+
+                    {/* Jerarquía Visual */}
+                    <div className="flex flex-wrap items-center justify-center gap-2 md:gap-4 mb-10 p-6 bg-white rounded-xl shadow-sm border border-slate-100">
+                        <div className="bg-red-100 text-red-800 px-4 py-3 rounded-lg font-bold shadow-sm text-center">Exponencial<br/><span className="text-sm font-normal opacity-80">(ej. <Latex math="e^x, 2^x" />)</span></div>
+                        <div className="text-slate-400 font-bold text-2xl">≫</div>
+                        <div className="bg-orange-100 text-orange-800 px-4 py-3 rounded-lg font-bold shadow-sm text-center">Polinómica<br/><span className="text-sm font-normal opacity-80">(ej. <Latex math="x^3, x^2" />)</span></div>
+                        <div className="text-slate-400 font-bold text-2xl">≫</div>
+                        <div className="bg-amber-100 text-amber-800 px-4 py-3 rounded-lg font-bold shadow-sm text-center">Raíz<br/><span className="text-sm font-normal opacity-80">(ej. <Latex math="\sqrt{x}" />)</span></div>
+                        <div className="text-slate-400 font-bold text-2xl">≫</div>
+                        <div className="bg-green-100 text-green-800 px-4 py-3 rounded-lg font-bold shadow-sm text-center">Logarítmica<br/><span className="text-sm font-normal opacity-80">(ej. <Latex math="\ln x" />)</span></div>
+                        <div className="text-slate-400 font-bold text-2xl">≫</div>
+                        <div className="bg-slate-200 text-slate-700 px-4 py-3 rounded-lg font-bold shadow-sm text-center">Constante<br/><span className="text-sm font-normal opacity-80">(ej. <Latex math="5" />)</span></div>
+                    </div>
+
+                    {/* Ejemplo de los apuntes */}
+                    <div className="bg-white p-6 md:p-8 rounded-xl border border-slate-200 shadow-sm max-w-3xl mx-auto">
+                        <h4 className="font-bold text-xl text-slate-800 mb-6 border-b border-slate-100 pb-2">Ejemplo resuelto:</h4>
+                        
+                        <div className="flex flex-col items-center text-lg gap-6">
+                            <div className="flex items-center gap-4 text-2xl">
+                                <Latex math="\displaystyle \lim_{x \to +\infty} \frac{\sqrt{x - 2}}{x + 6}" />
+                                <span>=</span>
+                                <Latex math="\left[ \frac{+\infty}{+\infty} \right]" />
+                            </div>
+                            
+                            <div className="flex flex-col md:flex-row gap-6 w-full items-stretch justify-center mt-2">
+                                <div className="bg-amber-50 p-4 rounded-lg border border-amber-200 flex-1 text-center">
+                                    <p className="text-amber-800 font-semibold mb-1">Numerador</p>
+                                    <Latex math="\sqrt{x - 2}" />
+                                    <p className="text-sm text-amber-700 mt-2">Comportamiento de <br/><strong>Raíz</strong></p>
+                                </div>
+                                <div className="bg-orange-50 p-4 rounded-lg border border-orange-200 flex-1 text-center relative">
+                                    <div className="absolute -top-3 -right-3 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full shadow transform rotate-12 animate-pulse">¡Crece más rápido!</div>
+                                    <p className="text-orange-800 font-semibold mb-1">Denominador</p>
+                                    <Latex math="x + 6" />
+                                    <p className="text-sm text-orange-700 mt-2">Comportamiento de <br/><strong>Polinomio (grado 1)</strong></p>
+                                </div>
+                            </div>
+
+                            <div className="mt-4 text-center">
+                                <p className="text-slate-600 mb-4">
+                                    Al igual que vimos en el <em>Caso 1</em> de los polinomios (cuando ganaba el denominador), como la función polinómica crece mucho más rápido que la raíz, el infinito del denominador es inmensamente más grande.
+                                </p>
+                                <div className="text-3xl font-bold text-blue-700 bg-blue-50 px-8 py-4 rounded-xl inline-block border border-blue-200">
+                                    <Latex math="\displaystyle \lim_{x \to +\infty} \frac{\sqrt{x - 2}}{x + 6} = \mathbf{0}" />
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
