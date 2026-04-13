@@ -72,7 +72,7 @@
             );
         };
 
-        // --- Componente Principal ---
+        // --- COMPONENTE PRINCIPAL (App) ---
         function App() {
             return (
                 <div className="min-h-screen bg-slate-50 text-slate-800 font-sans pb-20">
@@ -201,29 +201,29 @@
                             </div>
 
                             <div className="space-y-6 mb-10">
-                                {/* CASO 1 */}
+                                {/* CASO A */}
                                 <div className="bg-white p-5 rounded-lg border border-slate-200 shadow-sm">
                                     <h4 className="font-bold text-lg mb-2 text-slate-800">Caso A: Se obtiene un número real</h4>
                                     <p className="text-lg text-slate-600 mb-4">Ese valor será directamente el límite buscado.</p>
-                                    <div className="bg-slate-50 p-4 rounded border border-slate-200 text-center overflow-x-auto">
+                                    <div className="bg-slate-50 p-4 rounded border border-slate-200 text-center overflow-x-auto hide-scrollbar">
                                         <Latex math="\displaystyle \lim_{x \to -2} \frac{x^2 - 3}{x + 1} = \frac{(-2)^2 - 3}{-2 + 1} = \frac{4 - 3}{-1} = \mathbf{-1}" />
                                     </div>
                                 </div>
 
-                                {/* CASO 2 */}
+                                {/* CASO B */}
                                 <div className="bg-white p-5 rounded-lg border border-slate-200 shadow-sm">
                                     <h4 className="font-bold text-lg mb-2 text-slate-800">Caso B: Un número distinto de cero partido por cero <Latex math="\left( \frac{k}{0} \right)" /></h4>
                                     <p className="text-lg text-slate-600 mb-4">La expresión tiende a infinito. No es un número real, pero nos indica que la función <strong>diverge</strong> (habrá que estudiar límites laterales para ver el signo).</p>
-                                    <div className="bg-slate-50 p-4 rounded border border-slate-200 text-center overflow-x-auto">
+                                    <div className="bg-slate-50 p-4 rounded border border-slate-200 text-center overflow-x-auto hide-scrollbar">
                                         <Latex math="\displaystyle \lim_{x \to 2} \frac{-1}{(x - 2)^2} = \frac{-1}{0} = \mathbf{-\infty}" />
                                     </div>
                                 </div>
 
-                                {/* CASO 3 */}
+                                {/* CASO C */}
                                 <div className="bg-white p-5 rounded-lg border border-slate-200 shadow-sm">
                                     <h4 className="font-bold text-lg mb-2 text-slate-800">Caso C: Aparecen infinitos, pero el valor se puede determinar</h4>
                                     <p className="text-lg text-slate-600 mb-4">Aplicamos las reglas de la "Aritmética del Infinito" para deducir el resultado.</p>
-                                    <div className="bg-slate-50 p-4 rounded border border-slate-200 text-center overflow-x-auto flex flex-col md:flex-row justify-center gap-8">
+                                    <div className="bg-slate-50 p-4 rounded border border-slate-200 text-center overflow-x-auto hide-scrollbar flex flex-col md:flex-row justify-center gap-8">
                                         <div><Latex math="\displaystyle \lim_{x \to +\infty} \frac{4}{x} = \frac{4}{+\infty} = \mathbf{0}" /></div>
                                         <div><Latex math="\displaystyle \lim_{x \to +\infty} (x \cdot e^x) = (+\infty) \cdot (+\infty) = \mathbf{+\infty}" /></div>
                                     </div>
@@ -233,7 +233,7 @@
                             {/* TABLAS DE ARITMETICA DEL INFINITO */}
                             <InfinityArithmeticTabs />
 
-                            {/* CASO 4: INDETERMINACIONES */}
+                            {/* CASO D: INDETERMINACIONES */}
                             <div className="mt-12">
                                 <h3 className="text-2xl font-bold text-red-700 mb-4 border-b border-red-200 pb-2">Caso D: Las Indeterminaciones</h3>
                                 <p className="mb-6 text-lg">
@@ -248,7 +248,7 @@
                                     <a href="#indet-inf-inf" className="bg-white p-4 rounded-xl shadow-sm border border-red-200 flex flex-col items-center justify-center aspect-square transform transition hover:scale-105 hover:bg-red-50 hover:border-red-400 cursor-pointer">
                                         <span className="text-4xl font-bold text-red-600"><Latex math="\frac{\infty}{\infty}" /></span>
                                     </a>
-                                    <a href="#indet-0-0" className="bg-white p-4 rounded-xl shadow-sm border border-red-200 flex flex-col items-center justify-center aspect-square transform transition hover:scale-105 hover:bg-red-50 cursor-pointer" title="Próximamente">
+                                    <a href="#indet-0-0" className="bg-white p-4 rounded-xl shadow-sm border border-red-200 flex flex-col items-center justify-center aspect-square transform transition hover:scale-105 hover:bg-red-50 hover:border-red-400 cursor-pointer">
                                         <span className="text-4xl font-bold text-red-600"><Latex math="\frac{0}{0}" /></span>
                                     </a>
                                     <a href="#indet-inf-menos-inf" className="bg-white p-4 rounded-xl shadow-sm border border-red-200 flex flex-col items-center justify-center aspect-square transform transition hover:scale-105 hover:bg-red-50 cursor-pointer" title="Próximamente">
@@ -282,7 +282,7 @@
                                         <p className="text-lg mb-4 text-slate-700">
                                             Para resolver esta indeterminación, el método riguroso consiste en <strong>dividir todos los términos del numerador y del denominador por la <Latex math="x" /> elevada al mayor grado</strong> que aparezca en toda la fracción.
                                         </p>
-                                        <div className="bg-slate-50 p-6 rounded-lg border border-slate-200 shadow-sm overflow-x-auto text-center text-lg">
+                                        <div className="bg-slate-50 p-6 rounded-lg border border-slate-200 shadow-sm overflow-x-auto hide-scrollbar text-center text-lg">
                                             <div className="mb-2 font-semibold text-slate-600 text-left">Ejemplo paso a paso:</div>
                                             <Latex math="\displaystyle \lim_{x \to +\infty} \frac{2x^2 + 3x - 1}{x^2 + 5} = \left[ \frac{\infty}{\infty} \right]" display={true} />
                                             <p className="text-slate-500 italic my-4">Dividimos todo entre <Latex math="x^2" /> (el mayor grado presente en la fracción):</p>
@@ -318,6 +318,29 @@
                                 </div>
                             </div>
 
+                            {/* RESOLUCIÓN INDETERMINACIÓN 0 / 0 */}
+                            <div id="indet-0-0" className="mt-12 bg-white rounded-xl shadow-md border border-green-200 overflow-hidden scroll-mt-6">
+                                <div className="bg-green-600 p-6">
+                                    <h3 className="text-2xl font-bold text-white mb-2">Resolución: Indeterminación <Latex math="\frac{0}{0}" /></h3>
+                                    <p className="text-green-100 text-lg">Aparece en los límites en un punto <Latex math="x \to a" /> cuando <Latex math="x=a" /> es una raíz tanto del polinomio del numerador como del denominador.</p>
+                                </div>
+                                
+                                <div className="p-6">
+                                    <div className="bg-green-50 p-6 rounded-lg mb-8 border-l-4 border-green-500">
+                                        <h3 className="font-bold text-green-800 mb-2 text-lg">Fundamento matemático (El Teorema del Factor)</h3>
+                                        <p className="text-lg text-slate-700">
+                                            Si al sustituir obtenemos <Latex math="\frac{0}{0}" />, significa que el número <Latex math="a" /> anula los polinomios <Latex math="P(x)" /> y <Latex math="Q(x)" />. Por el teorema del factor, esto nos garantiza que <strong>el binomio <Latex math="(x - a)" /> es un factor común</strong> en ambos.
+                                        </p>
+                                        <p className="text-lg text-slate-700 mt-2 font-semibold">
+                                            El objetivo de nuestros cálculos será cancelar el factor <Latex math="(x - a)" /> problemático para "liberar" el límite.
+                                        </p>
+                                    </div>
+
+                                    <InteractiveZeroOverZero />
+                                    
+                                </div>
+                            </div>
+
                         </Accordion>
 
                     </main>
@@ -326,7 +349,7 @@
         }
 
         // ---------------------------------------------------------
-        // COMPONENTES APARTADO 5: ARITMÉTICA E INDETERMINACIONES
+        // COMPONENTES DE SUBSECCIONES (Pestañas, Ejercicios, etc.)
         // ---------------------------------------------------------
 
         const InfinityArithmeticTabs = () => {
@@ -361,54 +384,54 @@
                     <div className="p-6">
                         {activeTab === 'suma' && (
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-lg animate-fade-in">
-                                <div className="bg-slate-50 p-4 rounded-lg border border-slate-100 flex justify-center"><Latex math="(+\infty) + k = +\infty" /></div>
-                                <div className="bg-slate-50 p-4 rounded-lg border border-slate-100 flex justify-center"><Latex math="(+\infty) - k = +\infty" /></div>
-                                <div className="bg-slate-50 p-4 rounded-lg border border-slate-100 flex justify-center"><Latex math="(-\infty) + k = -\infty" /></div>
-                                <div className="bg-slate-50 p-4 rounded-lg border border-slate-100 flex justify-center"><Latex math="(-\infty) - k = -\infty" /></div>
-                                <div className="bg-slate-50 p-4 rounded-lg border border-slate-100 flex justify-center"><Latex math="(+\infty) + (+\infty) = +\infty" /></div>
-                                <div className="bg-slate-50 p-4 rounded-lg border border-slate-100 flex justify-center"><Latex math="(-\infty) + (-\infty) = -\infty" /></div>
+                                <div className="bg-slate-50 p-4 rounded-lg border border-slate-100 flex justify-center hide-scrollbar overflow-x-auto"><Latex math="(+\infty) + k = +\infty" /></div>
+                                <div className="bg-slate-50 p-4 rounded-lg border border-slate-100 flex justify-center hide-scrollbar overflow-x-auto"><Latex math="(+\infty) - k = +\infty" /></div>
+                                <div className="bg-slate-50 p-4 rounded-lg border border-slate-100 flex justify-center hide-scrollbar overflow-x-auto"><Latex math="(-\infty) + k = -\infty" /></div>
+                                <div className="bg-slate-50 p-4 rounded-lg border border-slate-100 flex justify-center hide-scrollbar overflow-x-auto"><Latex math="(-\infty) - k = -\infty" /></div>
+                                <div className="bg-slate-50 p-4 rounded-lg border border-slate-100 flex justify-center hide-scrollbar overflow-x-auto"><Latex math="(+\infty) + (+\infty) = +\infty" /></div>
+                                <div className="bg-slate-50 p-4 rounded-lg border border-slate-100 flex justify-center hide-scrollbar overflow-x-auto"><Latex math="(-\infty) + (-\infty) = -\infty" /></div>
                             </div>
                         )}
                         {activeTab === 'producto' && (
                             <div className="grid grid-cols-1 gap-4 text-lg animate-fade-in">
-                                <div className="bg-slate-50 p-4 rounded-lg border border-slate-100 text-center">
+                                <div className="bg-slate-50 p-4 rounded-lg border border-slate-100 text-center hide-scrollbar overflow-x-auto">
                                     <Latex math="\displaystyle k \cdot (+\infty) = \begin{cases} +\infty & \text{si } k > 0 \\ -\infty & \text{si } k < 0 \end{cases}" />
                                 </div>
-                                <div className="bg-slate-50 p-4 rounded-lg border border-slate-100 text-center">
+                                <div className="bg-slate-50 p-4 rounded-lg border border-slate-100 text-center hide-scrollbar overflow-x-auto">
                                     <Latex math="\displaystyle k \cdot (-\infty) = \begin{cases} -\infty & \text{si } k > 0 \\ +\infty & \text{si } k < 0 \end{cases}" />
                                 </div>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <div className="bg-slate-50 p-4 rounded-lg border border-slate-100 flex justify-center"><Latex math="(+\infty) \cdot (+\infty) = +\infty" /></div>
-                                    <div className="bg-slate-50 p-4 rounded-lg border border-slate-100 flex justify-center"><Latex math="(-\infty) \cdot (-\infty) = +\infty" /></div>
-                                    <div className="bg-slate-50 p-4 rounded-lg border border-slate-100 flex justify-center md:col-span-2"><Latex math="(+\infty) \cdot (-\infty) = -\infty" /></div>
+                                    <div className="bg-slate-50 p-4 rounded-lg border border-slate-100 flex justify-center hide-scrollbar overflow-x-auto"><Latex math="(+\infty) \cdot (+\infty) = +\infty" /></div>
+                                    <div className="bg-slate-50 p-4 rounded-lg border border-slate-100 flex justify-center hide-scrollbar overflow-x-auto"><Latex math="(-\infty) \cdot (-\infty) = +\infty" /></div>
+                                    <div className="bg-slate-50 p-4 rounded-lg border border-slate-100 flex justify-center md:col-span-2 hide-scrollbar overflow-x-auto"><Latex math="(+\infty) \cdot (-\infty) = -\infty" /></div>
                                 </div>
                             </div>
                         )}
                         {activeTab === 'cociente' && (
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-lg animate-fade-in">
-                                <div className="bg-slate-50 p-4 rounded-lg border border-slate-100 flex justify-center"><Latex math="\displaystyle \frac{k}{\pm\infty} = 0" /></div>
-                                <div className="bg-slate-50 p-4 rounded-lg border border-slate-100 flex justify-center"><Latex math="\displaystyle \frac{0}{\pm\infty} = 0" /></div>
-                                <div className="bg-slate-50 p-4 rounded-lg border border-slate-100 text-center md:col-span-2">
+                                <div className="bg-slate-50 p-4 rounded-lg border border-slate-100 flex justify-center hide-scrollbar overflow-x-auto"><Latex math="\displaystyle \frac{k}{\pm\infty} = 0" /></div>
+                                <div className="bg-slate-50 p-4 rounded-lg border border-slate-100 flex justify-center hide-scrollbar overflow-x-auto"><Latex math="\displaystyle \frac{0}{\pm\infty} = 0" /></div>
+                                <div className="bg-slate-50 p-4 rounded-lg border border-slate-100 text-center md:col-span-2 hide-scrollbar overflow-x-auto">
                                     <Latex math="\displaystyle \frac{k}{0} = \begin{cases} +\infty & \text{si } k > 0 \\ -\infty & \text{si } k < 0 \end{cases}" />
                                     <p className="text-sm text-slate-500 mt-2 italic">* Siempre estudiando el signo de los límites laterales</p>
                                 </div>
-                                <div className="bg-slate-50 p-4 rounded-lg border border-slate-100 flex justify-center"><Latex math="\displaystyle \frac{+\infty}{0} = \pm\infty" /></div>
-                                <div className="bg-slate-50 p-4 rounded-lg border border-slate-100 flex justify-center"><Latex math="\displaystyle \frac{-\infty}{0} = \pm\infty" /></div>
+                                <div className="bg-slate-50 p-4 rounded-lg border border-slate-100 flex justify-center hide-scrollbar overflow-x-auto"><Latex math="\displaystyle \frac{+\infty}{0} = \pm\infty" /></div>
+                                <div className="bg-slate-50 p-4 rounded-lg border border-slate-100 flex justify-center hide-scrollbar overflow-x-auto"><Latex math="\displaystyle \frac{-\infty}{0} = \pm\infty" /></div>
                             </div>
                         )}
                         {activeTab === 'potencia' && (
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-lg animate-fade-in">
-                                <div className="bg-slate-50 p-4 rounded-lg border border-slate-100 text-center md:col-span-2">
+                                <div className="bg-slate-50 p-4 rounded-lg border border-slate-100 text-center md:col-span-2 hide-scrollbar overflow-x-auto">
                                     <Latex math="\displaystyle k^{+\infty} = \begin{cases} +\infty & \text{si } k > 1 \\ 0 & \text{si } 0 \le k < 1 \end{cases}" />
                                 </div>
-                                <div className="bg-slate-50 p-4 rounded-lg border border-slate-100 text-center md:col-span-2">
+                                <div className="bg-slate-50 p-4 rounded-lg border border-slate-100 text-center md:col-span-2 hide-scrollbar overflow-x-auto">
                                     <Latex math="\displaystyle k^{-\infty} = \begin{cases} 0 & \text{si } k > 1 \\ +\infty & \text{si } 0 \le k < 1 \end{cases}" />
                                 </div>
-                                <div className="bg-slate-50 p-4 rounded-lg border border-slate-100 text-center md:col-span-2">
+                                <div className="bg-slate-50 p-4 rounded-lg border border-slate-100 text-center md:col-span-2 hide-scrollbar overflow-x-auto">
                                     <Latex math="\displaystyle (+\infty)^{k} = \begin{cases} +\infty & \text{si } k > 0 \\ 0 & \text{si } k < 0 \end{cases}" />
                                 </div>
-                                <div className="bg-slate-50 p-4 rounded-lg border border-slate-100 flex justify-center"><Latex math="(+\infty)^{+\infty} = +\infty" /></div>
-                                <div className="bg-slate-50 p-4 rounded-lg border border-slate-100 flex justify-center"><Latex math="(+\infty)^{-\infty} = 0" /></div>
+                                <div className="bg-slate-50 p-4 rounded-lg border border-slate-100 flex justify-center hide-scrollbar overflow-x-auto"><Latex math="(+\infty)^{+\infty} = +\infty" /></div>
+                                <div className="bg-slate-50 p-4 rounded-lg border border-slate-100 flex justify-center hide-scrollbar overflow-x-auto"><Latex math="(+\infty)^{-\infty} = 0" /></div>
                             </div>
                         )}
                     </div>
@@ -532,11 +555,11 @@
                             <h4 className="font-bold text-lg md:text-xl text-slate-800 mb-6 text-center border-b border-slate-300 pb-2">{current.conclusion}</h4>
                             
                             <div className="flex flex-col lg:flex-row items-center justify-center gap-6 text-lg md:text-xl w-full">
-                                <div className="bg-white px-6 py-4 rounded-lg shadow-sm border border-slate-200 overflow-x-auto min-w-[200px] text-center">
+                                <div className="bg-white px-6 py-4 rounded-lg shadow-sm border border-slate-200 overflow-x-auto hide-scrollbar min-w-[200px] text-center">
                                     <Latex math={current.latexFunc} />
                                 </div>
                                 <div className="text-slate-400 text-3xl rotate-90 lg:rotate-0">➜</div>
-                                <div className="flex flex-col gap-3 bg-white px-6 py-4 rounded-lg shadow-sm border border-slate-200 overflow-x-auto min-w-[200px]">
+                                <div className="flex flex-col gap-3 bg-white px-6 py-4 rounded-lg shadow-sm border border-slate-200 overflow-x-auto hide-scrollbar min-w-[200px]">
                                     {current.latexSteps.map((step, idx) => (
                                         <div key={idx} className={idx === current.latexSteps.length - 1 ? "font-bold text-blue-700 mt-2 text-2xl text-center border-t border-blue-100 pt-2" : "text-slate-600"}>
                                             <Latex math={step} />
@@ -560,7 +583,6 @@
             );
         };
 
-        // --- COMPONENTES NUEVOS: LISTA DE EJERCICIOS ---
         const ExerciseCard = ({ letter, limit, indet, formalSteps, trickSteps, directSteps, isDirect, finalResult }) => {
             const [showSol, setShowSol] = useState(false);
             return (
@@ -768,7 +790,6 @@
             );
         }
 
-        // --- COMPONENTE NUEVO: GRADOS DE INFINITO ---
         const InfinityDegrees = () => {
             return (
                 <div className="mt-16 bg-gradient-to-br from-slate-50 to-blue-50 p-6 md:p-8 rounded-xl border border-blue-200 shadow-sm">
@@ -832,6 +853,121 @@
             );
         };
 
+        // --- COMPONENTE NUEVO: EXPLORADOR DE 0/0 ---
+        const InteractiveZeroOverZero = () => {
+            const [activeTab, setActiveTab] = useState('polinomios');
+
+            return (
+                <div>
+                    {/* Pestañas */}
+                    <div className="flex flex-col md:flex-row border-b border-slate-200 bg-slate-100 rounded-t-lg overflow-hidden">
+                        <button onClick={() => setActiveTab('polinomios')} className={`flex-1 py-4 px-4 text-center transition-colors font-bold ${activeTab === 'polinomios' ? 'bg-white border-b-2 border-green-600 text-green-700 shadow-inner' : 'text-slate-600 hover:bg-slate-200'}`}>
+                            1. Polinomios (Sin radicales)
+                        </button>
+                        <button onClick={() => setActiveTab('radicales')} className={`flex-1 py-4 px-4 text-center transition-colors font-bold ${activeTab === 'radicales' ? 'bg-white border-b-2 border-green-600 text-green-700 shadow-inner' : 'text-slate-600 hover:bg-slate-200'}`}>
+                            2. Con Radicales
+                        </button>
+                    </div>
+
+                    <div className="p-6 bg-white border border-t-0 border-slate-200 rounded-b-lg shadow-sm">
+                        {activeTab === 'polinomios' && (
+                            <div className="animate-fade-in">
+                                <p className="text-lg mb-6 text-slate-700">
+                                    <strong>Regla:</strong> Factorizamos el numerador y el denominador (sacando factor común, identidades notables o Ruffini) y simplificamos el factor problemático.
+                                </p>
+
+                                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+                                    {/* Ejemplo A */}
+                                    <div className="bg-slate-50 p-6 rounded-xl border border-slate-200 shadow-sm">
+                                        <h5 className="font-bold text-slate-700 mb-4 border-b border-slate-200 pb-2">Ejemplo a)</h5>
+                                        <div className="flex flex-col items-center gap-4 overflow-x-auto hide-scrollbar text-lg">
+                                            <Latex math="\displaystyle \lim_{x \to -1} \frac{x+1}{x^2-x-2} = \left[ \frac{0}{0} \right]" />
+                                            <div className="text-sm text-slate-500 italic">Factorizamos (teniendo en cuenta que (x+1) será factor común):</div>
+                                            <Latex math="\displaystyle = \lim_{x \to -1} \frac{x+1}{(x+1)(x-2)}" />
+                                            <Latex math="\displaystyle = \lim_{x \to -1} \frac{1}{x-2}" />
+                                            <Latex math="\displaystyle = \frac{1}{-1-2} = \mathbf{-\frac{1}{3}}" />
+                                        </div>
+                                    </div>
+
+                                    {/* Ejemplo B */}
+                                    <div className="bg-slate-50 p-6 rounded-xl border border-slate-200 shadow-sm">
+                                        <h5 className="font-bold text-slate-700 mb-4 border-b border-slate-200 pb-2">Ejemplo b)</h5>
+                                        <div className="flex flex-col items-center gap-4 overflow-x-auto hide-scrollbar text-lg">
+                                            <Latex math="\displaystyle \lim_{x \to 1} \frac{x^2-3x+2}{x^2+x-2} = \left[ \frac{0}{0} \right]" />
+                                            <div className="text-sm text-slate-500 italic">Factorizamos sabiendo que (x-1) anula a ambos:</div>
+                                            <Latex math="\displaystyle = \lim_{x \to 1} \frac{(x-1)(x-2)}{(x-1)(x+2)}" />
+                                            <Latex math="\displaystyle = \lim_{x \to 1} \frac{x-2}{x+2}" />
+                                            <Latex math="\displaystyle = \frac{1-2}{1+2} = \mathbf{-\frac{1}{3}}" />
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Tips del profesor */}
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div className="bg-amber-50 p-5 rounded-xl border border-amber-200 shadow-sm">
+                                        <h5 className="font-bold text-amber-800 mb-2 flex items-center gap-2"><span className="text-xl">💡</span> Truco para Ruffini</h5>
+                                        <p className="text-amber-900 text-sm">
+                                            Si usas Ruffini para factorizar polinomios de grado 3 o superior, ¡no pierdas tiempo probando raíces a ciegas! Ya sabes qué número poner en la "cajita": es exactamente el valor al que tiende el límite (<Latex math="x \to a" />).
+                                        </p>
+                                    </div>
+                                    <div className="bg-red-50 p-5 rounded-xl border border-red-200 shadow-sm">
+                                        <h5 className="font-bold text-red-800 mb-2 flex items-center gap-2"><span className="text-xl">⚠️</span> El 0/0 "Mutante"</h5>
+                                        <p className="text-red-900 text-sm mb-3">
+                                            A veces, al simplificar el factor, el límite no da un número exacto y se transforma en un <Latex math="\frac{k}{0}" /> (Caso B). Esto ocurre si el factor estaba repetido en el denominador:
+                                        </p>
+                                        <div className="overflow-x-auto hide-scrollbar text-sm text-center font-semibold text-red-800">
+                                            <Latex math="\displaystyle \lim_{x \to 1} \frac{x^2-1}{x^2-2x+1} = \lim_{x \to 1} \frac{(x-1)(x+1)}{(x-1)^2} = \frac{2}{0} \to \infty" />
+                                        </div>
+                                        <p className="text-red-900 text-sm mt-2">
+                                            ¡En este caso tendrías que calcular límites laterales para hallar el signo!
+                                        </p>
+                                    </div>
+                                </div>
+
+                            </div>
+                        )}
+
+                        {activeTab === 'radicales' && (
+                            <div className="animate-fade-in">
+                                <p className="text-lg mb-6 text-slate-700">
+                                    <strong>Regla:</strong> Multiplicamos numerador y denominador por el <strong>conjugado</strong> de la expresión que lleva la raíz. Si tras operar la indeterminación sigue, factorizamos y simplificamos el factor problemático.
+                                </p>
+
+                                <div className="bg-slate-50 p-6 md:p-8 rounded-xl border border-slate-200 w-full overflow-hidden shadow-sm max-w-4xl mx-auto">
+                                    <h5 className="font-bold text-slate-700 mb-4 border-b border-slate-200 pb-2">Ejemplo con Radicales</h5>
+                                    <div className="flex flex-col items-center gap-6 overflow-x-auto hide-scrollbar text-lg w-full">
+                                        <div className="bg-white px-6 py-3 rounded-lg shadow-sm border border-slate-200">
+                                            <Latex math="\displaystyle \lim_{x \to 3} \frac{\sqrt{6+x}-3}{x^2-9} = \left[ \frac{0}{0} \right]" />
+                                        </div>
+                                        
+                                        <div className="text-sm text-slate-500 italic mt-2">1. Multiplicamos y dividimos por el conjugado: <Latex math="(\sqrt{6+x}+3)" /></div>
+                                        <div className="bg-white px-6 py-3 rounded-lg shadow-sm border border-slate-200">
+                                            <Latex math="\displaystyle = \lim_{x \to 3} \frac{(\sqrt{6+x}-3)(\sqrt{6+x}+3)}{(x^2-9)(\sqrt{6+x}+3)}" />
+                                        </div>
+
+                                        <div className="text-sm text-slate-500 italic mt-2">2. Suma por Diferencia = Diferencia de Cuadrados en el numerador:</div>
+                                        <div className="bg-white px-6 py-3 rounded-lg shadow-sm border border-slate-200 flex flex-col gap-4">
+                                            <Latex math="\displaystyle = \lim_{x \to 3} \frac{(\sqrt{6+x})^2 - 3^2}{(x^2-9)(\sqrt{6+x}+3)}" />
+                                            <Latex math="\displaystyle = \lim_{x \to 3} \frac{6+x-9}{(x^2-9)(\sqrt{6+x}+3)} = \lim_{x \to 3} \frac{x-3}{(x^2-9)(\sqrt{6+x}+3)} = \left[ \frac{0}{0} \right]" />
+                                        </div>
+
+                                        <div className="text-sm text-red-500 font-bold italic mt-2">3. ¡Sigue la indeterminación 0/0! Factorizamos el denominador <Latex math="(x^2-9)" />:</div>
+                                        <div className="bg-white px-6 py-3 rounded-lg shadow-sm border border-red-200">
+                                            <Latex math="\displaystyle = \lim_{x \to 3} \frac{x-3}{(x-3)(x+3)(\sqrt{6+x}+3)}" />
+                                        </div>
+
+                                        <div className="text-sm text-slate-500 italic mt-2">4. Simplificamos el factor problemático <Latex math="(x-3)" /> y ya podemos sustituir:</div>
+                                        <div className="bg-green-50 px-8 py-4 rounded-lg shadow-sm border border-green-300">
+                                            <Latex math="\displaystyle = \lim_{x \to 3} \frac{1}{(x+3)(\sqrt{6+x}+3)} = \frac{1}{(3+3)(\sqrt{9}+3)} = \frac{1}{6 \cdot 6} = \mathbf{\frac{1}{36}}" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            )
+        }
 
         // ---------------------------------------------------------
         // COMPONENTES DE EJEMPLOS ANTERIORES (1, 2, 3, 4, 5, 6, 7)
@@ -1064,7 +1200,7 @@
                 if (num === null || isNaN(num)) return "Indefinido";
                 if (Math.abs(num) >= 100000) {
                     const [base, exp] = num.toExponential(2).split('e');
-                    return `${base.replace('.', ',')} \times 10^{${exp.replace('+', '')}}`;
+                    return `${base.replace('.', ',')} \\times 10^{${exp.replace('+', '')}}`;
                 }
                 return parseFloat(num.toFixed(4)).toString().replace('.', ',');
             };
@@ -1266,13 +1402,11 @@
                 const currentY = func(currentX);
                 const gap = horizontalAsymptote - currentY;
                 
-                // Si el gap es muy pequeño o el valor explota (asíntota null), mantenemos una escala lógica
                 if (Math.abs(gap) > 0.0001) {
                     currentMinY = horizontalAsymptote - Math.abs(gap) * 3;
                     currentMaxY = horizontalAsymptote + Math.abs(gap) * 3;
                 }
             } else if (activeStep > 0 && horizontalAsymptote === null) {
-                // Caso divergente
                 const currentX = stepLeft > 0 ? -infinitySteps[activeStep - 1] : infinitySteps[activeStep - 1];
                 const currentY = func(currentX);
                 if (currentY > 0) {
