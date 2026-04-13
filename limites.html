@@ -53,335 +53,408 @@
             return <span ref={containerRef} className={display ? "my-4 block text-center" : ""} />;
         };
 
-        // --- Componente Acordeón Desplegable ---
-        const Accordion = ({ title, children, defaultOpen = false }) => {
-            const [isOpen, setIsOpen] = useState(defaultOpen);
+        // --- Componente Sección Fija ---
+        const SectionCard = ({ id, title, children }) => {
             return (
-                <div className="mb-6 border border-slate-200 rounded-xl bg-white shadow-sm overflow-hidden">
-                    <button
-                        onClick={() => setIsOpen(!isOpen)}
-                        className="w-full bg-slate-100 hover:bg-slate-200 p-4 flex justify-between items-center transition-colors focus:outline-none"
-                    >
-                        <h2 className="text-2xl font-bold text-slate-800 text-left">{title}</h2>
-                        <svg className={`w-6 h-6 transform transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                        </svg>
-                    </button>
-                    {isOpen && <div className="p-6 border-t border-slate-200 animate-fade-in">{children}</div>}
-                </div>
+                <section id={id} className="scroll-mt-24 mb-12 border border-slate-200 rounded-xl bg-white shadow-sm overflow-hidden">
+                    <div className="bg-slate-100 p-4 md:p-6 border-b border-slate-200">
+                        <h2 className="text-2xl font-bold text-slate-800">{title}</h2>
+                    </div>
+                    <div className="p-4 md:p-6 animate-fade-in">
+                        {children}
+                    </div>
+                </section>
             );
         };
 
         // --- COMPONENTE PRINCIPAL (App) ---
         function App() {
+            const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+            const [isIndetMenuOpen, setIsIndetMenuOpen] = useState(true); // ESTADO PARA EL SUBMENÚ
+            
+            const toggleMenu = () => setMobileMenuOpen(!mobileMenuOpen);
+            const closeMenu = () => setMobileMenuOpen(false);
+
             return (
-                <div className="min-h-screen bg-slate-50 text-slate-800 font-sans pb-20">
-                    <header className="bg-blue-600 text-white p-6 shadow-md">
-                        <div className="max-w-4xl mx-auto">
-                            <h2 className="text-sm font-semibold tracking-wider text-blue-200 uppercase mb-1">Matemáticas I - 1º Bachillerato</h2>
-                            <h1 className="text-3xl font-bold">Tema 10: Límites y Continuidad</h1>
+                <div className="min-h-screen bg-slate-50 text-slate-800 font-sans pb-20 lg:pb-0">
+                    
+                    {/* Barra superior fija (Navbar) */}
+                    <header className="fixed top-0 left-0 right-0 h-16 bg-blue-600 text-white shadow-md z-50 flex items-center px-4 lg:px-6">
+                        <div className="flex items-center gap-4 w-full max-w-[1600px] mx-auto">
+                            <button onClick={toggleMenu} className="lg:hidden p-2 -ml-2 rounded-lg hover:bg-blue-700 transition-colors focus:outline-none">
+                                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16"/>
+                                </svg>
+                            </button>
+                            <div>
+                                <h2 className="text-xs font-semibold tracking-wider text-blue-200 uppercase hidden sm:block">Matemáticas I - 1º Bachillerato</h2>
+                                <h1 className="text-lg sm:text-xl font-bold">Tema 10: Límites y Continuidad</h1>
+                            </div>
                         </div>
                     </header>
 
-                    <main className="max-w-4xl mx-auto mt-8 p-4 md:p-6">
+                    <div className="pt-16 flex max-w-[1600px] mx-auto">
                         
-                        {/* APARTADO 1 */}
-                        <Accordion title="1. Concepto y definición de límite" defaultOpen={false}>
-                            <p className="mb-4 text-lg">
-                                Si queremos estudiar hacia qué valor se aproxima una función cuando la variable independiente toma valores próximos a un número real dado, resulta imprescindible introducir el concepto de <strong>límite</strong>.
-                            </p>
-                            
-                            <div className="bg-blue-50 p-6 rounded-lg mb-6 border-l-4 border-blue-500">
-                                <h3 className="font-bold text-blue-800 mb-2">Definición intuitiva:</h3>
-                                <p className="text-lg">
-                                    Si <Latex math="a" /> y <Latex math="b" /> son números reales, la expresión:
-                                </p>
-                                <Latex math="\displaystyle \lim_{x \to a} f(x) = b" display={true} />
-                                <p className="text-lg">
-                                    quiere decir que siempre que <Latex math="x" /> tome valores próximos al número <Latex math="a" />, tanto menores como mayores, los correspondientes valores de <Latex math="f" /> se aproximan al número <Latex math="b" />.
-                                </p>
-                            </div>
-
-                            <div className="bg-amber-50 p-4 rounded-lg border border-amber-200 mb-6 text-amber-900">
-                                <strong>* Ojo:</strong> <Latex math="f(x)" /> puede <strong>no estar definida</strong> en <Latex math="x = a" />.
-                            </div>
-
-                            <p className="text-lg mb-2">
-                                <strong>Se lee:</strong> "El límite de <Latex math="f(x)" /> cuando <Latex math="x" /> tiende a <Latex math="a" /> es <Latex math="b" />".
-                            </p>
-                            <p className="text-lg text-slate-600 italic mb-8">
-                                (Si <Latex math="a" /> es <Latex math="+\infty" /> o <Latex math="-\infty" />, hablamos de límite en el infinito).
-                            </p>
-
-                            <h3 className="text-xl font-bold text-slate-800 mb-6 border-b border-slate-200 pb-2">Explora los ejemplos:</h3>
-                            
-                            <InteractiveExample1 />
-                            <InteractiveExample2 />
-                            <InteractiveExample3 />
-                        </Accordion>
-
-                        {/* APARTADO 2 */}
-                        <Accordion title="2. Límites laterales" defaultOpen={false}>
-                            <div className="mb-6">
-                                <p className="text-lg mb-4">
-                                    El límite de una función <Latex math="f(x)" /> cuando <Latex math="x" /> toma valores próximos a <Latex math="a" /> pero <strong>menores</strong> se denomina <strong>"límite por la izquierda"</strong>:
-                                </p>
-                                <div className="bg-white p-4 rounded-lg shadow-sm border border-slate-200 mb-6 flex justify-center text-xl font-bold text-blue-700">
-                                    <Latex math="\displaystyle \lim_{x \to a^-} f(x) = b" />
-                                </div>
-
-                                <p className="text-lg mb-4">
-                                    El límite de una función <Latex math="f(x)" /> cuando <Latex math="x" /> toma valores próximos a <Latex math="a" /> pero <strong>mayores</strong> se denomina <strong>"límite por la derecha"</strong>:
-                                </p>
-                                <div className="bg-white p-4 rounded-lg shadow-sm border border-slate-200 mb-8 flex justify-center text-xl font-bold text-rose-700">
-                                    <Latex math="\displaystyle \lim_{x \to a^+} f(x) = c" />
-                                </div>
-                            </div>
-
-                            <div className="bg-blue-50 p-6 rounded-lg mb-8 border-l-4 border-blue-500">
-                                <h3 className="font-bold text-blue-800 mb-4 text-lg">Condición de existencia de límite</h3>
-                                <p className="text-lg mb-4">
-                                    Se dice que una función <Latex math="f(x)" /> tiene límite <Latex math="L" /> en el punto <Latex math="x = a" /> si y solo si <strong>existen los límites laterales y son iguales</strong>.
-                                </p>
-                                <div className="bg-white p-4 rounded border border-blue-200 flex justify-center mb-4 text-lg font-bold">
-                                    <Latex math="\displaystyle \lim_{x \to a} f(x) = L \iff \lim_{x \to a^-} f(x) = \lim_{x \to a^+} f(x) = L" />
-                                </div>
-                                <ul className="list-disc pl-6 text-lg space-y-2 text-blue-900">
-                                    <li>El límite de una función en un punto, si existe, es <strong>ÚNICO</strong>.</li>
-                                    <li>Es <strong>independiente del valor</strong> de la función en el punto.</li>
-                                </ul>
-                            </div>
-                            
-                            <InteractiveExample4 />
-                        </Accordion>
-
-                        {/* APARTADO 3 */}
-                        <Accordion title="3. Límites infinitos" defaultOpen={false}>
-                            <p className="mb-4 text-lg">
-                                A veces, al acercarse la <Latex math="x" /> a un valor <Latex math="a" />, la función <Latex math="f(x)" /> toma valores que se hacen tan grandes o pequeños como queramos.
-                            </p>
-                            
-                            <div className="flex flex-col md:flex-row gap-6 mb-8 justify-center">
-                                <div className="bg-white p-4 rounded-lg shadow-sm border border-slate-200 text-xl font-bold text-slate-800">
-                                    <Latex math="\displaystyle \lim_{x \to a} f(x) = +\infty" />
-                                </div>
-                                <div className="bg-white p-4 rounded-lg shadow-sm border border-slate-200 text-xl font-bold text-slate-800">
-                                    <Latex math="\displaystyle \lim_{x \to a} f(x) = -\infty" />
-                                </div>
-                            </div>
-
-                            <div className="bg-amber-50 p-6 rounded-lg mb-8 border border-amber-200 text-amber-900">
-                                <h3 className="font-bold mb-2">Aclaración Matemática Fundamental:</h3>
-                                <p className="text-lg">
-                                    Decimos que "el límite de <Latex math="f(x)" /> cuando <Latex math="x" /> tiende a <Latex math="a" /> es infinito". Pero dado que el infinito no es un número real, hablando estrictamente a nivel matemático, <strong>el límite no existe</strong> (decimos que diverge).
-                                </p>
-                            </div>
-
-                            <InteractiveExample5 />
-                            <InteractiveExample6 />
-                        </Accordion>
-
-                        {/* APARTADO 4 */}
-                        <Accordion title="4. Límites en el infinito" defaultOpen={false}>
-                            <p className="mb-4 text-lg">
-                                Ahora vamos a estudiar el valor de la función para valores de <Latex math="x" /> cada vez <strong>mayores</strong> (<Latex math="\to +\infty" />) o cada vez <strong>menores</strong> (<Latex math="\to -\infty" />). En vez de buscar acercarnos a un número, vamos a ver qué pasa cuando nos alejamos indefinidamente hacia los extremos del eje.
-                            </p>
-
-                            <InteractiveExample7 />
-                        </Accordion>
-
-                        {/* APARTADO 5: CÁLCULO E INDETERMINACIONES */}
-                        <Accordion title="5. Cálculo de límites. Indeterminaciones" defaultOpen={false}>
-                            
-                            <div className="bg-indigo-50 border-l-4 border-indigo-500 p-6 mb-8 rounded-r-lg mt-2">
-                                <p className="text-lg font-semibold text-indigo-900 mb-2">Paso 1 Universal: Sustitución directa</p>
-                                <p className="text-lg text-indigo-800">
-                                    Para calcular un límite analíticamente, el primer paso consiste siempre en <strong>sustituir la variable por el valor al que tiende</strong>. Dependiendo del resultado que obtengamos, nos encontraremos ante diferentes situaciones.
-                                </p>
-                            </div>
-
-                            <div className="space-y-6 mb-10">
-                                {/* CASO A */}
-                                <div className="bg-white p-5 rounded-lg border border-slate-200 shadow-sm">
-                                    <h4 className="font-bold text-lg mb-2 text-slate-800">Caso A: Se obtiene un número real</h4>
-                                    <p className="text-lg text-slate-600 mb-4">Ese valor será directamente el límite buscado.</p>
-                                    <div className="bg-slate-50 p-4 rounded border border-slate-200 text-center overflow-x-auto hide-scrollbar">
-                                        <Latex math="\displaystyle \lim_{x \to -2} \frac{x^2 - 3}{x + 1} = \frac{(-2)^2 - 3}{-2 + 1} = \frac{4 - 3}{-1} = \mathbf{-1}" />
+                        {/* Menú Lateral Izquierdo (Sidebar) */}
+                        <aside className={`fixed inset-y-0 left-0 pt-16 w-72 bg-white border-r border-slate-200 z-40 transform transition-transform duration-300 lg:translate-x-0 ${mobileMenuOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full'} lg:sticky lg:top-16 lg:h-[calc(100vh-4rem)]`}>
+                            <div className="h-full overflow-y-auto p-6 hide-scrollbar">
+                                <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4 pl-2">Índice del Tema</h3>
+                                <nav className="space-y-1">
+                                    <a href="#sec-1" onClick={closeMenu} className="block px-4 py-2.5 rounded-lg font-semibold text-slate-700 hover:bg-slate-100 hover:text-blue-600 transition-colors">1. Concepto de límite</a>
+                                    <a href="#sec-2" onClick={closeMenu} className="block px-4 py-2.5 rounded-lg font-semibold text-slate-700 hover:bg-slate-100 hover:text-blue-600 transition-colors">2. Límites laterales</a>
+                                    <a href="#sec-3" onClick={closeMenu} className="block px-4 py-2.5 rounded-lg font-semibold text-slate-700 hover:bg-slate-100 hover:text-blue-600 transition-colors">3. Límites infinitos</a>
+                                    <a href="#sec-4" onClick={closeMenu} className="block px-4 py-2.5 rounded-lg font-semibold text-slate-700 hover:bg-slate-100 hover:text-blue-600 transition-colors">4. Límites en el infinito</a>
+                                    
+                                    {/* Botón desplegable para Indeterminaciones */}
+                                    <div className="flex items-center justify-between px-4 py-2.5 rounded-lg hover:bg-slate-100 transition-colors group cursor-pointer" onClick={(e) => { e.preventDefault(); setIsIndetMenuOpen(!isIndetMenuOpen); }}>
+                                        <a href="#sec-5" onClick={(e) => { e.stopPropagation(); closeMenu(); }} className="font-semibold text-slate-700 group-hover:text-blue-600 flex-1">5. Indeterminaciones</a>
+                                        <button className="text-slate-400 hover:text-blue-600 focus:outline-none p-1">
+                                            <svg className={`w-5 h-5 transform transition-transform duration-200 ${isIndetMenuOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
+                                        </button>
                                     </div>
-                                </div>
+                                    
+                                    {/* Submenú de Indeterminaciones */}
+                                    {isIndetMenuOpen && (
+                                        <div className="pl-4 mt-1 space-y-1 border-l-2 border-slate-100 ml-4 animate-fade-in">
+                                            <a href="#caso-a-b-c" onClick={closeMenu} className="block px-4 py-2 rounded-lg text-sm text-slate-600 hover:bg-slate-100 hover:text-blue-600 transition-colors">
+                                                Aritmética del Infinito
+                                            </a>
+                                            <a href="#indet-inf-inf" onClick={closeMenu} className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-bold text-blue-600 hover:bg-blue-50 transition-colors">
+                                                <span className="w-1.5 h-1.5 rounded-full bg-blue-600 shrink-0"></span>
+                                                Indet. <Latex math="\frac{\infty}{\infty}" />
+                                            </a>
+                                            <a href="#indet-0-0" onClick={closeMenu} className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-bold text-green-600 hover:bg-green-50 transition-colors">
+                                                <span className="w-1.5 h-1.5 rounded-full bg-green-600 shrink-0"></span>
+                                                Indet. <Latex math="\frac{0}{0}" />
+                                            </a>
+                                            <a href="#indet-inf-menos-inf" onClick={closeMenu} className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-bold text-orange-500 hover:bg-orange-50 transition-colors">
+                                                <span className="w-1.5 h-1.5 rounded-full bg-orange-500 shrink-0"></span>
+                                                Indet. <Latex math="\infty - \infty" />
+                                            </a>
+                                        </div>
+                                    )}
+                                </nav>
+                            </div>
+                        </aside>
 
-                                {/* CASO B */}
-                                <div className="bg-white p-5 rounded-lg border border-slate-200 shadow-sm">
-                                    <h4 className="font-bold text-lg mb-2 text-slate-800">Caso B: Un número distinto de cero partido por cero <Latex math="\left( \frac{k}{0} \right)" /></h4>
-                                    <p className="text-lg text-slate-600 mb-4">
-                                        La expresión tiende a infinito. Como no es un número real, la función <strong>diverge</strong>. Para saber si va hacia <Latex math="+\infty" /> o <Latex math="-\infty" />, es obligatorio <strong>estudiar los límites laterales</strong> dando valores muy próximos por la izquierda y por la derecha para deducir el signo del cero (<Latex math="0^+" /> o <Latex math="0^-" />).
+                        {/* Overlay oscuro para cerrar menú en móvil */}
+                        {mobileMenuOpen && (
+                            <div onClick={closeMenu} className="fixed inset-0 bg-slate-900/50 z-30 lg:hidden backdrop-blur-sm transition-opacity"></div>
+                        )}
+
+                        {/* Área de Contenido Principal */}
+                        <main className="flex-1 p-4 md:p-8 lg:p-10 min-w-0 max-w-5xl">
+                            
+                            {/* APARTADO 1 */}
+                            <SectionCard id="sec-1" title="1. Concepto y definición de límite">
+                                <p className="mb-4 text-lg">
+                                    Si queremos estudiar hacia qué valor se aproxima una función cuando la variable independiente toma valores próximos a un número real dado, resulta imprescindible introducir el concepto de <strong>límite</strong>.
+                                </p>
+                                
+                                <div className="bg-blue-50 p-6 rounded-lg mb-6 border-l-4 border-blue-500">
+                                    <h3 className="font-bold text-blue-800 mb-2">Definición intuitiva:</h3>
+                                    <p className="text-lg">
+                                        Si <Latex math="a" /> y <Latex math="b" /> son números reales, la expresión:
                                     </p>
+                                    <Latex math="\displaystyle \lim_{x \to a} f(x) = b" display={true} />
+                                    <p className="text-lg">
+                                        quiere decir que siempre que <Latex math="x" /> tome valores próximos al número <Latex math="a" />, tanto menores como mayores, los correspondientes valores de <Latex math="f" /> se aproximan al número <Latex math="b" />.
+                                    </p>
+                                </div>
 
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-                                        {/* Ejemplo 1 */}
-                                        <div className="bg-slate-50 p-5 rounded-lg border border-slate-200">
-                                            <h5 className="font-semibold text-slate-700 mb-4 text-center border-b border-slate-200 pb-2">Ejemplo 1: Mismo signo</h5>
-                                            <div className="overflow-x-auto hide-scrollbar text-center">
-                                                <Latex math="\displaystyle \lim_{x \to 1} \frac{3}{(x-1)^2} = \frac{3}{0} \to \infty" display={true} />
-                                            </div>
-                                            <div className="text-base text-slate-600 mt-4 space-y-3">
-                                                <p className="flex flex-col items-center"><span className="text-sm font-semibold text-slate-400">Por la izquierda (ej. x = 0,99):</span> <Latex math="\lim_{x \to 1^-} \dots = \frac{3}{0^+} = \mathbf{+\infty}" /></p>
-                                                <p className="flex flex-col items-center"><span className="text-sm font-semibold text-slate-400">Por la derecha (ej. x = 1,01):</span> <Latex math="\lim_{x \to 1^+} \dots = \frac{3}{0^+} = \mathbf{+\infty}" /></p>
-                                            </div>
-                                            <div className="mt-6 text-center font-bold text-blue-700 bg-blue-100 py-2 rounded-lg border border-blue-200">
-                                                La función tiende a <Latex math="\mathbf{+\infty}" />
-                                            </div>
-                                        </div>
+                                <div className="bg-amber-50 p-4 rounded-lg border border-amber-200 mb-6 text-amber-900">
+                                    <strong>* Ojo:</strong> <Latex math="f(x)" /> puede <strong>no estar definida</strong> en <Latex math="x = a" />.
+                                </div>
 
-                                        {/* Ejemplo 2 */}
-                                        <div className="bg-slate-50 p-5 rounded-lg border border-slate-200">
-                                            <h5 className="font-semibold text-slate-700 mb-4 text-center border-b border-slate-200 pb-2">Ejemplo 2: Distinto signo</h5>
-                                            <div className="overflow-x-auto hide-scrollbar text-center">
-                                                <Latex math="\displaystyle \lim_{x \to 3} \frac{x+2}{x-3} = \frac{5}{0} \to \infty" display={true} />
-                                            </div>
-                                            <div className="text-base text-slate-600 mt-4 space-y-3">
-                                                <p className="flex flex-col items-center"><span className="text-sm font-semibold text-slate-400">Por la izquierda (ej. x = 2,99):</span> <Latex math="\lim_{x \to 3^-} \dots = \frac{5}{0^-} = \mathbf{-\infty}" /></p>
-                                                <p className="flex flex-col items-center"><span className="text-sm font-semibold text-slate-400">Por la derecha (ej. x = 3,01):</span> <Latex math="\lim_{x \to 3^+} \dots = \frac{5}{0^+} = \mathbf{+\infty}" /></p>
-                                            </div>
-                                            <div className="mt-6 text-center font-bold text-red-700 bg-red-100 py-2 rounded-lg border border-red-200">
-                                                No hay tendencia global
-                                            </div>
-                                        </div>
+                                <p className="text-lg mb-2">
+                                    <strong>Se lee:</strong> "El límite de <Latex math="f(x)" /> cuando <Latex math="x" /> tiende a <Latex math="a" /> es <Latex math="b" />".
+                                </p>
+                                <p className="text-lg text-slate-600 italic mb-8">
+                                    (Si <Latex math="a" /> es <Latex math="+\infty" /> o <Latex math="-\infty" />, hablamos de límite en el infinito).
+                                </p>
+
+                                <h3 className="text-xl font-bold text-slate-800 mb-6 border-b border-slate-200 pb-2">Explora los ejemplos:</h3>
+                                <InteractiveExample1 />
+                                <InteractiveExample2 />
+                                <InteractiveExample3 />
+                            </SectionCard>
+
+                            {/* APARTADO 2 */}
+                            <SectionCard id="sec-2" title="2. Límites laterales">
+                                <div className="mb-6">
+                                    <p className="text-lg mb-4">
+                                        El límite de una función <Latex math="f(x)" /> cuando <Latex math="x" /> toma valores próximos a <Latex math="a" /> pero <strong>menores</strong> se denomina <strong>"límite por la izquierda"</strong>:
+                                    </p>
+                                    <div className="bg-white p-4 rounded-lg shadow-sm border border-slate-200 mb-6 flex justify-center text-xl font-bold text-blue-700">
+                                        <Latex math="\displaystyle \lim_{x \to a^-} f(x) = b" />
                                     </div>
 
-                                    <div className="mt-6 bg-indigo-50 text-indigo-900 p-4 rounded-lg flex items-start gap-3 border border-indigo-200 shadow-sm">
-                                        <span className="text-2xl leading-none">💡</span>
-                                        <p className="text-base">
-                                            <strong>Nota visual:</strong> Si quieres ver cómo se comportan estas gráficas, vuelve a interactuar con el <strong>Ejemplo 5</strong> (Mismo signo) y el <strong>Ejemplo 6</strong> (Distinto signo) del <em>Apartado 3</em> de este tema.
-                                        </p>
+                                    <p className="text-lg mb-4">
+                                        El límite de una función <Latex math="f(x)" /> cuando <Latex math="x" /> toma valores próximos a <Latex math="a" /> pero <strong>mayores</strong> se denomina <strong>"límite por la derecha"</strong>:
+                                    </p>
+                                    <div className="bg-white p-4 rounded-lg shadow-sm border border-slate-200 mb-8 flex justify-center text-xl font-bold text-rose-700">
+                                        <Latex math="\displaystyle \lim_{x \to a^+} f(x) = c" />
                                     </div>
                                 </div>
 
-                                {/* CASO C */}
-                                <div className="bg-white p-5 rounded-lg border border-slate-200 shadow-sm">
-                                    <h4 className="font-bold text-lg mb-2 text-slate-800">Caso C: Aparecen infinitos, pero el valor se puede determinar</h4>
-                                    <p className="text-lg text-slate-600 mb-4">Aplicamos las reglas de la "Aritmética del Infinito" para deducir el resultado.</p>
-                                    <div className="bg-slate-50 p-4 rounded border border-slate-200 text-center overflow-x-auto hide-scrollbar flex flex-col md:flex-row justify-center gap-8">
-                                        <div><Latex math="\displaystyle \lim_{x \to +\infty} \frac{4}{x} = \frac{4}{+\infty} = \mathbf{0}" /></div>
-                                        <div><Latex math="\displaystyle \lim_{x \to +\infty} (x \cdot e^x) = (+\infty) \cdot (+\infty) = \mathbf{+\infty}" /></div>
+                                <div className="bg-blue-50 p-6 rounded-lg mb-8 border-l-4 border-blue-500">
+                                    <h3 className="font-bold text-blue-800 mb-4 text-lg">Condición de existencia de límite</h3>
+                                    <p className="text-lg mb-4">
+                                        Se dice que una función <Latex math="f(x)" /> tiene límite <Latex math="L" /> en el punto <Latex math="x = a" /> si y solo si <strong>existen los límites laterales y son iguales</strong>.
+                                    </p>
+                                    <div className="bg-white p-4 rounded border border-blue-200 flex justify-center mb-4 text-lg font-bold">
+                                        <Latex math="\displaystyle \lim_{x \to a} f(x) = L \iff \lim_{x \to a^-} f(x) = \lim_{x \to a^+} f(x) = L" />
                                     </div>
+                                    <ul className="list-disc pl-6 text-lg space-y-2 text-blue-900">
+                                        <li>El límite de una función en un punto, si existe, es <strong>ÚNICO</strong>.</li>
+                                        <li>Es <strong>independiente del valor</strong> de la función en el punto.</li>
+                                    </ul>
                                 </div>
-                            </div>
+                                
+                                <InteractiveExample4 />
+                            </SectionCard>
 
-                            {/* TABLAS DE ARITMETICA DEL INFINITO */}
-                            <InfinityArithmeticTabs />
-
-                            {/* CASO D: INDETERMINACIONES */}
-                            <div className="mt-12">
-                                <h3 className="text-2xl font-bold text-red-700 mb-4 border-b border-red-200 pb-2">Caso D: Las Indeterminaciones</h3>
-                                <p className="mb-6 text-lg">
-                                    A veces, al sustituir, la expresión obtenida no es real ni resulta evidente saber a qué valor o infinito tiende mediante aritmética básica. En matemáticas, decimos que se trata de una <strong>indeterminación</strong>. 
+                            {/* APARTADO 3 */}
+                            <SectionCard id="sec-3" title="3. Límites infinitos">
+                                <p className="mb-4 text-lg">
+                                    A veces, al acercarse la <Latex math="x" /> a un valor <Latex math="a" />, la función <Latex math="f(x)" /> toma valores que se hacen tan grandes o pequeños como queramos.
                                 </p>
                                 
-                                <InteractiveSubstitution />
-
-                                <p className="mt-8 mb-6 text-lg font-semibold text-slate-800">Existen 7 tipos de indeterminaciones a las que podemos llegar:</p>
-                                
-                                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12">
-                                    <a href="#indet-inf-inf" className="bg-white p-4 rounded-xl shadow-sm border border-red-200 flex flex-col items-center justify-center aspect-square transform transition hover:scale-105 hover:bg-red-50 hover:border-red-400 cursor-pointer">
-                                        <span className="text-4xl font-bold text-red-600"><Latex math="\frac{\infty}{\infty}" /></span>
-                                    </a>
-                                    <a href="#indet-0-0" className="bg-white p-4 rounded-xl shadow-sm border border-red-200 flex flex-col items-center justify-center aspect-square transform transition hover:scale-105 hover:bg-red-50 hover:border-red-400 cursor-pointer">
-                                        <span className="text-4xl font-bold text-red-600"><Latex math="\frac{0}{0}" /></span>
-                                    </a>
-                                    <a href="#indet-inf-menos-inf" className="bg-white p-4 rounded-xl shadow-sm border border-red-200 flex flex-col items-center justify-center aspect-square transform transition hover:scale-105 hover:bg-red-50 cursor-pointer" title="Próximamente">
-                                        <span className="text-4xl font-bold text-red-600"><Latex math="\infty - \infty" /></span>
-                                    </a>
-                                    <a href="#indet-0-por-inf" className="bg-white p-4 rounded-xl shadow-sm border border-red-200 flex flex-col items-center justify-center aspect-square transform transition hover:scale-105 hover:bg-red-50 cursor-pointer" title="Próximamente">
-                                        <span className="text-4xl font-bold text-red-600"><Latex math="0 \cdot \infty" /></span>
-                                    </a>
-                                    <a href="#indet-1-inf" className="bg-white p-4 rounded-xl shadow-sm border border-red-200 flex flex-col items-center justify-center aspect-square transform transition hover:scale-105 hover:bg-red-50 cursor-pointer" title="Próximamente">
-                                        <span className="text-4xl font-bold text-red-600"><Latex math="1^\infty" /></span>
-                                    </a>
-                                    <a href="#indet-inf-0" className="bg-white p-4 rounded-xl shadow-sm border border-red-200 flex flex-col items-center justify-center aspect-square transform transition hover:scale-105 hover:bg-red-50 cursor-pointer" title="Próximamente">
-                                        <span className="text-4xl font-bold text-red-600"><Latex math="\infty^0" /></span>
-                                    </a>
-                                    <a href="#indet-0-0-pot" className="bg-white p-4 rounded-xl shadow-sm border border-red-200 flex flex-col items-center justify-center aspect-square transform transition hover:scale-105 hover:bg-red-50 cursor-pointer" title="Próximamente">
-                                        <span className="text-4xl font-bold text-red-600"><Latex math="0^0" /></span>
-                                    </a>
+                                <div className="flex flex-col md:flex-row gap-6 mb-8 justify-center">
+                                    <div className="bg-white p-4 rounded-lg shadow-sm border border-slate-200 text-xl font-bold text-slate-800">
+                                        <Latex math="\displaystyle \lim_{x \to a} f(x) = +\infty" />
+                                    </div>
+                                    <div className="bg-white p-4 rounded-lg shadow-sm border border-slate-200 text-xl font-bold text-slate-800">
+                                        <Latex math="\displaystyle \lim_{x \to a} f(x) = -\infty" />
+                                    </div>
                                 </div>
-                            </div>
 
-                            {/* RESOLUCIÓN INDETERMINACIÓN INF / INF */}
-                            <div id="indet-inf-inf" className="mt-12 bg-white rounded-xl shadow-md border border-blue-200 overflow-hidden scroll-mt-6">
-                                <div className="bg-blue-600 p-6">
-                                    <h3 className="text-2xl font-bold text-white mb-2">Resolución: Indeterminación <Latex math="\frac{\infty}{\infty}" /></h3>
-                                    <p className="text-blue-100 text-lg">Suele aparecer al calcular el límite en el infinito de funciones racionales (fracciones con polinomios).</p>
+                                <div className="bg-amber-50 p-6 rounded-lg mb-8 border border-amber-200 text-amber-900">
+                                    <h3 className="font-bold mb-2">Aclaración Matemática Fundamental:</h3>
+                                    <p className="text-lg">
+                                        Decimos que "el límite de <Latex math="f(x)" /> cuando <Latex math="x" /> tiende a <Latex math="a" /> es infinito". Pero dado que el infinito no es un número real, hablando estrictamente a nivel matemático, <strong>el límite no existe</strong> (decimos que diverge).
+                                    </p>
                                 </div>
+
+                                <InteractiveExample5 />
+                                <InteractiveExample6 />
+                            </SectionCard>
+
+                            {/* APARTADO 4 */}
+                            <SectionCard id="sec-4" title="4. Límites en el infinito">
+                                <p className="mb-4 text-lg">
+                                    Ahora vamos a estudiar el valor de la función para valores de <Latex math="x" /> cada vez <strong>mayores</strong> (<Latex math="\to +\infty" />) o cada vez <strong>menores</strong> (<Latex math="\to -\infty" />). En vez de buscar acercarnos a un número, vamos a ver qué pasa cuando nos alejamos indefinidamente hacia los extremos del eje.
+                                </p>
+                                <InteractiveExample7 />
+                            </SectionCard>
+
+                            {/* APARTADO 5: CÁLCULO E INDETERMINACIONES */}
+                            <SectionCard id="sec-5" title="5. Cálculo de límites. Indeterminaciones">
                                 
-                                <div className="p-6">
-                                    <div className="mb-8">
-                                        <h3 className="text-xl font-bold text-slate-800 mb-4 border-b border-slate-200 pb-2">El método matemático formal</h3>
-                                        <p className="text-lg mb-4 text-slate-700">
-                                            Para resolver esta indeterminación, el método riguroso consiste en <strong>dividir todos los términos del numerador y del denominador por la <Latex math="x" /> elevada al mayor grado</strong> que aparezca en toda la fracción.
+                                <div id="caso-a-b-c" className="scroll-mt-24">
+                                    <div className="bg-indigo-50 border-l-4 border-indigo-500 p-6 mb-8 rounded-r-lg mt-2">
+                                        <p className="text-lg font-semibold text-indigo-900 mb-2">Paso 1 Universal: Sustitución directa</p>
+                                        <p className="text-lg text-indigo-800">
+                                            Para calcular un límite analíticamente, el primer paso consiste siempre en <strong>sustituir la variable por el valor al que tiende</strong>. Dependiendo del resultado que obtengamos, nos encontraremos ante diferentes situaciones.
                                         </p>
-                                        <div className="bg-slate-50 p-6 rounded-lg border border-slate-200 shadow-sm overflow-x-auto hide-scrollbar text-center text-lg">
-                                            <div className="mb-2 font-semibold text-slate-600 text-left">Ejemplo paso a paso:</div>
-                                            <Latex math="\displaystyle \lim_{x \to +\infty} \frac{2x^2 + 3x - 1}{x^2 + 5} = \left[ \frac{\infty}{\infty} \right]" display={true} />
-                                            <p className="text-slate-500 italic my-4">Dividimos todo entre <Latex math="x^2" /> (el mayor grado presente en la fracción):</p>
-                                            <Latex math="\displaystyle \lim_{x \to +\infty} \frac{\frac{2x^2}{x^2} + \frac{3x}{x^2} - \frac{1}{x^2}}{\frac{x^2}{x^2} + \frac{5}{x^2}} = \lim_{x \to +\infty} \frac{2 + \frac{3}{x} - \frac{1}{x^2}}{1 + \frac{5}{x^2}}" display={true} />
-                                            <p className="text-slate-500 italic my-4">Como cualquier número dividido entre infinito da cero (<Latex math="\frac{k}{\infty} = 0" />):</p>
-                                            <Latex math="\displaystyle \frac{2 + 0 - 0}{1 + 0} = \mathbf{2}" display={true} />
+                                    </div>
+
+                                    <div className="space-y-6 mb-10">
+                                        {/* CASO A */}
+                                        <div className="bg-white p-5 rounded-lg border border-slate-200 shadow-sm">
+                                            <h4 className="font-bold text-lg mb-2 text-slate-800">Caso A: Se obtiene un número real</h4>
+                                            <p className="text-lg text-slate-600 mb-4">Ese valor será directamente el límite buscado.</p>
+                                            <div className="bg-slate-50 p-4 rounded border border-slate-200 text-center overflow-x-auto hide-scrollbar">
+                                                <Latex math="\displaystyle \lim_{x \to -2} \frac{x^2 - 3}{x + 1} = \frac{(-2)^2 - 3}{-2 + 1} = \frac{4 - 3}{-1} = \mathbf{-1}" />
+                                            </div>
+                                        </div>
+
+                                        {/* CASO B */}
+                                        <div className="bg-white p-5 rounded-lg border border-slate-200 shadow-sm">
+                                            <h4 className="font-bold text-lg mb-2 text-slate-800">Caso B: Un número distinto de cero partido por cero <Latex math="\left( \frac{k}{0} \right)" /></h4>
+                                            <p className="text-lg text-slate-600 mb-4">
+                                                La expression tiende a infinito. Como no es un número real, la función <strong>diverge</strong>. Para saber si va hacia <Latex math="+\infty" /> o <Latex math="-\infty" />, es obligatorio <strong>estudiar los límites laterales</strong> dando valores muy próximos por la izquierda y por la derecha para deducir el signo del cero (<Latex math="0^+" /> o <Latex math="0^-" />).
+                                            </p>
+
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+                                                {/* Ejemplo 1 */}
+                                                <div className="bg-slate-50 p-5 rounded-lg border border-slate-200">
+                                                    <h5 className="font-semibold text-slate-700 mb-4 text-center border-b border-slate-200 pb-2">Ejemplo 1: Mismo signo</h5>
+                                                    <div className="overflow-x-auto hide-scrollbar text-center">
+                                                        <Latex math="\displaystyle \lim_{x \to 1} \frac{3}{(x-1)^2} = \frac{3}{0} \to \infty" display={true} />
+                                                    </div>
+                                                    <div className="text-base text-slate-600 mt-4 space-y-3">
+                                                        <p className="flex flex-col items-center"><span className="text-sm font-semibold text-slate-400">Por la izquierda (ej. x = 0,99):</span> <Latex math="\lim_{x \to 1^-} \dots = \frac{3}{0^+} = \mathbf{+\infty}" /></p>
+                                                        <p className="flex flex-col items-center"><span className="text-sm font-semibold text-slate-400">Por la derecha (ej. x = 1,01):</span> <Latex math="\lim_{x \to 1^+} \dots = \frac{3}{0^+} = \mathbf{+\infty}" /></p>
+                                                    </div>
+                                                    <div className="mt-6 text-center font-bold text-blue-700 bg-blue-100 py-2 rounded-lg border border-blue-200">
+                                                        La función tiende a <Latex math="\mathbf{+\infty}" />
+                                                    </div>
+                                                </div>
+
+                                                {/* Ejemplo 2 */}
+                                                <div className="bg-slate-50 p-5 rounded-lg border border-slate-200">
+                                                    <h5 className="font-semibold text-slate-700 mb-4 text-center border-b border-slate-200 pb-2">Ejemplo 2: Distinto signo</h5>
+                                                    <div className="overflow-x-auto hide-scrollbar text-center">
+                                                        <Latex math="\displaystyle \lim_{x \to 3} \frac{x+2}{x-3} = \frac{5}{0} \to \infty" display={true} />
+                                                    </div>
+                                                    <div className="text-base text-slate-600 mt-4 space-y-3">
+                                                        <p className="flex flex-col items-center"><span className="text-sm font-semibold text-slate-400">Por la izquierda (ej. x = 2,99):</span> <Latex math="\lim_{x \to 3^-} \dots = \frac{5}{0^-} = \mathbf{-\infty}" /></p>
+                                                        <p className="flex flex-col items-center"><span className="text-sm font-semibold text-slate-400">Por la derecha (ej. x = 3,01):</span> <Latex math="\lim_{x \to 3^+} \dots = \frac{5}{0^+} = \mathbf{+\infty}" /></p>
+                                                    </div>
+                                                    <div className="mt-6 text-center font-bold text-red-700 bg-red-100 py-2 rounded-lg border border-red-200">
+                                                        No hay tendencia global
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div className="mt-6 bg-indigo-50 text-indigo-900 p-4 rounded-lg flex items-start gap-3 border border-indigo-200 shadow-sm">
+                                                <span className="text-2xl leading-none">💡</span>
+                                                <p className="text-base">
+                                                    <strong>Nota visual:</strong> Si quieres ver cómo se comportan estas gráficas, vuelve a interactuar con el <strong>Ejemplo 5</strong> (Mismo signo) y el <strong>Ejemplo 6</strong> (Distinto signo) del <em>Apartado 3</em>.
+                                                </p>
+                                            </div>
+                                        </div>
+
+                                        {/* CASO C */}
+                                        <div className="bg-white p-5 rounded-lg border border-slate-200 shadow-sm">
+                                            <h4 className="font-bold text-lg mb-2 text-slate-800">Caso C: Aparecen infinitos, pero el valor se puede determinar</h4>
+                                            <p className="text-lg text-slate-600 mb-4">Aplicamos las reglas de la "Aritmética del Infinito" para deducir el resultado.</p>
+                                            <div className="bg-slate-50 p-4 rounded border border-slate-200 text-center overflow-x-auto hide-scrollbar flex flex-col md:flex-row justify-center gap-8">
+                                                <div><Latex math="\displaystyle \lim_{x \to +\infty} \frac{4}{x} = \frac{4}{+\infty} = \mathbf{0}" /></div>
+                                                <div><Latex math="\displaystyle \lim_{x \to +\infty} (x \cdot e^x) = (+\infty) \cdot (+\infty) = \mathbf{+\infty}" /></div>
+                                            </div>
                                         </div>
                                     </div>
 
-                                    <div className="bg-blue-50 p-6 rounded-lg mb-8 border-l-4 border-blue-500">
-                                        <h3 className="font-bold text-blue-800 mb-4 text-lg">En la práctica: La regla de los grados (Términos dominantes)</h3>
-                                        <p className="text-lg mb-4 text-slate-700">
-                                            Si te fijas en el ejemplo anterior, los términos de menor grado acabaron siendo divididos por alguna potencia de <Latex math="x" /> (como <Latex math="x" />, <Latex math="x^2" />...) y terminaron anulándose y convirtiéndose en ceros al aplicar el límite. 
-                                        </p>
-                                        <p className="text-lg mb-4 text-slate-700">
-                                            Por lo tanto, para resolverlo de forma inmediata, <strong>podemos ignorar directamente el resto del polinomio y quedarnos solo con el término de mayor grado del numerador y del denominador</strong>.
-                                        </p>
-                                        <p className="text-lg text-blue-900 font-semibold">
-                                            Al simplificar la fracción resultante, siempre nos encontraremos con uno de estos 3 casos:
-                                        </p>
+                                    {/* TABLAS DE ARITMETICA DEL INFINITO */}
+                                    <InfinityArithmeticTabs />
+                                </div>
+
+                                {/* CASO D: INDETERMINACIONES */}
+                                <div className="mt-12">
+                                    <h3 className="text-2xl font-bold text-red-700 mb-4 border-b border-red-200 pb-2">Caso D: Las Indeterminaciones</h3>
+                                    <p className="mb-6 text-lg">
+                                        A veces, al sustituir, la expresión obtenida no es real ni resulta evidente saber a qué valor o infinito tiende mediante aritmética básica. En matemáticas, decimos que se trata de una <strong>indeterminación</strong>. 
+                                    </p>
+                                    
+                                    <InteractiveSubstitution />
+
+                                    <p className="mt-8 mb-6 text-lg font-semibold text-slate-800">Existen 7 tipos de indeterminaciones a las que podemos llegar:</p>
+                                    
+                                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12">
+                                        <a href="#indet-inf-inf" className="bg-white p-4 rounded-xl shadow-sm border border-red-200 flex flex-col items-center justify-center aspect-square transform transition hover:scale-105 hover:bg-red-50 hover:border-red-400 cursor-pointer">
+                                            <span className="text-4xl font-bold text-red-600"><Latex math="\frac{\infty}{\infty}" /></span>
+                                        </a>
+                                        <a href="#indet-0-0" className="bg-white p-4 rounded-xl shadow-sm border border-red-200 flex flex-col items-center justify-center aspect-square transform transition hover:scale-105 hover:bg-red-50 hover:border-red-400 cursor-pointer">
+                                            <span className="text-4xl font-bold text-red-600"><Latex math="\frac{0}{0}" /></span>
+                                        </a>
+                                        <a href="#indet-inf-menos-inf" className="bg-white p-4 rounded-xl shadow-sm border border-red-200 flex flex-col items-center justify-center aspect-square transform transition hover:scale-105 hover:bg-red-50 hover:border-red-400 cursor-pointer">
+                                            <span className="text-4xl font-bold text-red-600"><Latex math="\infty - \infty" /></span>
+                                        </a>
+                                        <a href="#indet-0-por-inf" className="bg-white p-4 rounded-xl shadow-sm border border-red-200 flex flex-col items-center justify-center aspect-square transform transition hover:scale-105 hover:bg-red-50 cursor-pointer" title="Próximamente">
+                                            <span className="text-4xl font-bold text-red-600"><Latex math="0 \cdot \infty" /></span>
+                                        </a>
+                                        <a href="#indet-1-inf" className="bg-white p-4 rounded-xl shadow-sm border border-red-200 flex flex-col items-center justify-center aspect-square transform transition hover:scale-105 hover:bg-red-50 cursor-pointer" title="Próximamente">
+                                            <span className="text-4xl font-bold text-red-600"><Latex math="1^\infty" /></span>
+                                        </a>
+                                        <a href="#indet-inf-0" className="bg-white p-4 rounded-xl shadow-sm border border-red-200 flex flex-col items-center justify-center aspect-square transform transition hover:scale-105 hover:bg-red-50 cursor-pointer" title="Próximamente">
+                                            <span className="text-4xl font-bold text-red-600"><Latex math="\infty^0" /></span>
+                                        </a>
+                                        <a href="#indet-0-0-pot" className="bg-white p-4 rounded-xl shadow-sm border border-red-200 flex flex-col items-center justify-center aspect-square transform transition hover:scale-105 hover:bg-red-50 cursor-pointer" title="Próximamente">
+                                            <span className="text-4xl font-bold text-red-600"><Latex math="0^0" /></span>
+                                        </a>
                                     </div>
+                                </div>
 
-                                    <InteractiveInfOverInf />
+                                {/* RESOLUCIÓN INDETERMINACIÓN INF / INF */}
+                                <div id="indet-inf-inf" className="mt-12 bg-white rounded-xl shadow-md border border-blue-200 overflow-hidden scroll-mt-24">
+                                    <div className="bg-blue-600 p-6">
+                                        <h3 className="text-2xl font-bold text-white mb-2">Resolución: Indeterminación <Latex math="\frac{\infty}{\infty}" /></h3>
+                                        <p className="text-blue-100 text-lg">Suele aparecer al calcular el límite en el infinito de funciones racionales (fracciones con polinomios).</p>
+                                    </div>
+                                    
+                                    <div className="p-6">
+                                        <div className="mb-8">
+                                            <h3 className="text-xl font-bold text-slate-800 mb-4 border-b border-slate-200 pb-2">El método matemático formal</h3>
+                                            <p className="text-lg mb-4 text-slate-700">
+                                                Para resolver esta indeterminación, el método riguroso consiste en <strong>dividir todos los términos del numerador y del denominador por la <Latex math="x" /> elevada al mayor grado</strong> que aparezca en toda la fracción.
+                                            </p>
+                                            <div className="bg-slate-50 p-6 rounded-lg border border-slate-200 shadow-sm overflow-x-auto hide-scrollbar text-center text-lg">
+                                                <div className="mb-2 font-semibold text-slate-600 text-left">Ejemplo paso a paso:</div>
+                                                <Latex math="\displaystyle \lim_{x \to +\infty} \frac{2x^2 + 3x - 1}{x^2 + 5} = \left[ \frac{\infty}{\infty} \right]" display={true} />
+                                                <p className="text-slate-500 italic my-4">Dividimos todo entre <Latex math="x^2" /> (el mayor grado presente en la fracción):</p>
+                                                <Latex math="\displaystyle \lim_{x \to +\infty} \frac{\frac{2x^2}{x^2} + \frac{3x}{x^2} - \frac{1}{x^2}}{\frac{x^2}{x^2} + \frac{5}{x^2}} = \lim_{x \to +\infty} \frac{2 + \frac{3}{x} - \frac{1}{x^2}}{1 + \frac{5}{x^2}}" display={true} />
+                                                <p className="text-slate-500 italic my-4">Como cualquier número dividido entre infinito da cero (<Latex math="\frac{k}{\infty} = 0" />):</p>
+                                                <Latex math="\displaystyle \frac{2 + 0 - 0}{1 + 0} = \mathbf{2}" display={true} />
+                                            </div>
+                                        </div>
 
-                                    {/* LISTA DE EJERCICIOS A - H */}
+                                        <div className="bg-blue-50 p-6 rounded-lg mb-8 border-l-4 border-blue-500">
+                                            <h3 className="font-bold text-blue-800 mb-4 text-lg">En la práctica: La regla de los grados (Términos dominantes)</h3>
+                                            <p className="text-lg mb-4 text-slate-700">
+                                                Si te fijas en el ejemplo anterior, los términos de menor grado acabaron siendo divididos por alguna potencia de <Latex math="x" /> (como <Latex math="x" />, <Latex math="x^2" />...) y terminaron anulándose y convirtiéndose en ceros al aplicar el límite. 
+                                            </p>
+                                            <p className="text-lg mb-4 text-slate-700">
+                                                Por lo tanto, para resolverlo de forma inmediata, <strong>podemos ignorar directamente el resto del polinomio y quedarnos solo con el término de mayor grado del numerador y del denominador</strong>.
+                                            </p>
+                                            <p className="text-lg text-blue-900 font-semibold">
+                                                Al simplificar la fracción resultante, siempre nos encontraremos con uno de estos 3 casos:
+                                            </p>
+                                        </div>
+
+                                        <InteractiveInfOverInf />
+
+                                        <div className="mt-12">
+                                            <h3 className="text-xl font-bold text-slate-800 mb-6 border-b border-slate-200 pb-2">Ejercicios resueltos:</h3>
+                                            <ExerciseListInfOverInf />
+                                        </div>
+
+                                        <InfinityDegrees />
+                                    </div>
+                                </div>
+
+                                {/* RESOLUCIÓN INDETERMINACIÓN 0 / 0 */}
+                                <div id="indet-0-0" className="mt-12 bg-white rounded-xl shadow-md border border-green-200 overflow-hidden scroll-mt-24">
+                                    <div className="bg-green-600 p-6">
+                                        <h3 className="text-2xl font-bold text-white mb-2">Resolución: Indeterminación <Latex math="\frac{0}{0}" /></h3>
+                                        <p className="text-green-100 text-lg">Aparece en los límites en un punto <Latex math="x \to a" /> cuando <Latex math="x=a" /> es una raíz tanto del polinomio del numerador como del denominador.</p>
+                                    </div>
+                                    
+                                    <div className="p-6">
+                                        <div className="bg-green-50 p-6 rounded-lg mb-8 border-l-4 border-green-500">
+                                            <h3 className="font-bold text-green-800 mb-2 text-lg">Fundamento matemático (El Teorema del Factor)</h3>
+                                            <p className="text-lg text-slate-700">
+                                                Si al sustituir obtenemos <Latex math="\frac{0}{0}" />, significa que el número <Latex math="a" /> anula los polinomios <Latex math="P(x)" /> y <Latex math="Q(x)" />. Por el teorema del factor, esto nos garantiza que <strong>el binomio <Latex math="(x - a)" /> es un factor común</strong> en ambos.
+                                            </p>
+                                            <p className="text-lg text-slate-700 mt-2 font-semibold">
+                                                El objetivo de nuestros cálculos será cancelar el factor <Latex math="(x - a)" /> problemático para "liberar" el límite.
+                                            </p>
+                                        </div>
+
+                                        <InteractiveZeroOverZero />
+                                        
+                                        <div className="mt-12">
+                                            <h3 className="text-xl font-bold text-slate-800 mb-6 border-b border-slate-200 pb-2">Ejercicios resueltos:</h3>
+                                            <ExerciseListZeroOverZero />
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* RESOLUCIÓN INDETERMINACIÓN INF - INF */}
+                                <div id="indet-inf-menos-inf">
+                                    <InteractiveInfMinusInf />
+                                    
                                     <div className="mt-12">
                                         <h3 className="text-xl font-bold text-slate-800 mb-6 border-b border-slate-200 pb-2">Ejercicios resueltos:</h3>
-                                        <ExerciseListInfOverInf />
+                                        <ExerciseListInfMinusInf />
                                     </div>
-
-                                    {/* GRADOS DE INFINITO (NUEVO) */}
-                                    <InfinityDegrees />
                                 </div>
-                            </div>
 
-                            {/* RESOLUCIÓN INDETERMINACIÓN 0 / 0 */}
-                            <div id="indet-0-0" className="mt-12 bg-white rounded-xl shadow-md border border-green-200 overflow-hidden scroll-mt-6">
-                                <div className="bg-green-600 p-6">
-                                    <h3 className="text-2xl font-bold text-white mb-2">Resolución: Indeterminación <Latex math="\frac{0}{0}" /></h3>
-                                    <p className="text-green-100 text-lg">Aparece en los límites en un punto <Latex math="x \to a" /> cuando <Latex math="x=a" /> es una raíz tanto del polinomio del numerador como del denominador.</p>
-                                </div>
-                                
-                                <div className="p-6">
-                                    <div className="bg-green-50 p-6 rounded-lg mb-8 border-l-4 border-green-500">
-                                        <h3 className="font-bold text-green-800 mb-2 text-lg">Fundamento matemático (El Teorema del Factor)</h3>
-                                        <p className="text-lg text-slate-700">
-                                            Si al sustituir obtenemos <Latex math="\frac{0}{0}" />, significa que el número <Latex math="a" /> anula los polinomios <Latex math="P(x)" /> y <Latex math="Q(x)" />. Por el teorema del factor, esto nos garantiza que <strong>el binomio <Latex math="(x - a)" /> es un factor común</strong> en ambos.
-                                        </p>
-                                        <p className="text-lg text-slate-700 mt-2 font-semibold">
-                                            El objetivo de nuestros cálculos será cancelar el factor <Latex math="(x - a)" /> problemático para "liberar" el límite.
-                                        </p>
-                                    </div>
+                            </SectionCard>
 
-                                    <InteractiveZeroOverZero />
-                                    
-                                </div>
-                            </div>
-
-                        </Accordion>
-
-                    </main>
+                        </main>
+                    </div>
                 </div>
             );
         }
@@ -516,7 +589,7 @@
                             <div className="mt-8 p-4 bg-red-50 text-red-900 rounded-lg animate-fade-in border border-red-200">
                                 <span className="block text-2xl mb-2">🚨</span>
                                 ¡Atención! Hemos llegado a <Latex math="\frac{0}{0}" />. <br/>
-                                Como <strong>no sabemos a qué valor tiende ni si es infinito</strong>, estamos ante una <strong>indeterminación</strong>. En el próximo apartado veremos cómo resolver este tipo de funciones.
+                                Como <strong>no sabemos a qué valor tiende ni si es infinito</strong>, estamos ante una <strong>indeterminación</strong>.
                             </div>
                         )}
                     </div>
@@ -891,7 +964,360 @@
             );
         };
 
-        // --- COMPONENTE NUEVO: EXPLORADOR DE 0/0 ---
+        const GenericExerciseCard = ({ letter, limit, indet, steps, finalResult, isTrick, colorTheme = "green" }) => {
+            const [showSol, setShowSol] = useState(false);
+            
+            // Colores dinámicos basados en el tema
+            const theme = {
+                green: {
+                    btn: 'bg-green-600 text-white hover:bg-green-700',
+                    resultBg: 'bg-green-100 border-green-200 text-green-800'
+                },
+                orange: {
+                    btn: 'bg-orange-500 text-white hover:bg-orange-600',
+                    resultBg: 'bg-orange-100 border-orange-200 text-orange-800'
+                }
+            };
+            
+            const currentTheme = theme[colorTheme] || theme.green;
+
+            return (
+                <div className="mb-6 border border-slate-200 rounded-xl overflow-hidden shadow-sm bg-white">
+                    <div className="flex justify-between items-center bg-slate-50 p-4 border-b border-slate-200">
+                        <div className="flex items-center gap-4 overflow-x-auto hide-scrollbar overflow-y-hidden py-1">
+                            <span className="font-bold text-xl text-slate-700">{letter})</span>
+                            <div className="text-lg"><Latex math={limit} /></div>
+                        </div>
+                        <button
+                            onClick={() => setShowSol(!showSol)}
+                            className={`ml-4 shrink-0 px-4 py-2 rounded-lg font-semibold transition-colors ${showSol ? 'bg-slate-200 text-slate-700 hover:bg-slate-300' : currentTheme.btn}`}
+                        >
+                            {showSol ? 'Ocultar' : 'Ver solución'}
+                        </button>
+                    </div>
+                    {showSol && (
+                        <div className="p-6 animate-fade-in bg-white">
+                            <div className="text-center mb-6 text-lg text-red-600 font-bold border-b border-slate-100 pb-4">
+                                {isTrick ? (
+                                    <>¡Ojo! Al sustituir comprobamos que: <Latex math={indet} /></>
+                                ) : (
+                                    <>Al sustituir obtenemos la indeterminación: <Latex math={indet} /></>
+                                )}
+                            </div>
+
+                            <div className="bg-slate-50 p-5 rounded-xl border border-slate-200 max-w-3xl mx-auto">
+                                <h5 className="font-bold text-slate-700 mb-4 text-center border-b border-slate-300 pb-2">Resolución paso a paso</h5>
+                                <div className="flex flex-col items-center gap-4 overflow-x-auto hide-scrollbar text-lg py-2">
+                                    {steps.map((step, i) => (
+                                        <React.Fragment key={i}>
+                                            {typeof step === 'string' ? (
+                                                <div className="text-slate-700"><Latex math={step} /></div>
+                                            ) : (
+                                                step
+                                            )}
+                                        </React.Fragment>
+                                    ))}
+                                </div>
+                            </div>
+
+                            <div className={`mt-8 text-center text-2xl font-bold ${isTrick ? 'text-red-800 bg-red-100 border-red-200' : currentTheme.resultBg} p-4 rounded-lg shadow-sm border`}>
+                                Solución: <Latex math={finalResult.includes("No hay") ? finalResult : `\\mathbf{${finalResult}}`} />
+                            </div>
+                        </div>
+                    )}
+                </div>
+            );
+        };
+
+        const ExerciseListZeroOverZero = () => {
+            const exercises = [
+                {
+                    letter: 'a',
+                    limit: "\\displaystyle \\lim_{x \\to 2} \\frac{x^2 - 4}{x - 2}",
+                    indet: "\\left[ \\frac{0}{0} \\right]",
+                    steps: [
+                        <div className="text-sm text-slate-500 italic mt-2">Factorizamos el numerador (Diferencia de cuadrados):</div>,
+                        "\\displaystyle = \\lim_{x \\to 2} \\frac{(x - 2)(x + 2)}{x - 2}",
+                        <div className="text-sm text-slate-500 italic mt-2">Simplificamos el factor problemático <Latex math="(x-2)" /> :</div>,
+                        "\\displaystyle = \\lim_{x \\to 2} (x + 2)",
+                        "\\displaystyle = 2 + 2 = 4"
+                    ],
+                    finalResult: "4"
+                },
+                {
+                    letter: 'b',
+                    limit: "\\displaystyle \\lim_{x \\to 3} \\frac{x^2 - 5x + 6}{x - 3}",
+                    indet: "\\left[ \\frac{0}{0} \\right]",
+                    steps: [
+                        <div className="text-sm text-slate-500 italic mt-2">Factorizamos el numerador: <Latex math="x^2 - 5x + 6 = (x - 3)(x - 2)" /></div>,
+                        "\\displaystyle = \\lim_{x \\to 3} \\frac{(x - 3)(x - 2)}{x - 3}",
+                        <div className="text-sm text-slate-500 italic mt-2">Simplificamos el factor problemático <Latex math="(x-3)" /> :</div>,
+                        "\\displaystyle = \\lim_{x \\to 3} (x - 2)",
+                        "\\displaystyle = 3 - 2 = 1"
+                    ],
+                    finalResult: "1"
+                },
+                {
+                    letter: 'c',
+                    limit: "\\displaystyle \\lim_{x \\to 1} \\frac{x^3 - 3x + 2}{x^2 - 1}",
+                    indet: "\\left[ \\frac{0}{0} \\right]",
+                    steps: [
+                        <div className="text-sm text-slate-500 italic mt-2">Factorizamos por Ruffini el numerador y por identidades el denominador:</div>,
+                        "\\displaystyle = \\lim_{x \\to 1} \\frac{(x - 1)(x^2 + x - 2)}{(x - 1)(x + 1)} = \\lim_{x \\to 1} \\frac{(x - 1)^2(x + 2)}{(x - 1)(x + 1)}",
+                        <div className="text-sm text-slate-500 italic mt-2">Simplificamos un factor <Latex math="(x-1)" /> arriba y abajo:</div>,
+                        "\\displaystyle = \\lim_{x \\to 1} \\frac{(x - 1)(x + 2)}{x + 1}",
+                        "\\displaystyle = \\frac{(1 - 1)(1 + 2)}{1 + 1} = \\frac{0 \\cdot 3}{2} = 0"
+                    ],
+                    finalResult: "0"
+                },
+                {
+                    letter: 'd',
+                    limit: "\\displaystyle \\lim_{x \\to 0} \\frac{\\sqrt{x + 1} - 1}{x}",
+                    indet: "\\left[ \\frac{0}{0} \\right]",
+                    steps: [
+                        <div className="text-sm text-slate-500 italic mt-2">Multiplicamos y dividimos por el conjugado: <Latex math="(\sqrt{x + 1} + 1)" /></div>,
+                        "\\displaystyle = \\lim_{x \\to 0} \\frac{(\\sqrt{x + 1} - 1)(\\sqrt{x + 1} + 1)}{x(\\sqrt{x + 1} + 1)}",
+                        "\\displaystyle = \\lim_{x \\to 0} \\frac{(x + 1) - 1}{x(\\sqrt{x + 1} + 1)} = \\lim_{x \\to 0} \\frac{x}{x(\\sqrt{x + 1} + 1)}",
+                        <div className="text-sm text-slate-500 italic mt-2">Simplificamos la <Latex math="x" /> :</div>,
+                        "\\displaystyle = \\lim_{x \\to 0} \\frac{1}{\\sqrt{x + 1} + 1}",
+                        "\\displaystyle = \\frac{1}{\\sqrt{0 + 1} + 1} = \\frac{1}{2}"
+                    ],
+                    finalResult: "\\frac{1}{2}"
+                },
+                {
+                    letter: 'e',
+                    limit: "\\displaystyle \\lim_{x \\to 4} \\frac{x - 4}{\\sqrt{x} - 2}",
+                    indet: "\\left[ \\frac{0}{0} \\right]",
+                    steps: [
+                        <div className="text-sm text-slate-500 italic mt-2">Multiplicamos y dividimos por el conjugado: <Latex math="(\sqrt{x} + 2)" /></div>,
+                        "\\displaystyle = \\lim_{x \\to 4} \\frac{(x - 4)(\\sqrt{x} + 2)}{(\\sqrt{x} - 2)(\\sqrt{x} + 2)}",
+                        "\\displaystyle = \\lim_{x \\to 4} \\frac{(x - 4)(\\sqrt{x} + 2)}{x - 4}",
+                        <div className="text-sm text-slate-500 italic mt-2">Simplificamos el factor <Latex math="(x-4)" /> :</div>,
+                        "\\displaystyle = \\lim_{x \\to 4} (\\sqrt{x} + 2)",
+                        "\\displaystyle = \\sqrt{4} + 2 = 4"
+                    ],
+                    finalResult: "4"
+                },
+                {
+                    letter: 'f',
+                    limit: "\\displaystyle \\lim_{x \\to 1} \\frac{\\sqrt{x} - 1}{x^3 - 1}",
+                    indet: "\\left[ \\frac{0}{0} \\right]",
+                    steps: [
+                        <div className="text-sm text-slate-500 italic mt-2">Multiplicamos y dividimos por el conjugado: <Latex math="(\sqrt{x} + 1)" /></div>,
+                        "\\displaystyle = \\lim_{x \\to 1} \\frac{(\\sqrt{x} - 1)(\\sqrt{x} + 1)}{(x^3 - 1)(\\sqrt{x} + 1)}",
+                        "\\displaystyle = \\lim_{x \\to 1} \\frac{x - 1}{(x - 1)(x^2 + x + 1)(\\sqrt{x} + 1)}",
+                        <div className="text-sm text-slate-500 italic mt-2">Simplificamos el factor <Latex math="(x-1)" /> :</div>,
+                        "\\displaystyle = \\lim_{x \\to 1} \\frac{1}{(x^2 + x + 1)(\\sqrt{x} + 1)}",
+                        "\\displaystyle = \\frac{1}{(1^2 + 1 + 1)(\\sqrt{1} + 1)} = \\frac{1}{3 \\cdot 2} = \\frac{1}{6}"
+                    ],
+                    finalResult: "\\frac{1}{6}"
+                },
+                {
+                    letter: 'g',
+                    limit: "\\displaystyle \\lim_{x \\to -1} \\frac{x^3 + 1}{x^2 - 1}",
+                    indet: "\\left[ \\frac{0}{0} \\right]",
+                    steps: [
+                        <div className="text-sm text-slate-500 italic mt-2">Factorizamos el numerador (Ruffini) y el denominador:</div>,
+                        "\\displaystyle = \\lim_{x \\to -1} \\frac{(x + 1)(x^2 - x + 1)}{(x + 1)(x - 1)}",
+                        <div className="text-sm text-slate-500 italic mt-2">Simplificamos el factor problemático <Latex math="(x+1)" /> :</div>,
+                        "\\displaystyle = \\lim_{x \\to -1} \\frac{x^2 - x + 1}{x - 1}",
+                        "\\displaystyle = \\frac{(-1)^2 - (-1) + 1}{-1 - 1} = \\frac{3}{-2} = -\\frac{3}{2}"
+                    ],
+                    finalResult: "-\\frac{3}{2}"
+                },
+                {
+                    letter: 'h',
+                    limit: "\\displaystyle \\lim_{x \\to 2} \\frac{\\sqrt{x + 2} - 2}{x^2 - 4}",
+                    indet: "\\left[ \\frac{0}{0} \\right]",
+                    steps: [
+                        <div className="text-sm text-slate-500 italic mt-2">Multiplicamos y dividimos por el conjugado: <Latex math="(\sqrt{x + 2} + 2)" /></div>,
+                        "\\displaystyle = \\lim_{x \\to 2} \\frac{(\\sqrt{x + 2} - 2)(\\sqrt{x + 2} + 2)}{(x^2 - 4)(\\sqrt{x + 2} + 2)}",
+                        "\\displaystyle = \\lim_{x \\to 2} \\frac{(x + 2) - 4}{(x - 2)(x + 2)(\\sqrt{x + 2} + 2)}",
+                        "\\displaystyle = \\lim_{x \\to 2} \\frac{x - 2}{(x - 2)(x + 2)(\\sqrt{x + 2} + 2)}",
+                        <div className="text-sm text-slate-500 italic mt-2">Simplificamos el factor problemático <Latex math="(x-2)" /> :</div>,
+                        "\\displaystyle = \\lim_{x \\to 2} \\frac{1}{(x + 2)(\\sqrt{x + 2} + 2)}",
+                        "\\displaystyle = \\frac{1}{(2 + 2)(\\sqrt{2 + 2} + 2)} = \\frac{1}{4 \\cdot 4} = \\frac{1}{16}"
+                    ],
+                    finalResult: "\\frac{1}{16}"
+                },
+                {
+                    letter: 'i',
+                    limit: "\\displaystyle \\lim_{x \\to 1} \\frac{x^3 - 2x^2 + x - 2}{x^2 - 1}",
+                    indet: "\\frac{-2}{0}",
+                    isTrick: true,
+                    steps: [
+                        <div className="text-red-600 font-bold mt-2">¡Cuidado! El Paso 1 universal siempre es sustituir primero.</div>,
+                        "\\displaystyle \\text{Numerador: } 1^3 - 2(1)^2 + 1 - 2 = -2",
+                        "\\displaystyle \\text{Denominador: } 1^2 - 1 = 0",
+                        <div className="text-red-600 font-semibold mt-2">No es una indeterminación 0/0, sino un caso de divergencia <Latex math="(k/0)" />.</div>,
+                        <div className="text-sm text-slate-500 italic mt-2">Estudiamos los límites laterales para deducir el signo del cero:</div>,
+                        "\\displaystyle \\lim_{x \\to 1^-} \\dots = \\frac{-2}{0^-} = +\\infty \\quad \\text{y} \\quad \\lim_{x \\to 1^+} \\dots = \\frac{-2}{0^+} = -\\infty"
+                    ],
+                    finalResult: "\\text{No hay tendencia global}"
+                },
+                {
+                    letter: 'j',
+                    limit: "\\displaystyle \\lim_{x \\to 9} \\frac{3 - \\sqrt{x}}{9x - x^2}",
+                    indet: "\\left[ \\frac{0}{0} \\right]",
+                    steps: [
+                        <div className="text-sm text-slate-500 italic mt-2">Multiplicamos y dividimos por el conjugado: <Latex math="(3 + \sqrt{x})" /></div>,
+                        "\\displaystyle = \\lim_{x \\to 9} \\frac{(3 - \\sqrt{x})(3 + \\sqrt{x})}{x(9 - x)(3 + \\sqrt{x})}",
+                        "\\displaystyle = \\lim_{x \\to 9} \\frac{9 - x}{x(9 - x)(3 + \\sqrt{x})}",
+                        <div className="text-sm text-slate-500 italic mt-2">Simplificamos el factor problemático <Latex math="(9-x)" /> :</div>,
+                        "\\displaystyle = \\lim_{x \\to 9} \\frac{1}{x(3 + \\sqrt{x})}",
+                        "\\displaystyle = \\frac{1}{9(3 + \\sqrt{9})} = \\frac{1}{9 \\cdot 6} = \\frac{1}{54}"
+                    ],
+                    finalResult: "\\frac{1}{54}"
+                }
+            ];
+
+            return (
+                <div>
+                    {exercises.map(ex => <GenericExerciseCard key={ex.letter} {...ex} colorTheme="green" />)}
+                </div>
+            );
+        };
+
+        const ExerciseListInfMinusInf = () => {
+            const exercises = [
+                {
+                    letter: 'a',
+                    limit: "\\displaystyle \\lim_{x \\to +\\infty} (x^4 - 5x^3 + 2x)",
+                    indet: "\\left[ \\infty - \\infty \\right]",
+                    steps: [
+                        <div className="text-sm text-slate-500 italic mt-2">Polinomios: nos quedamos con el término de mayor grado.</div>,
+                        "\\displaystyle = \\lim_{x \\to +\\infty} x^4",
+                        "\\displaystyle = +\\infty"
+                    ],
+                    finalResult: "+\\infty"
+                },
+                {
+                    letter: 'b',
+                    limit: "\\displaystyle \\lim_{x \\to +\\infty} (2^x - x^3)",
+                    indet: "\\left[ \\infty - \\infty \\right]",
+                    steps: [
+                        <div className="text-sm text-slate-500 italic mt-2">Órdenes de infinito: la función exponencial crece más rápido que la polinómica.</div>,
+                        "\\displaystyle = \\lim_{x \\to +\\infty} 2^x",
+                        "\\displaystyle = +\\infty"
+                    ],
+                    finalResult: "+\\infty"
+                },
+                {
+                    letter: 'c',
+                    limit: "\\displaystyle \\lim_{x \\to 1} \\left( \\frac{1}{x-1} - \\frac{2}{x^2-1} \\right)",
+                    indet: "\\left[ \\infty - \\infty \\right]",
+                    steps: [
+                        <div className="text-sm text-slate-500 italic mt-2">Hacemos común denominador <Latex math="(x^2-1)" /> :</div>,
+                        "\\displaystyle = \\lim_{x \\to 1} \\frac{(x+1) - 2}{x^2-1} = \\lim_{x \\to 1} \\frac{x-1}{x^2-1} = \\left[ \\frac{0}{0} \\right]",
+                        <div className="text-sm text-slate-500 italic mt-2">Se transforma en 0/0. Factorizamos y simplificamos:</div>,
+                        "\\displaystyle = \\lim_{x \\to 1} \\frac{x-1}{(x-1)(x+1)} = \\lim_{x \\to 1} \\frac{1}{x+1}",
+                        "\\displaystyle = \\frac{1}{1+1} = \\frac{1}{2}"
+                    ],
+                    finalResult: "\\frac{1}{2}"
+                },
+                {
+                    letter: 'd',
+                    limit: "\\displaystyle \\lim_{x \\to +\\infty} \\left( \\frac{x^2+1}{x} - \\frac{x^2}{x-1} \\right)",
+                    indet: "\\left[ \\infty - \\infty \\right]",
+                    steps: [
+                        <div className="text-sm text-slate-500 italic mt-2">Hacemos común denominador <Latex math="x(x-1)" /> :</div>,
+                        "\\displaystyle = \\lim_{x \\to +\\infty} \\frac{(x^2+1)(x-1) - x^2(x)}{x(x-1)}",
+                        "\\displaystyle = \\lim_{x \\to +\\infty} \\frac{x^3 - x^2 + x - 1 - x^3}{x^2 - x} = \\lim_{x \\to +\\infty} \\frac{-x^2 + x - 1}{x^2 - x} = \\left[ \\frac{\\infty}{\\infty} \\right]",
+                        <div className="text-sm text-slate-500 italic mt-2">Nos quedamos con los términos de mayor grado:</div>,
+                        "\\displaystyle = \\lim_{x \\to +\\infty} \\frac{-x^2}{x^2} = -1"
+                    ],
+                    finalResult: "-1"
+                },
+                {
+                    letter: 'e',
+                    limit: "\\displaystyle \\lim_{x \\to +\\infty} (\\sqrt{x^2+5x} - x)",
+                    indet: "\\left[ \\infty - \\infty \\right]",
+                    steps: [
+                        <div className="text-sm text-slate-500 italic mt-2">Los términos de mayor grado empatan <Latex math="(\sqrt{x^2} = x)" />. Multiplicamos por el conjugado:</div>,
+                        "\\displaystyle = \\lim_{x \\to +\\infty} \\frac{(\\sqrt{x^2+5x} - x)(\\sqrt{x^2+5x} + x)}{\\sqrt{x^2+5x} + x}",
+                        <div className="text-sm text-slate-500 italic mt-2">Suma por diferencia:</div>,
+                        "\\displaystyle = \\lim_{x \\to +\\infty} \\frac{(x^2+5x) - x^2}{\\sqrt{x^2+5x} + x} = \\lim_{x \\to +\\infty} \\frac{5x}{\\sqrt{x^2+5x} + x} = \\left[ \\frac{\\infty}{\\infty} \\right]",
+                        <div className="text-sm text-slate-500 italic mt-2">Nos quedamos con los términos dominantes arriba y abajo:</div>,
+                        "\\displaystyle = \\lim_{x \\to +\\infty} \\frac{5x}{\\sqrt{x^2} + x} = \\lim_{x \\to +\\infty} \\frac{5x}{2x} = \\frac{5}{2}"
+                    ],
+                    finalResult: "\\frac{5}{2}"
+                },
+                {
+                    letter: 'f',
+                    limit: "\\displaystyle \\lim_{x \\to +\\infty} (\\sqrt{x^2+1} - \\sqrt{x^2-1})",
+                    indet: "\\left[ \\infty - \\infty \\right]",
+                    steps: [
+                        <div className="text-sm text-slate-500 italic mt-2">Multiplicamos y dividimos por el conjugado:</div>,
+                        "\\displaystyle = \\lim_{x \\to +\\infty} \\frac{(\\sqrt{x^2+1} - \\sqrt{x^2-1})(\\sqrt{x^2+1} + \\sqrt{x^2-1})}{\\sqrt{x^2+1} + \\sqrt{x^2-1}}",
+                        "\\displaystyle = \\lim_{x \\to +\\infty} \\frac{(x^2+1) - (x^2-1)}{\\sqrt{x^2+1} + \\sqrt{x^2-1}} = \\lim_{x \\to +\\infty} \\frac{2}{\\sqrt{x^2+1} + \\sqrt{x^2-1}}",
+                        <div className="text-sm text-slate-500 italic mt-2">El numerador es una constante y el denominador tiende a infinito:</div>,
+                        "\\displaystyle = \\frac{2}{+\\infty} = 0"
+                    ],
+                    finalResult: "0"
+                },
+                {
+                    letter: 'g',
+                    limit: "\\displaystyle \\lim_{x \\to +\\infty} (\\sqrt{4x^2-x} - 2x)",
+                    indet: "\\left[ \\infty - \\infty \\right]",
+                    steps: [
+                        <div className="text-sm text-slate-500 italic mt-2">Multiplicamos y dividimos por el conjugado:</div>,
+                        "\\displaystyle = \\lim_{x \\to +\\infty} \\frac{(\\sqrt{4x^2-x} - 2x)(\\sqrt{4x^2-x} + 2x)}{\\sqrt{4x^2-x} + 2x}",
+                        "\\displaystyle = \\lim_{x \\to +\\infty} \\frac{(4x^2-x) - 4x^2}{\\sqrt{4x^2-x} + 2x} = \\lim_{x \\to +\\infty} \\frac{-x}{\\sqrt{4x^2-x} + 2x} = \\left[ \\frac{\\infty}{\\infty} \\right]",
+                        <div className="text-sm text-slate-500 italic mt-2">Términos dominantes:</div>,
+                        "\\displaystyle = \\lim_{x \\to +\\infty} \\frac{-x}{\\sqrt{4x^2} + 2x} = \\lim_{x \\to +\\infty} \\frac{-x}{4x} = -\\frac{1}{4}"
+                    ],
+                    finalResult: "-\\frac{1}{4}"
+                },
+                {
+                    letter: 'h',
+                    limit: "\\displaystyle \\lim_{x \\to 2} \\left( \\frac{1}{x-2} - \\frac{x}{x^2-4} \\right)",
+                    indet: "\\left[ \\infty - \\infty \\right]",
+                    isTrick: true,
+                    steps: [
+                        <div className="text-sm text-slate-500 italic mt-2">Hacemos común denominador <Latex math="(x^2-4)" /> :</div>,
+                        "\\displaystyle = \\lim_{x \\to 2} \\frac{(x+2) - x}{x^2-4} = \\lim_{x \\to 2} \\frac{2}{x^2-4} = \\frac{2}{0} \\to \\infty",
+                        <div className="text-red-600 font-semibold mt-2">¡Cuidado! Se ha transformado en un caso de divergencia <Latex math="(k/0)" />.</div>,
+                        <div className="text-sm text-slate-500 italic mt-2">Estudiamos los límites laterales para deducir el signo del cero:</div>,
+                        "\\displaystyle \\lim_{x \\to 2^-} \\dots = \\frac{2}{0^-} = -\\infty \\quad \\text{y} \\quad \\lim_{x \\to 2^+} \\dots = \\frac{2}{0^+} = +\\infty"
+                    ],
+                    finalResult: "\\text{No hay tendencia global}"
+                },
+                {
+                    letter: 'i',
+                    limit: "\\displaystyle \\lim_{x \\to +\\infty} (\\sqrt{9x^2+x} - x)",
+                    indet: "\\left[ \\infty - \\infty \\right]",
+                    isTrick: true,
+                    steps: [
+                        <div className="text-red-600 font-semibold mt-2">¡Atención! Antes de lanzarnos a usar conjugados, comprobamos los términos dominantes:</div>,
+                        "\\displaystyle \\lim_{x \\to +\\infty} (\\sqrt{9x^2} - x) = \\lim_{x \\to +\\infty} (3x - x)",
+                        <div className="text-sm text-slate-500 italic mt-2">Como <Latex math="3x \neq x" />, no hay empate de coeficientes. El primer término domina claramente.</div>,
+                        <div className="text-sm text-slate-500 italic mt-2">No necesitamos conjugado. Calculamos directamente:</div>,
+                        "\\displaystyle = \\lim_{x \\to +\\infty} 2x = +\\infty"
+                    ],
+                    finalResult: "+\\infty"
+                },
+                {
+                    letter: 'j',
+                    limit: "\\displaystyle \\lim_{x \\to +\\infty} (\\sqrt{x^3+2x} - x)",
+                    indet: "\\left[ \\infty - \\infty \\right]",
+                    steps: [
+                        <div className="text-sm text-slate-500 italic mt-2">Estudiamos los grados de los términos:</div>,
+                        "\\text{La raíz tiene grado interior } 3 \\text{, que equivale a un grado exterior } 3/2 = 1.5.",
+                        "\\text{El monomio del sustraendo tiene grado } 1.",
+                        <div className="text-sm text-slate-500 italic mt-2">Como el grado de la raíz es mayor, no hay empate y domina la carrera hacia el infinito:</div>,
+                        "\\displaystyle = \\lim_{x \\to +\\infty} \\sqrt{x^3} = +\\infty"
+                    ],
+                    finalResult: "+\\infty"
+                }
+            ];
+
+            return (
+                <div>
+                    {exercises.map(ex => <GenericExerciseCard key={ex.letter} {...ex} colorTheme="orange" />)}
+                </div>
+            );
+        };
+
         const InteractiveZeroOverZero = () => {
             const [activeTab, setActiveTab] = useState('polinomios');
 
@@ -1006,6 +1432,126 @@
                 </div>
             )
         }
+
+        const InteractiveInfMinusInf = () => {
+            return (
+                <div className="bg-white p-0">
+                    <div className="bg-orange-500 p-6 rounded-t-xl">
+                        <h3 className="text-2xl font-bold text-white mb-2">Resolución: Indeterminación <Latex math="\infty - \infty" /></h3>
+                        <p className="text-orange-50 text-lg">Aparece cuando restamos dos funciones que tienden a infinito. La resolución depende del tipo de función, ya que debemos averiguar qué infinito "gana" la carrera.</p>
+                    </div>
+                    
+                    <div className="p-6 space-y-12">
+                        {/* CASO 1 */}
+                        <div className="bg-slate-50 p-6 md:p-8 rounded-xl border border-slate-200 shadow-sm">
+                            <h4 className="text-xl font-bold text-slate-800 mb-4 border-b border-slate-200 pb-2 text-orange-700">1. Con polinomios y funciones elementales</h4>
+                            <p className="text-lg text-slate-700 mb-6 bg-white p-5 rounded-lg border border-slate-100 shadow-sm">
+                                <strong>Regla:</strong> Estudiamos los <strong>órdenes de infinito</strong>. Nos quedamos con el término dominante (el que crece más rápido hacia el infinito).
+                            </p>
+                            
+                            <div className="space-y-6">
+                                <div className="flex flex-col gap-2">
+                                    <div className="text-sm text-slate-500 italic font-semibold">Término dominante: polinómica &gt;&gt; logarítmica</div>
+                                    <div className="bg-white px-6 py-4 rounded-lg shadow-sm border border-slate-200 overflow-x-auto hide-scrollbar text-lg">
+                                        <Latex math="\displaystyle \lim_{x \to +\infty} (\textcolor{#db2777}{x} - \ln x) = \lim_{x \to +\infty} x = \mathbf{+\infty}" />
+                                    </div>
+                                </div>
+                                <div className="flex flex-col gap-2">
+                                    <div className="text-sm text-slate-500 italic font-semibold">Domina por tener mayor exponente:</div>
+                                    <div className="bg-white px-6 py-4 rounded-lg shadow-sm border border-slate-200 overflow-x-auto hide-scrollbar text-lg">
+                                        <Latex math="\displaystyle \lim_{x \to +\infty} (\textcolor{#db2777}{3x^2} - x) = \lim_{x \to +\infty} 3x^2 = \mathbf{+\infty}" />
+                                    </div>
+                                </div>
+                                <div className="flex flex-col gap-2">
+                                    <div className="text-sm text-slate-500 italic font-semibold">Domina por tener mayor base:</div>
+                                    <div className="bg-white px-6 py-4 rounded-lg shadow-sm border border-slate-200 overflow-x-auto hide-scrollbar text-lg">
+                                        <Latex math="\displaystyle \lim_{x \to +\infty} (2^x - \textcolor{#db2777}{3^x}) = \lim_{x \to +\infty} (-3^x) = \mathbf{-\infty}" />
+                                    </div>
+                                </div>
+                                <div className="flex flex-col gap-2">
+                                    <div className="text-sm text-slate-500 italic font-semibold">Entre logaritmos domina el de menor base (siempre que base &gt; 1):</div>
+                                    <div className="bg-white px-6 py-4 rounded-lg shadow-sm border border-slate-200 overflow-x-auto hide-scrollbar text-lg">
+                                        <Latex math="\displaystyle \lim_{x \to +\infty} (\log x - \textcolor{#db2777}{\ln x}) = \lim_{x \to +\infty} (-\ln x) = \mathbf{-\infty}" />
+                                    </div>
+                                </div>
+                                <div className="flex flex-col gap-2">
+                                    <div className="text-sm text-slate-500 italic font-semibold">Domina por mayor coeficiente:</div>
+                                    <div className="bg-white px-6 py-4 rounded-lg shadow-sm border border-slate-200 overflow-x-auto hide-scrollbar text-lg">
+                                        <Latex math="\displaystyle \lim_{x \to +\infty} \left( \textcolor{#db2777}{\sqrt{3x^2-1}} - \sqrt{x^2-3x} \right) = \mathbf{+\infty}" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* CASO 2 */}
+                        <div className="bg-slate-50 p-6 md:p-8 rounded-xl border border-slate-200 shadow-sm">
+                            <h4 className="text-xl font-bold text-slate-800 mb-4 border-b border-slate-200 pb-2 text-orange-700">2. Con fracciones algebraicas</h4>
+                            <p className="text-lg text-slate-700 mb-6 bg-white p-5 rounded-lg border border-slate-100 shadow-sm">
+                                <strong>Regla:</strong> Se operan las funciones (calculando el mínimo común múltiplo) para transformarlas en una fracción única.
+                            </p>
+                            
+                            <div className="bg-white p-6 rounded-lg shadow-sm border border-slate-200 overflow-x-auto hide-scrollbar text-lg flex flex-col gap-4">
+                                <Latex math="\displaystyle \lim_{x \to 3} \left( \frac{1}{x^2-9} - \frac{1}{x-3} \right) = \left[ \infty - \infty \right]" />
+                                <div className="text-sm text-slate-500 italic mt-2">Hacemos común denominador <Latex math="(x^2-9)" /> :</div>
+                                <Latex math="\displaystyle = \lim_{x \to 3} \frac{1 - (x+3)}{x^2-9} = \lim_{x \to 3} \frac{-x-2}{x^2-9} = \frac{-5}{0} \to \text{Divergencia}" />
+                                
+                                <div className="mt-6 p-5 bg-slate-50 border border-slate-200 rounded-lg">
+                                    <div className="text-sm font-bold text-slate-600 mb-4 text-center border-b border-slate-200 pb-2">Calculamos los límites laterales:</div>
+                                    <div className="flex flex-col md:flex-row justify-center gap-8 text-center mb-6">
+                                        <Latex math="\displaystyle \lim_{x \to 3^+} \dots = \frac{-5}{0^+} = \mathbf{-\infty}" />
+                                        <Latex math="\displaystyle \lim_{x \to 3^-} \dots = \frac{-5}{0^-} = \mathbf{+\infty}" />
+                                    </div>
+                                    <div className="text-center text-red-600 font-bold bg-red-50 py-3 rounded-lg border border-red-100 mx-auto max-w-md">
+                                        <Latex math="\displaystyle \implies \nexists \lim_{x \to 3} \left( \frac{1}{x^2-9} - \frac{1}{x-3} \right)" />
+                                        <span className="block text-sm font-normal mt-1">(No hay tendencia global)</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* CASO 3 */}
+                        <div className="bg-slate-50 p-6 md:p-8 rounded-xl border border-slate-200 shadow-sm">
+                            <h4 className="text-xl font-bold text-slate-800 mb-4 border-b border-slate-200 pb-2 text-orange-700">3. Con radicales y polinomios (mismo grado y coeficiente)</h4>
+                            <p className="text-lg text-slate-700 mb-6 bg-white p-5 rounded-lg border border-slate-100 shadow-sm">
+                                <strong>Regla:</strong> Se multiplica y divide por la <strong>expresión radical conjugada</strong>.
+                            </p>
+                            
+                            <div className="bg-white p-6 rounded-lg shadow-sm border border-slate-200 overflow-x-auto hide-scrollbar text-lg flex flex-col gap-4">
+                                <Latex math="\displaystyle \lim_{x \to +\infty} \left[ \sqrt{4x^2+1} - (2x+1) \right] = \left[ \infty - \infty \right]" />
+                                
+                                <div className="text-sm text-slate-500 italic mt-2">Multiplicamos y dividimos por el conjugado:</div>
+                                <div className="bg-slate-50 p-3 rounded border border-slate-100">
+                                    <Latex math="\displaystyle = \lim_{x \to +\infty} \frac{\left[ \sqrt{4x^2+1} - (2x+1) \right] \cdot \left[ \sqrt{4x^2+1} + (2x+1) \right]}{\sqrt{4x^2+1} + (2x+1)}" />
+                                </div>
+                                
+                                <div className="text-sm text-slate-500 italic mt-4">Operamos Suma por Diferencia en el numerador:</div>
+                                <div className="bg-slate-50 p-3 rounded border border-slate-100">
+                                    <Latex math="\displaystyle = \lim_{x \to +\infty} \frac{(\sqrt{4x^2+1})^2 - (2x+1)^2}{\sqrt{4x^2+1} + 2x + 1}" />
+                                    <Latex math="\displaystyle = \lim_{x \to +\infty} \frac{(4x^2+1) - (4x^2+4x+1)}{\sqrt{4x^2+1} + 2x + 1}" />
+                                </div>
+                                
+                                <div className="text-sm text-slate-500 italic mt-4">Simplificamos y obtenemos una indeterminación del Caso 1:</div>
+                                <div className="bg-orange-50 p-3 rounded border border-orange-200 text-orange-900 font-semibold">
+                                    <Latex math="\displaystyle = \lim_{x \to +\infty} \frac{-4x}{\sqrt{4x^2+1} + (2x+1)} = \left[ \frac{-\infty}{+\infty} \right]" />
+                                </div>
+
+                                <div className="mt-8 p-6 bg-white border-2 border-orange-300 rounded-xl relative shadow-md">
+                                    <div className="absolute -top-4 -left-3 text-3xl">💡</div>
+                                    <div className="text-base font-bold text-orange-800 mb-3 text-center border-b border-orange-100 pb-2">Resolviendo el <Latex math="\infty / \infty" /> final:</div>
+                                    <div className="text-slate-600 text-center mb-6">
+                                        Cuando la <Latex math="x" /> tiende a infinito, los números <Latex math="+1" /> del término de la raíz y del paréntesis se vuelven <strong>despreciables</strong>. Nos quedamos solo con los términos de mayor grado:
+                                    </div>
+                                    <div className="bg-slate-50 py-4 px-2 rounded-lg text-center overflow-x-auto hide-scrollbar">
+                                        <Latex math="\displaystyle = \lim_{x \to +\infty} \frac{-4x}{\sqrt{\textcolor{#db2777}{4x^2}} + \textcolor{#db2777}{2x}} = \lim_{x \to +\infty} \frac{-4x}{2x + 2x} = \lim_{x \to +\infty} \frac{-4x}{4x} = \mathbf{-1}" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            );
+        };
 
         // ---------------------------------------------------------
         // COMPONENTES DE EJEMPLOS ANTERIORES (1, 2, 3, 4, 5, 6, 7)
@@ -1222,10 +1768,6 @@
                 </div>
             );
         };
-
-        // ---------------------------------------------------------
-        // MOTORES DE INTERACCIÓN Y GRÁFICOS
-        // ---------------------------------------------------------
 
         const LimitInteractive = ({ targetX, targetY, func, step, setStep, steps, holeAtTarget = false, breakAtTarget = false, isStepFunction = false, verticalAsymptote = null, hideZoom = false, splitApproaches = false, stepLeft, setStepLeft, stepRight, setStepRight, graphDomain, graphRange, isDivergent = false }) => {
             
