@@ -213,9 +213,47 @@
                                 {/* CASO B */}
                                 <div className="bg-white p-5 rounded-lg border border-slate-200 shadow-sm">
                                     <h4 className="font-bold text-lg mb-2 text-slate-800">Caso B: Un número distinto de cero partido por cero <Latex math="\left( \frac{k}{0} \right)" /></h4>
-                                    <p className="text-lg text-slate-600 mb-4">La expresión tiende a infinito. No es un número real, pero nos indica que la función <strong>diverge</strong> (habrá que estudiar límites laterales para ver el signo).</p>
-                                    <div className="bg-slate-50 p-4 rounded border border-slate-200 text-center overflow-x-auto hide-scrollbar">
-                                        <Latex math="\displaystyle \lim_{x \to 2} \frac{-1}{(x - 2)^2} = \frac{-1}{0} = \mathbf{-\infty}" />
+                                    <p className="text-lg text-slate-600 mb-4">
+                                        La expresión tiende a infinito. Como no es un número real, la función <strong>diverge</strong>. Para saber si va hacia <Latex math="+\infty" /> o <Latex math="-\infty" />, es obligatorio <strong>estudiar los límites laterales</strong> dando valores muy próximos por la izquierda y por la derecha para deducir el signo del cero (<Latex math="0^+" /> o <Latex math="0^-" />).
+                                    </p>
+
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+                                        {/* Ejemplo 1 */}
+                                        <div className="bg-slate-50 p-5 rounded-lg border border-slate-200">
+                                            <h5 className="font-semibold text-slate-700 mb-4 text-center border-b border-slate-200 pb-2">Ejemplo 1: Mismo signo</h5>
+                                            <div className="overflow-x-auto hide-scrollbar text-center">
+                                                <Latex math="\displaystyle \lim_{x \to 1} \frac{3}{(x-1)^2} = \frac{3}{0} \to \infty" display={true} />
+                                            </div>
+                                            <div className="text-base text-slate-600 mt-4 space-y-3">
+                                                <p className="flex flex-col items-center"><span className="text-sm font-semibold text-slate-400">Por la izquierda (ej. x = 0,99):</span> <Latex math="\lim_{x \to 1^-} \dots = \frac{3}{0^+} = \mathbf{+\infty}" /></p>
+                                                <p className="flex flex-col items-center"><span className="text-sm font-semibold text-slate-400">Por la derecha (ej. x = 1,01):</span> <Latex math="\lim_{x \to 1^+} \dots = \frac{3}{0^+} = \mathbf{+\infty}" /></p>
+                                            </div>
+                                            <div className="mt-6 text-center font-bold text-blue-700 bg-blue-100 py-2 rounded-lg border border-blue-200">
+                                                La función tiende a <Latex math="\mathbf{+\infty}" />
+                                            </div>
+                                        </div>
+
+                                        {/* Ejemplo 2 */}
+                                        <div className="bg-slate-50 p-5 rounded-lg border border-slate-200">
+                                            <h5 className="font-semibold text-slate-700 mb-4 text-center border-b border-slate-200 pb-2">Ejemplo 2: Distinto signo</h5>
+                                            <div className="overflow-x-auto hide-scrollbar text-center">
+                                                <Latex math="\displaystyle \lim_{x \to 3} \frac{x+2}{x-3} = \frac{5}{0} \to \infty" display={true} />
+                                            </div>
+                                            <div className="text-base text-slate-600 mt-4 space-y-3">
+                                                <p className="flex flex-col items-center"><span className="text-sm font-semibold text-slate-400">Por la izquierda (ej. x = 2,99):</span> <Latex math="\lim_{x \to 3^-} \dots = \frac{5}{0^-} = \mathbf{-\infty}" /></p>
+                                                <p className="flex flex-col items-center"><span className="text-sm font-semibold text-slate-400">Por la derecha (ej. x = 3,01):</span> <Latex math="\lim_{x \to 3^+} \dots = \frac{5}{0^+} = \mathbf{+\infty}" /></p>
+                                            </div>
+                                            <div className="mt-6 text-center font-bold text-red-700 bg-red-100 py-2 rounded-lg border border-red-200">
+                                                No hay tendencia global
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="mt-6 bg-indigo-50 text-indigo-900 p-4 rounded-lg flex items-start gap-3 border border-indigo-200 shadow-sm">
+                                        <span className="text-2xl leading-none">💡</span>
+                                        <p className="text-base">
+                                            <strong>Nota visual:</strong> Si quieres ver cómo se comportan estas gráficas, vuelve a interactuar con el <strong>Ejemplo 5</strong> (Mismo signo) y el <strong>Ejemplo 6</strong> (Distinto signo) del <em>Apartado 3</em> de este tema.
+                                        </p>
                                     </div>
                                 </div>
 
