@@ -131,6 +131,18 @@
                                                 <span className="w-1.5 h-1.5 rounded-full bg-orange-500 shrink-0"></span>
                                                 Indet. <Latex math="\infty - \infty" />
                                             </a>
+                                            <a href="#indet-0-por-inf" onClick={closeMenu} className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-bold text-purple-600 hover:bg-purple-50 transition-colors">
+                                                <span className="w-1.5 h-1.5 rounded-full bg-purple-600 shrink-0"></span>
+                                                Indet. <Latex math="0 \cdot \infty" />
+                                            </a>
+                                            <a href="#indet-1-inf" onClick={closeMenu} className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-bold text-teal-600 hover:bg-teal-50 transition-colors">
+                                                <span className="w-1.5 h-1.5 rounded-full bg-teal-600 shrink-0"></span>
+                                                Indet. <Latex math="1^\infty" />
+                                            </a>
+                                            <a href="#indet-futuras" onClick={closeMenu} className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-bold text-slate-500 hover:bg-slate-100 transition-colors">
+                                                <span className="w-1.5 h-1.5 rounded-full bg-slate-400 shrink-0"></span>
+                                                Indet. <Latex math="\infty^0, 0^0" />
+                                            </a>
                                         </div>
                                     )}
                                 </nav>
@@ -352,17 +364,19 @@
                                         <a href="#indet-inf-menos-inf" className="bg-white p-4 rounded-xl shadow-sm border border-red-200 flex flex-col items-center justify-center aspect-square transform transition hover:scale-105 hover:bg-red-50 hover:border-red-400 cursor-pointer">
                                             <span className="text-4xl font-bold text-red-600"><Latex math="\infty - \infty" /></span>
                                         </a>
-                                        <a href="#indet-0-por-inf" className="bg-white p-4 rounded-xl shadow-sm border border-red-200 flex flex-col items-center justify-center aspect-square transform transition hover:scale-105 hover:bg-red-50 cursor-pointer" title="Próximamente">
+                                        <a href="#indet-0-por-inf" className="bg-white p-4 rounded-xl shadow-sm border border-red-200 flex flex-col items-center justify-center aspect-square transform transition hover:scale-105 hover:bg-red-50 hover:border-red-400 cursor-pointer">
                                             <span className="text-4xl font-bold text-red-600"><Latex math="0 \cdot \infty" /></span>
                                         </a>
-                                        <a href="#indet-1-inf" className="bg-white p-4 rounded-xl shadow-sm border border-red-200 flex flex-col items-center justify-center aspect-square transform transition hover:scale-105 hover:bg-red-50 cursor-pointer" title="Próximamente">
+                                        <a href="#indet-1-inf" className="bg-white p-4 rounded-xl shadow-sm border border-red-200 flex flex-col items-center justify-center aspect-square transform transition hover:scale-105 hover:bg-red-50 hover:border-red-400 cursor-pointer">
                                             <span className="text-4xl font-bold text-red-600"><Latex math="1^\infty" /></span>
                                         </a>
-                                        <a href="#indet-inf-0" className="bg-white p-4 rounded-xl shadow-sm border border-red-200 flex flex-col items-center justify-center aspect-square transform transition hover:scale-105 hover:bg-red-50 cursor-pointer" title="Próximamente">
-                                            <span className="text-4xl font-bold text-red-600"><Latex math="\infty^0" /></span>
+                                        <a href="#indet-futuras" className="bg-slate-50 p-4 rounded-xl shadow-sm border border-slate-300 flex flex-col items-center justify-center aspect-square cursor-pointer group relative overflow-hidden hover:bg-slate-100 hover:scale-105 transition transform">
+                                            <span className="text-4xl font-bold text-slate-500 mb-1"><Latex math="\infty^0" /></span>
+                                            <span className="text-[10px] font-bold text-slate-600 bg-slate-200 px-2 py-1 rounded-md text-center leading-tight shadow-inner">Próximamente<br/>2º Bach.</span>
                                         </a>
-                                        <a href="#indet-0-0-pot" className="bg-white p-4 rounded-xl shadow-sm border border-red-200 flex flex-col items-center justify-center aspect-square transform transition hover:scale-105 hover:bg-red-50 cursor-pointer" title="Próximamente">
-                                            <span className="text-4xl font-bold text-red-600"><Latex math="0^0" /></span>
+                                        <a href="#indet-futuras" className="bg-slate-50 p-4 rounded-xl shadow-sm border border-slate-300 flex flex-col items-center justify-center aspect-square cursor-pointer group relative overflow-hidden hover:bg-slate-100 hover:scale-105 transition transform">
+                                            <span className="text-4xl font-bold text-slate-500 mb-1"><Latex math="0^0" /></span>
+                                            <span className="text-[10px] font-bold text-slate-600 bg-slate-200 px-2 py-1 rounded-md text-center leading-tight shadow-inner">Próximamente<br/>2º Bach.</span>
                                         </a>
                                     </div>
                                 </div>
@@ -450,6 +464,15 @@
                                         <ExerciseListInfMinusInf />
                                     </div>
                                 </div>
+
+                                {/* RESOLUCIÓN INDETERMINACIÓN 0 * INF */}
+                                <InteractiveZeroTimesInf />
+
+                                {/* RESOLUCIÓN INDETERMINACIÓN 1^INF */}
+                                <InteractiveOneToInf />
+
+                                {/* EXPLICACIÓN INDETERMINACIONES FUTURAS */}
+                                <FutureIndeterminations />
 
                             </SectionCard>
 
@@ -976,6 +999,14 @@
                 orange: {
                     btn: 'bg-orange-500 text-white hover:bg-orange-600',
                     resultBg: 'bg-orange-100 border-orange-200 text-orange-800'
+                },
+                purple: {
+                    btn: 'bg-purple-600 text-white hover:bg-purple-700',
+                    resultBg: 'bg-purple-100 border-purple-200 text-purple-800'
+                },
+                teal: {
+                    btn: 'bg-teal-600 text-white hover:bg-teal-700',
+                    resultBg: 'bg-teal-100 border-teal-200 text-teal-800'
                 }
             };
             
@@ -1314,6 +1345,249 @@
             return (
                 <div>
                     {exercises.map(ex => <GenericExerciseCard key={ex.letter} {...ex} colorTheme="orange" />)}
+                </div>
+            );
+        };
+
+        // --- COMPONENTE NUEVO: INDETERMINACIÓN 0 POR INFINITO ---
+        const InteractiveZeroTimesInf = () => {
+            return (
+                <div id="indet-0-por-inf" className="mt-16 bg-white rounded-xl shadow-md border border-purple-200 overflow-hidden scroll-mt-24">
+                    <div className="bg-purple-600 p-6">
+                        <h3 className="text-2xl font-bold text-white mb-2">Resolución: Indeterminación <Latex math="0 \cdot \infty" /></h3>
+                        <p className="text-purple-100 text-lg">Esta indeterminación no tiene reglas de resolución propias, sino que sirve de "puente" hacia otras que ya sabemos resolver.</p>
+                    </div>
+                    
+                    <div className="p-6">
+                        <div className="bg-purple-50 p-6 rounded-lg mb-10 border-l-4 border-purple-500 shadow-sm">
+                            <h3 className="font-bold text-purple-800 mb-2 text-xl">La regla de oro: Multiplicar</h3>
+                            <p className="text-lg text-slate-700 mb-4">
+                                Para resolver un <Latex math="0 \cdot \infty" />, el único paso que debemos dar es <strong>realizar la operación de multiplicación indicada</strong>.
+                            </p>
+                            <p className="text-lg text-slate-700">
+                                Al multiplicar y juntar los términos en una sola fracción, el límite se transformará automáticamente en un <Latex math="\left[ \frac{0}{0} \right]" /> o en un <Latex math="\left[ \frac{\infty}{\infty} \right]" />. ¡A partir de ahí, solo hay que aplicar las reglas que ya conocemos!
+                            </p>
+                        </div>
+
+                        <h3 className="text-xl font-bold text-slate-800 mb-6 border-b border-slate-200 pb-2">Ejercicios resueltos:</h3>
+                        <ExerciseListZeroTimesInf />
+                    </div>
+                </div>
+            );
+        };
+
+        const ExerciseListZeroTimesInf = () => {
+            const exercises = [
+                {
+                    letter: 'a',
+                    limit: "\\displaystyle \\lim_{x \\to 1} \\left[ (x^2 - 2x + 1) \\cdot \\frac{1}{x - 1} \\right]",
+                    indet: "\\left[ 0 \\cdot \\infty \\right]",
+                    steps: [
+                        <div className="text-sm text-slate-500 italic mt-2">Multiplicamos para juntar la expresión en una sola fracción:</div>,
+                        "\\displaystyle = \\lim_{x \\to 1} \\frac{x^2 - 2x + 1}{x - 1} = \\left[ \\frac{0}{0} \\right]",
+                        <div className="text-sm text-slate-500 italic mt-2">Se transforma en 0/0. Factorizamos el numerador (identidad notable):</div>,
+                        "\\displaystyle = \\lim_{x \\to 1} \\frac{(x - 1)^2}{x - 1}",
+                        <div className="text-sm text-slate-500 italic mt-2">Simplificamos:</div>,
+                        "\\displaystyle = \\lim_{x \\to 1} (x - 1) = 1 - 1 = 0"
+                    ],
+                    finalResult: "0"
+                },
+                {
+                    letter: 'b',
+                    limit: "\\displaystyle \\lim_{x \\to +\\infty} \\left[ x \\cdot \\frac{5}{2x + 1} \\right]",
+                    indet: "\\left[ \\infty \\cdot 0 \\right]",
+                    steps: [
+                        <div className="text-sm text-slate-500 italic mt-2">Multiplicamos la x por el numerador de la fracción:</div>,
+                        "\\displaystyle = \\lim_{x \\to +\\infty} \\frac{5x}{2x + 1} = \\left[ \\frac{\\infty}{\\infty} \\right]",
+                        <div className="text-sm text-slate-500 italic mt-2">Se transforma en infinito partido por infinito. Nos quedamos con los términos dominantes:</div>,
+                        "\\displaystyle = \\lim_{x \\to +\\infty} \\frac{5x}{2x} = \\frac{5}{2}"
+                    ],
+                    finalResult: "\\frac{5}{2}"
+                },
+                {
+                    letter: 'c',
+                    limit: "\\displaystyle \\lim_{x \\to +\\infty} x \\cdot (\\sqrt{x^2 + 1} - x)",
+                    indet: "\\left[ \\infty \\cdot 0 \\right]",
+                    steps: [
+                        <div className="text-sm text-slate-500 italic mt-2">Al sustituir el paréntesis da infinito menos infinito. Multiplicamos y dividimos por su conjugado:</div>,
+                        "\\displaystyle = \\lim_{x \\to +\\infty} x \\cdot \\frac{(\\sqrt{x^2 + 1} - x)(\\sqrt{x^2 + 1} + x)}{\\sqrt{x^2 + 1} + x}",
+                        "\\displaystyle = \\lim_{x \\to +\\infty} x \\cdot \\frac{(x^2 + 1) - x^2}{\\sqrt{x^2 + 1} + x} = \\lim_{x \\to +\\infty} x \\cdot \\frac{1}{\\sqrt{x^2 + 1} + x}",
+                        <div className="text-sm text-slate-500 italic mt-2">Multiplicamos la x:</div>,
+                        "\\displaystyle = \\lim_{x \\to +\\infty} \\frac{x}{\\sqrt{x^2 + 1} + x} = \\left[ \\frac{\\infty}{\\infty} \\right]",
+                        <div className="text-sm text-slate-500 italic mt-2">Ahora aplicamos términos dominantes de mayor grado (despreciamos el +1 interior):</div>,
+                        "\\displaystyle = \\lim_{x \\to +\\infty} \\frac{x}{\\sqrt{x^2} + x} = \\lim_{x \\to +\\infty} \\frac{x}{x + x} = \\lim_{x \\to +\\infty} \\frac{x}{2x} = \\frac{1}{2}"
+                    ],
+                    finalResult: "\\frac{1}{2}"
+                },
+                {
+                    letter: 'd',
+                    limit: "\\displaystyle \\lim_{x \\to 0} \\left[ x \\cdot \\left( \\frac{1}{x} - \\frac{1}{x^2 + x} \\right) \\right]",
+                    indet: "\\left[ 0 \\cdot \\infty \\right]",
+                    steps: [
+                        <div className="text-sm text-slate-500 italic mt-2">Multiplicamos la x por ambas fracciones aplicando la propiedad distributiva:</div>,
+                        "\\displaystyle = \\lim_{x \\to 0} \\left( \\frac{x}{x} - \\frac{x}{x^2 + x} \\right)",
+                        <div className="text-sm text-slate-500 italic mt-2">Simplificamos las fracciones:</div>,
+                        "\\displaystyle = \\lim_{x \\to 0} \\left( 1 - \\frac{x}{x(x + 1)} \\right) = \\lim_{x \\to 0} \\left( 1 - \\frac{1}{x + 1} \\right)",
+                        <div className="text-sm text-slate-500 italic mt-2">Volvemos a intentar la sustitución directa:</div>,
+                        "\\displaystyle = 1 - \\frac{1}{0 + 1} = 1 - 1 = 0"
+                    ],
+                    finalResult: "0"
+                }
+            ];
+
+            return (
+                <div>
+                    {exercises.map(ex => <GenericExerciseCard key={ex.letter} {...ex} colorTheme="purple" />)}
+                </div>
+            );
+        };
+
+        // --- COMPONENTE NUEVO: INDETERMINACIÓN 1 ELEVADO A INFINITO ---
+        const InteractiveOneToInf = () => {
+            return (
+                <div id="indet-1-inf" className="mt-16 bg-white rounded-xl shadow-md border border-teal-200 overflow-hidden scroll-mt-24">
+                    <div className="bg-teal-600 p-6">
+                        <h3 className="text-2xl font-bold text-white mb-2">Resolución: Indeterminación <Latex math="1^\infty" /></h3>
+                        <p className="text-teal-100 text-lg">Aparece en funciones exponenciales donde la base tiende a 1 y el exponente a infinito. Está íntimamente ligada al número <Latex math="e" />.</p>
+                    </div>
+                    
+                    <div className="p-6">
+                        <div className="bg-teal-50 p-6 rounded-lg mb-10 border-l-4 border-teal-500 shadow-sm">
+                            <h3 className="font-bold text-teal-800 mb-2 text-xl">El origen: El número <Latex math="e" /></h3>
+                            <p className="text-lg text-slate-700 mb-4">
+                                El número de Euler (<Latex math="e \approx 2,71828..." />) se define matemáticamente mediante este famoso límite:
+                            </p>
+                            <div className="bg-white p-4 rounded border border-teal-200 text-center text-xl font-bold text-teal-700 mb-4 overflow-x-auto hide-scrollbar">
+                                <Latex math="\displaystyle \lim_{x \to +\infty} \left( 1 + \frac{1}{x} \right)^x = e" />
+                            </div>
+                            <p className="text-lg text-slate-700 mb-4">
+                                Aunque podríamos intentar manipular algebraicamente nuestra función paso a paso para que se parezca a esta definición, en 1º de Bachillerato utilizamos una <strong>fórmula resolutiva directa</strong> que nos simplifica enormemente el trabajo.
+                            </p>
+
+                            <h3 className="font-bold text-teal-800 mt-8 mb-2 text-xl">La fórmula resolutiva (Regla Rápida):</h3>
+                            <p className="text-lg text-slate-700 mb-4">
+                                Si al calcular <Latex math="\lim_{x \to a} f(x)^{g(x)}" /> comprobamos que la base tiende a 1 y el exponente a infinito, el resultado siempre será <Latex math="e" /> elevado a un nuevo límite mucho más fácil de resolver:
+                            </p>
+                            <div className="bg-white p-6 rounded-xl border-2 border-teal-300 text-center text-2xl font-bold text-teal-900 shadow-sm overflow-x-auto hide-scrollbar">
+                                <Latex math="\displaystyle \lim_{x \to a} f(x)^{g(x)} = e^{\displaystyle \lim_{x \to a} g(x) \cdot [f(x) - 1]}" />
+                            </div>
+                            <p className="text-sm text-teal-700 mt-3 text-center italic">
+                                * Se multiplica el exponente original por la base menos uno.
+                            </p>
+                        </div>
+
+                        <h3 className="text-xl font-bold text-slate-800 mb-6 border-b border-slate-200 pb-2">Ejercicios resueltos:</h3>
+                        <ExerciseListOneToInf />
+                    </div>
+                </div>
+            );
+        };
+
+        const ExerciseListOneToInf = () => {
+            const exercises = [
+                {
+                    letter: 'a',
+                    limit: "\\displaystyle \\lim_{x \\to +\\infty} \\left( \\frac{x + 2}{x - 1} \\right)^{3x}",
+                    indet: "\\left[ 1^{\\infty} \\right]",
+                    steps: [
+                        <div className="text-sm text-slate-500 italic mt-2">Comprobamos primero que la base tiende a 1 y el exponente a infinito. Luego aplicamos la fórmula:</div>,
+                        "\\displaystyle L = e^{\\displaystyle \\lim_{x \\to +\\infty} 3x \\cdot \\left( \\frac{x + 2}{x - 1} - 1 \\right)}",
+                        <div className="text-sm text-slate-500 italic mt-2">Hacemos común denominador dentro del paréntesis para restar 1:</div>,
+                        "\\displaystyle = e^{\\displaystyle \\lim_{x \\to +\\infty} 3x \\cdot \\left( \\frac{x + 2 - (x - 1)}{x - 1} \\right)} = e^{\\displaystyle \\lim_{x \\to +\\infty} 3x \\cdot \\left( \\frac{x + 2 - x + 1}{x - 1} \\right)}",
+                        "\\displaystyle = e^{\\displaystyle \\lim_{x \\to +\\infty} 3x \\cdot \\left( \\frac{3}{x - 1} \\right)}",
+                        <div className="text-sm text-slate-500 italic mt-2">Multiplicamos la fracción por el <Latex math="3x" /> exterior:</div>,
+                        "\\displaystyle = e^{\\displaystyle \\lim_{x \\to +\\infty} \\frac{9x}{x - 1}}",
+                        <div className="text-sm text-slate-500 italic mt-2">Resolvemos el límite del exponente (es un <Latex math="\frac{\infty}{\infty}" /> de mismo grado):</div>,
+                        "\\displaystyle = e^{\\frac{9}{1}} = e^9"
+                    ],
+                    finalResult: "e^9"
+                },
+                {
+                    letter: 'b',
+                    limit: "\\displaystyle \\lim_{x \\to +\\infty} \\left( \\frac{2x^2 + 1}{2x^2 - 3} \\right)^{x^2 + 2}",
+                    indet: "\\left[ 1^{\\infty} \\right]",
+                    steps: [
+                        <div className="text-sm text-slate-500 italic mt-2">Aplicamos la fórmula resolutiva: <Latex math="L = e^{\lim g(x) \cdot (f(x) - 1)}" /></div>,
+                        "\\displaystyle L = e^{\\displaystyle \\lim_{x \\to +\\infty} (x^2 + 2) \\cdot \\left( \\frac{2x^2 + 1}{2x^2 - 3} - 1 \\right)}",
+                        <div className="text-sm text-slate-500 italic mt-2">Restamos 1 haciendo común denominador:</div>,
+                        "\\displaystyle = e^{\\displaystyle \\lim_{x \\to +\\infty} (x^2 + 2) \\cdot \\left( \\frac{2x^2 + 1 - (2x^2 - 3)}{2x^2 - 3} \\right)}",
+                        "\\displaystyle = e^{\\displaystyle \\lim_{x \\to +\\infty} (x^2 + 2) \\cdot \\left( \\frac{4}{2x^2 - 3} \\right)}",
+                        <div className="text-sm text-slate-500 italic mt-2">Multiplicamos el polinomio por el numerador de la fracción:</div>,
+                        "\\displaystyle = e^{\\displaystyle \\lim_{x \\to +\\infty} \\frac{4x^2 + 8}{2x^2 - 3}}",
+                        <div className="text-sm text-slate-500 italic mt-2">Tomamos los términos dominantes en el exponente:</div>,
+                        "\\displaystyle = e^{\\frac{4}{2}} = e^2"
+                    ],
+                    finalResult: "e^2"
+                },
+                {
+                    letter: 'c',
+                    limit: "\\displaystyle \\lim_{x \\to +\\infty} \\left( \\frac{x - 5}{x + 1} \\right)^{\\frac{x}{2}}",
+                    indet: "\\left[ 1^{\\infty} \\right]",
+                    steps: [
+                        <div className="text-sm text-slate-500 italic mt-2">Aplicamos la fórmula:</div>,
+                        "\\displaystyle L = e^{\\displaystyle \\lim_{x \\to +\\infty} \\frac{x}{2} \\cdot \\left( \\frac{x - 5}{x + 1} - 1 \\right)}",
+                        <div className="text-sm text-slate-500 italic mt-2">Operamos el paréntesis:</div>,
+                        "\\displaystyle = e^{\\displaystyle \\lim_{x \\to +\\infty} \\frac{x}{2} \\cdot \\left( \\frac{x - 5 - (x + 1)}{x + 1} \\right)} = e^{\\displaystyle \\lim_{x \\to +\\infty} \\frac{x}{2} \\cdot \\left( \\frac{-6}{x + 1} \\right)}",
+                        <div className="text-sm text-slate-500 italic mt-2">Multiplicamos las fracciones (numerador por numerador, denominador por denominador):</div>,
+                        "\\displaystyle = e^{\\displaystyle \\lim_{x \\to +\\infty} \\frac{-6x}{2x + 2}}",
+                        <div className="text-sm text-slate-500 italic mt-2">Calculamos el límite (mismos grados, se dividen coeficientes):</div>,
+                        "\\displaystyle = e^{\\frac{-6}{2}} = e^{-3} = \\frac{1}{e^3}"
+                    ],
+                    finalResult: "\\frac{1}{e^3}"
+                }
+            ];
+
+            return (
+                <div>
+                    {exercises.map(ex => <GenericExerciseCard key={ex.letter} {...ex} colorTheme="teal" />)}
+                </div>
+            );
+        };
+
+        // --- COMPONENTE NUEVO: INDETERMINACIONES FUTURAS (0^0, inf^0) ---
+        const FutureIndeterminations = () => {
+            return (
+                <div id="indet-futuras" className="mt-16 bg-slate-50 rounded-xl shadow-inner border-2 border-dashed border-slate-300 overflow-hidden scroll-mt-24">
+                    <div className="bg-slate-700 p-6 flex justify-between items-center flex-wrap gap-4">
+                        <div>
+                            <h3 className="text-2xl font-bold text-white mb-2">Indeterminaciones <Latex math="\infty^0" /> y <Latex math="0^0" /></h3>
+                            <p className="text-slate-300 text-lg">¿Por qué no las calculamos este año?</p>
+                        </div>
+                        <div className="bg-amber-400 text-amber-950 font-bold px-4 py-2 rounded-lg shadow-sm transform md:rotate-2">
+                            ¡Próximamente en 2º de Bachillerato!
+                        </div>
+                    </div>
+                    
+                    <div className="p-6 md:p-8">
+                        <p className="text-lg text-slate-700 mb-6">
+                            Para resolver estas dos indeterminaciones exponenciales, el método matemático universal consiste en tomar <strong>logaritmos neperianos</strong> en ambos lados de la igualdad para poder "bajar" el exponente:
+                        </p>
+                        
+                        <div className="bg-white p-6 rounded-lg border border-slate-200 shadow-sm overflow-x-auto hide-scrollbar text-center mb-6">
+                            <Latex math="A = \lim_{x \to a} f(x)^{g(x)} \implies \ln A = \lim_{x \to a} [g(x) \cdot \ln f(x)]" display={true} />
+                        </div>
+
+                        <p className="text-lg text-slate-700 mb-6">
+                            Esto transforma el límite inicial en un <Latex math="0 \cdot \infty" />, que a su vez (como vimos en apartados anteriores) se pasa a fracción para que quede como <Latex math="\left[ \frac{0}{0} \right]" /> o <Latex math="\left[ \frac{\infty}{\infty} \right]" />.
+                        </p>
+
+                        <div className="bg-red-50 p-6 rounded-lg border-l-4 border-red-500 mb-6 shadow-sm">
+                            <h3 className="font-bold text-red-800 mb-2 text-xl">¿Cuál es el problema?</h3>
+                            <p className="text-lg text-slate-700">
+                                Que al llegar a esa fracción llena de logaritmos, la inmensa mayoría de las veces es <strong>imposible resolverla factorizando o quedándonos con los grados dominantes</strong>. Requiere obligatoriamente usar herramientas analíticas más potentes.
+                            </p>
+                        </div>
+
+                        <div className="bg-indigo-50 p-6 md:p-8 rounded-xl border border-indigo-200 text-center shadow-sm">
+                            <h3 className="font-bold text-indigo-900 mb-4 text-2xl">La solución: La Regla de L'Hôpital</h3>
+                            <p className="text-lg text-indigo-800 mb-4">
+                                Esta regla mágica (que utiliza el cálculo de <strong>derivadas</strong> para salvar límites), junto con el manejo fluido de la regla de la cadena en funciones compuestas, es contenido troncal de <strong>2º de Bachillerato</strong>. 
+                            </p>
+                            <p className="text-lg text-indigo-800 font-semibold bg-indigo-100 py-3 px-6 rounded-lg inline-block">
+                                Intentar resolver estos límites ahora mismo nos metería en un callejón sin salida matemático. ¡Así que paciencia, lo mejor está por llegar!
+                            </p>
+                        </div>
+                    </div>
                 </div>
             );
         };
