@@ -72,6 +72,14 @@
             const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
             const [isIndetMenuOpen, setIsIndetMenuOpen] = useState(false); // ESTADO PARA EL SUBMENÚ CERRADO POR DEFECTO
             
+            // Forzar inicio al tope de la página al cargar la app
+            useEffect(() => {
+                window.scrollTo(0, 0);
+                if (window.location.hash) {
+                    window.history.replaceState(null, null, window.location.pathname);
+                }
+            }, []);
+
             const toggleMenu = () => setMobileMenuOpen(!mobileMenuOpen);
             const closeMenu = () => setMobileMenuOpen(false);
 
@@ -149,6 +157,11 @@
                                     {/* NUEVA SECCIÓN: ASÍNTOTAS */}
                                     <a href="#sec-6" onClick={closeMenu} className="block px-4 py-2.5 mt-2 rounded-lg font-semibold text-slate-700 hover:bg-slate-100 hover:text-blue-600 transition-colors">
                                         6. Asíntotas
+                                    </a>
+
+                                    {/* NUEVA SECCIÓN: CONTINUIDAD */}
+                                    <a href="#sec-7" onClick={closeMenu} className="block px-4 py-2.5 mt-2 rounded-lg font-semibold text-slate-700 hover:bg-slate-100 hover:text-emerald-600 transition-colors">
+                                        7. Continuidad
                                     </a>
                                 </nav>
                             </div>
@@ -268,6 +281,44 @@
                             {/* APARTADO 5: CÁLCULO E INDETERMINACIONES */}
                             <SectionCard id="sec-5" title="5. Cálculo de límites. Indeterminaciones">
                                 
+                                {/* NUEVO BLOQUE: ÁLGEBRA DE LÍMITES */}
+                                <div className="mb-12">
+                                    <h3 className="text-2xl font-bold text-slate-800 mb-4 border-b border-slate-200 pb-2">5.1. Operaciones con límites (Álgebra de límites)</h3>
+                                    <p className="text-lg text-slate-700 mb-6">
+                                        Como ocurre con los números reales, podemos realizar operaciones matemáticas con límites. Estas propiedades nos permiten justificar por qué podemos hacer sustituciones directas en funciones complejas, calculando el límite de cada "trozo" por separado:
+                                    </p>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <div className="bg-white p-5 rounded-xl shadow-sm border border-slate-200 flex items-center gap-4 hover:border-blue-300 transition-colors">
+                                            <div className="w-2.5 h-2.5 rounded-full bg-rose-400 shrink-0"></div>
+                                            <div className="overflow-x-auto hide-scrollbar flex-1 flex justify-center text-lg">
+                                                <Latex math="\displaystyle \lim_{x \to a} [f(x) \pm g(x)] = \lim_{x \to a} f(x) \pm \lim_{x \to a} g(x)" />
+                                            </div>
+                                        </div>
+                                        <div className="bg-white p-5 rounded-xl shadow-sm border border-slate-200 flex items-center gap-4 hover:border-blue-300 transition-colors">
+                                            <div className="w-2.5 h-2.5 rounded-full bg-rose-400 shrink-0"></div>
+                                            <div className="overflow-x-auto hide-scrollbar flex-1 flex justify-center text-lg">
+                                                <Latex math="\displaystyle \lim_{x \to a} [f(x) \cdot g(x)] = \lim_{x \to a} f(x) \cdot \lim_{x \to a} g(x)" />
+                                            </div>
+                                        </div>
+                                        <div className="bg-white p-5 rounded-xl shadow-sm border border-slate-200 flex items-center gap-4 hover:border-blue-300 transition-colors">
+                                            <div className="w-2.5 h-2.5 rounded-full bg-rose-400 shrink-0"></div>
+                                            <div className="overflow-x-auto hide-scrollbar flex-1 flex justify-center text-lg">
+                                                <Latex math="\displaystyle \lim_{x \to a} \frac{f(x)}{g(x)} = \frac{\displaystyle \lim_{x \to a} f(x)}{\displaystyle \lim_{x \to a} g(x)}" />
+                                            </div>
+                                        </div>
+                                        <div className="bg-white p-5 rounded-xl shadow-sm border border-slate-200 flex items-center gap-4 hover:border-blue-300 transition-colors">
+                                            <div className="w-2.5 h-2.5 rounded-full bg-rose-400 shrink-0"></div>
+                                            <div className="overflow-x-auto hide-scrollbar flex-1 flex justify-center text-lg">
+                                                <Latex math="\displaystyle \lim_{x \to a} f(x)^{g(x)} = \left[ \lim_{x \to a} f(x) \right]^{\displaystyle \lim_{x \to a} g(x)}" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="mt-4 bg-slate-50 p-4 rounded-lg border border-slate-100 text-slate-500 text-sm italic">
+                                        * Estas propiedades se cumplen exactamente igual cuando <Latex math="x \to \pm\infty" /> y son válidas siempre que los límites individuales existan y no generen operaciones matemáticamente imposibles.
+                                    </div>
+                                </div>
+
+                                <h3 className="text-2xl font-bold text-slate-800 mb-4 border-b border-slate-200 pb-2">5.2. Indeterminaciones y Sustitución</h3>
                                 <div id="caso-a-b-c" className="scroll-mt-24">
                                     <div className="bg-indigo-50 border-l-4 border-indigo-500 p-6 mb-8 rounded-r-lg mt-2">
                                         <p className="text-lg font-semibold text-indigo-900 mb-2">Paso 1 Universal: Sustitución directa</p>
@@ -494,6 +545,11 @@
                                 </p>
 
                                 <AsymptotesTabs />
+                            </SectionCard>
+
+                            {/* NUEVO APARTADO 7: CONTINUIDAD */}
+                            <SectionCard id="sec-7" title="7. Continuidad de una función">
+                                <ContinuitySectionContent />
                             </SectionCard>
 
                         </main>
@@ -2137,7 +2193,7 @@
             };
 
             return (
-                <div className="mb-12 border border-slate-200 rounded-xl overflow-hidden">
+                <div id="ejemplo-2" className="scroll-mt-24 mb-12 border border-slate-200 rounded-xl overflow-hidden">
                     <div className="bg-slate-100 p-4 border-b border-slate-200 flex justify-between items-center">
                         <h4 className="font-bold text-lg text-slate-700">Ejemplo 2: Discontinuidad evitable</h4>
                         <div className="text-xl font-bold text-blue-700 bg-white px-4 py-3 rounded-lg shadow-sm">
@@ -2181,7 +2237,7 @@
             };
 
             return (
-                <div className="mb-8 border border-slate-200 rounded-xl overflow-hidden mt-8">
+                <div id="ejemplo-4" className="scroll-mt-24 mb-8 border border-slate-200 rounded-xl overflow-hidden mt-8">
                     <div className="bg-slate-100 p-4 border-b border-slate-200 flex justify-between items-center">
                         <h4 className="font-bold text-lg text-slate-700">Ejemplo 4: Salto Finito</h4>
                         <div className="text-lg font-bold text-purple-700 bg-white px-4 py-2 rounded-lg shadow-sm">
@@ -2272,7 +2328,7 @@
             }
 
             return (
-                <div className="mb-8 border border-slate-200 rounded-xl overflow-hidden mt-8">
+                <div id="ejemplo-6" className="scroll-mt-24 mb-8 border border-slate-200 rounded-xl overflow-hidden mt-8">
                     <div className="bg-slate-100 p-4 border-b border-slate-200 flex justify-between items-center flex-wrap gap-4">
                         <h4 className="font-bold text-lg text-slate-700">Ejemplo 6: Divergencia con cambio de signo</h4>
                         <div className="flex gap-4">
@@ -2917,6 +2973,217 @@
                     ))}
                 </svg>
             );
+        };
+
+        // ---------------------------------------------------------
+        // COMPONENTES DE CONTINUIDAD (SECCIÓN 7)
+        // ---------------------------------------------------------
+
+        const ContinuitySectionContent = () => {
+            return (
+                <div className="space-y-12 animate-fade-in">
+                    {/* Intro & Rules */}
+                    <div className="bg-emerald-50 border-l-4 border-emerald-500 p-6 rounded-r-lg shadow-sm">
+                        <div className="flex items-center gap-3 mb-4">
+                            <span className="text-3xl">✏️</span>
+                            <h3 className="font-bold text-emerald-900 text-xl">La idea intuitiva y la realidad matemática</h3>
+                        </div>
+                        <p className="text-lg text-slate-700 mb-6">
+                            Intuitivamente, una función es continua en un intervalo si su gráfica no presenta saltos, agujeros ni cortes dentro de ese intervalo. La idea de <strong>"dibujar sin levantar el lápiz"</strong> sirve como imagen visual, pero no es una definición matemática rigurosa y debe usarse con cuidado. Matemáticamente, para que una función <Latex math="f(x)" /> sea continua en un punto exacto <Latex math="x = a" />, debe pasar un "triple filtro" (las 3 condiciones):
+                        </p>
+                        
+                        <div className="bg-white p-6 rounded-lg border border-emerald-200 shadow-sm space-y-4 text-lg text-slate-800">
+                            <div className="flex items-start gap-4">
+                                <div className="bg-emerald-100 text-emerald-800 font-bold w-8 h-8 rounded-full flex items-center justify-center shrink-0">1</div>
+                                <div className="flex-1"><strong>La función debe estar definida en ese punto:</strong> Es decir, debe existir el valor de <Latex math="f(a)" />.</div>
+                            </div>
+                            <div className="flex items-start gap-4">
+                                <div className="bg-emerald-100 text-emerald-800 font-bold w-8 h-8 rounded-full flex items-center justify-center shrink-0">2</div>
+                                <div className="flex-1">
+                                    <strong>Deben existir los límites:</strong> El límite por la izquierda y por la derecha deben coincidir y dar un número real.
+                                    <Latex math="\exists \lim_{x \to a} f(x) = L" display={true} />
+                                </div>
+                            </div>
+                            <div className="flex items-start gap-4">
+                                <div className="bg-emerald-100 text-emerald-800 font-bold w-8 h-8 rounded-full flex items-center justify-center shrink-0">3</div>
+                                <div className="flex-1">
+                                    <strong>Todo debe encajar:</strong> El valor del límite debe ser igual al valor de la función en el punto.
+                                    <Latex math="f(a) = \lim_{x \to a} f(x)" display={true} />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="mt-6 bg-emerald-100 p-5 rounded-lg border border-emerald-300 text-emerald-900 shadow-sm flex items-start gap-3">
+                            <span className="text-2xl leading-none">💡</span>
+                            <div>
+                                <strong className="block mb-1">Nota importante sobre el dominio:</strong>
+                                La continuidad se estudia siempre en un punto o en un conjunto. Decir que una función es "continua" a secas suele significar que es continua en <strong>todos los puntos de su dominio</strong>. Por ejemplo, <Latex math="f(x) = \frac{1}{x}" /> es una función continua en su dominio (<Latex math="\mathbb{R} \setminus \{0\}" />), aunque tenga una asíntota vertical si la miramos dentro de toda la recta real en <Latex math="x=0" />.
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Catálogo */}
+                    <div>
+                        <h3 className="text-2xl font-bold text-slate-800 mb-6 border-b border-slate-200 pb-2">El catálogo de discontinuidades</h3>
+                        <p className="text-lg text-slate-700 mb-6">Si la función suspende alguna de las 3 pruebas anteriores, decimos que es discontinua en ese punto. ¿Recuerdas los ejemplos del principio del tema? ¡Eran exactamente esto!</p>
+                        
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <a href="#ejemplo-2" className="bg-white p-6 rounded-xl shadow-sm border border-slate-200 hover:border-blue-400 hover:shadow-md transition cursor-pointer group flex flex-col justify-between">
+                                <div>
+                                    <h4 className="font-bold text-blue-800 mb-2">1. Evitable (Agujero)</h4>
+                                    <p className="text-sm text-slate-600 mb-4">Los límites laterales coinciden, pero la función no está definida en el punto o tiene otro valor desplazado.</p>
+                                </div>
+                                <div className="text-xs font-bold text-blue-600 bg-blue-50 px-3 py-2 rounded-lg text-center group-hover:bg-blue-100">Ver Ejemplo 2 👆</div>
+                            </a>
+                            <a href="#ejemplo-4" className="bg-white p-6 rounded-xl shadow-sm border border-slate-200 hover:border-purple-400 hover:shadow-md transition cursor-pointer group flex flex-col justify-between">
+                                <div>
+                                    <h4 className="font-bold text-purple-800 mb-2">2. Salto Finito (Escalón)</h4>
+                                    <p className="text-sm text-slate-600 mb-4">Los límites laterales dan números reales diferentes. Hay un "escalón" imposible de unir sin levantar el lápiz.</p>
+                                </div>
+                                <div className="text-xs font-bold text-purple-600 bg-purple-50 px-3 py-2 rounded-lg text-center group-hover:bg-purple-100">Ver Ejemplo 4 👆</div>
+                            </a>
+                            <a href="#ejemplo-6" className="bg-white p-6 rounded-xl shadow-sm border border-slate-200 hover:border-rose-400 hover:shadow-md transition cursor-pointer group flex flex-col justify-between">
+                                <div>
+                                    <h4 className="font-bold text-rose-800 mb-2">3. Salto Infinito (Asíntota)</h4>
+                                    <p className="text-sm text-slate-600 mb-4">Al menos uno de los límites laterales se dispara hacia el infinito. La curva se rompe por completo.</p>
+                                </div>
+                                <div className="text-xs font-bold text-rose-600 bg-rose-50 px-3 py-2 rounded-lg text-center group-hover:bg-rose-100">Ver Ejemplo 6 👆</div>
+                            </a>
+                        </div>
+                    </div>
+
+                    {/* El problema estrella */}
+                    <div className="bg-slate-800 rounded-xl overflow-hidden shadow-lg mt-12 text-slate-50">
+                        <div className="bg-slate-900 p-6 flex items-center justify-between border-b border-slate-700">
+                            <h3 className="text-xl font-bold text-amber-400">⭐ El Problema Estrella de Examen</h3>
+                        </div>
+                        <div className="p-6 md:p-8">
+                            <p className="text-lg mb-6 text-slate-200">El ejercicio más clásico en 1º de Bachillerato es darte una función a trozos con una letra desconocida (un parámetro <Latex math="k" />) y pedirte que calcules su valor para forzar a que la función sea continua.</p>
+                            
+                            <div className="bg-slate-700 p-6 rounded-xl border border-slate-600 shadow-inner mb-8 flex flex-col items-center">
+                                <span className="text-slate-300 font-semibold mb-4 text-center">Encuentra el valor de <Latex math="k" /> para que <Latex math="f(x)" /> sea continua en el punto conflictivo <Latex math="x = 2" />:</span>
+                                <div className="text-2xl bg-white text-slate-900 px-8 py-4 rounded-lg shadow-sm font-bold overflow-x-auto max-w-full">
+                                    <Latex math="f(x) = \begin{cases} x^2 & \text{si } x < 2 \\ x + k & \text{si } x \ge 2 \end{cases}" />
+                                </div>
+                            </div>
+
+                            {/* Controles y Gráfico interactivo */}
+                            <ContinuitySlider />
+
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        const ContinuitySlider = () => {
+            const [k, setK] = useState(0);
+            const targetK = 2;
+            const isContinuous = parseFloat(k) === targetK;
+
+            // Simple SVG Graph dimensions
+            const width = 400, height = 300, padding = 40;
+            const minX = -1, maxX = 5, minY = -2, maxY = 8;
+            
+            const mapX = (x) => padding + ((x - minX) / (maxX - minX)) * (width - 2 * padding);
+            const mapY = (y) => height - padding - ((y - minY) / (maxY - minY)) * (height - 2 * padding);
+
+            // Branch 1: y = x^2 (x < 2)
+            let path1 = "";
+            for(let x = minX; x <= 2; x += 0.05) {
+                path1 += (x === minX ? "M" : "L") + ` ${mapX(x)} ${mapY(x*x)} `;
+            }
+            
+            // Branch 2: y = x + k (x >= 2)
+            const path2 = `M ${mapX(2)} ${mapY(2 + parseFloat(k))} L ${mapX(maxX)} ${mapY(maxX + parseFloat(k))}`;
+
+            return (
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center mt-8">
+                    {/* Controles y Analítico */}
+                    <div className="space-y-6">
+                        <div className="bg-slate-700 p-6 rounded-xl border border-slate-600 shadow-sm">
+                            <h4 className="font-bold text-amber-300 mb-4 whitespace-nowrap tracking-tight sm:tracking-normal">1. Ajusta la rama derecha (mueve la k):</h4>
+                            <input 
+                                type="range" min="-3" max="5" step="0.5" 
+                                value={k} onChange={(e) => setK(e.target.value)}
+                                className="w-full h-2 bg-slate-500 rounded-lg appearance-none cursor-pointer accent-amber-400 focus:outline-none focus:ring-2 focus:ring-amber-500"
+                            />
+                            <div className="mt-4 text-center text-xl font-bold bg-slate-800 py-2 rounded text-white border border-slate-600 shadow-inner">
+                                k = {k}
+                            </div>
+                        </div>
+
+                        <div className="bg-slate-700 p-6 rounded-xl border border-slate-600 shadow-sm">
+                            <h4 className="font-bold text-amber-300 mb-4">2. Resolución analítica (la teoría):</h4>
+                            <div className="space-y-3 text-slate-300 text-lg">
+                                <div className="flex justify-between items-center bg-slate-800 p-2 rounded">
+                                    <span>Límite Izq. <Latex math="(x \to 2^-)" />:</span>
+                                    <span className="font-bold text-white"><Latex math="2^2 = \mathbf{4}" /></span>
+                                </div>
+                                <div className="flex justify-between items-center bg-slate-800 p-2 rounded">
+                                    <span>Límite Der. <Latex math="(x \to 2^+)" />:</span>
+                                    <span className="font-bold text-white"><Latex math="2 + k" /></span>
+                                </div>
+                                <div className="flex justify-between items-center border-t border-slate-500 pt-3 mt-2">
+                                    <span className="text-sm uppercase tracking-wider font-bold">Igualamos:</span>
+                                    <span className="font-bold text-amber-400 text-xl">4 = 2 + k</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Espacio reservado para evitar el salto de la interfaz */}
+                        <div className="h-[72px]">
+                            {isContinuous && (
+                                <div className="bg-emerald-500 text-white font-bold p-4 rounded-xl text-center shadow-lg animate-bounce flex items-center justify-center gap-2 text-lg h-full">
+                                    <svg className="w-6 h-6 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg>
+                                    ¡Perfecto! k = 2. Las ramas están unidas.
+                                </div>
+                            )}
+                        </div>
+                    </div>
+
+                    {/* Gráfico SVG Personalizado */}
+                    <div className="bg-slate-50 rounded-xl shadow-inner border-4 border-slate-600 p-2 relative h-[350px]">
+                        <svg width="100%" height="100%" viewBox={`0 0 ${width} ${height}`} className="w-full h-full">
+                            {/* Cuadrícula suave */}
+                            {[...Array(11).keys()].map(i => (
+                                <line key={`hy${i}`} x1={padding} y1={mapY(i-2)} x2={width-padding} y2={mapY(i-2)} stroke="#e2e8f0" strokeWidth="1" />
+                            ))}
+                            
+                            {/* Ejes */}
+                            <line x1={mapX(minX)} y1={mapY(0)} x2={mapX(maxX)} y2={mapY(0)} stroke="#94a3b8" strokeWidth="2" />
+                            <line x1={mapX(0)} y1={mapY(minY)} x2={mapX(0)} y2={mapY(maxY)} stroke="#94a3b8" strokeWidth="2" />
+                            
+                            {/* Etiqueta Ejes */}
+                            <text x={mapX(maxX) + 5} y={mapY(0) + 4} fontSize="12" fill="#64748b" fontWeight="bold">x</text>
+                            
+                            {/* Pared divisoria en x=2 */}
+                            <line x1={mapX(2)} y1={mapY(minY)} x2={mapX(2)} y2={mapY(maxY)} stroke="#fcd34d" strokeWidth="2" strokeDasharray="6 4" />
+                            <text x={mapX(2)} y={height - 10} fontSize="12" fontWeight="bold" fill="#d97706" textAnchor="middle">x = 2</text>
+                            
+                            {/* Rama Izquierda (x^2) */}
+                            <path d={path1} fill="none" stroke="#3b82f6" strokeWidth="4" />
+                            <text x={mapX(1)} y={mapY(1*1) - 15} fontSize="14" fontWeight="bold" fill="#3b82f6" textAnchor="middle">x²</text>
+                            
+                            {/* Rama Derecha (x+k) */}
+                            <path d={path2} fill="none" stroke="#ec4899" strokeWidth="4" className="transition-all duration-200 ease-linear" />
+                            <text x={mapX(3.5)} y={mapY(3.5 + parseFloat(k)) - 15} fontSize="14" fontWeight="bold" fill="#ec4899" textAnchor="middle" className="transition-all duration-200 ease-linear">x + k</text>
+                            
+                            {/* Puntos terminales en x=2 */}
+                            {/* Hueco rama izq (se oculta si encaja perfectamente, o se dibuja debajo) */}
+                            <circle cx={mapX(2)} cy={mapY(4)} r="6" fill="white" stroke="#3b82f6" strokeWidth="3" />
+                            
+                            {/* Punto lleno rama der */}
+                            <circle cx={mapX(2)} cy={mapY(2 + parseFloat(k))} r="6" fill={isContinuous ? "#10b981" : "#ec4899"} className="transition-all duration-200 ease-linear" />
+                            
+                            {/* Indicador de éxito */}
+                            {isContinuous && (
+                                <circle cx={mapX(2)} cy={mapY(4)} r="14" fill="none" stroke="#10b981" strokeWidth="3" className="animate-ping" />
+                            )}
+                        </svg>
+                    </div>
+                </div>
+            )
         };
 
         const root = ReactDOM.createRoot(document.getElementById('root'));
