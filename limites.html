@@ -616,9 +616,30 @@
                     <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
                         <h4 className="font-bold text-slate-800 text-lg mb-4 border-b border-slate-100 pb-2">¿Dónde buscamos las candidatas a A.V.?</h4>
                         <p className="text-lg text-slate-700 mb-4">
-                            Generalmente, las buscamos en los valores que <strong>no pertenecen al dominio</strong> de la función (ej. valores que anulan un denominador), o en los puntos de salto de las funciones definidas a trozos.
+                            Generalmente, las buscamos en los valores que <strong>anulan un denominador</strong> (puntos aislados fuera del dominio), en los <strong>extremos abiertos de los intervalos del dominio</strong> (como en las funciones logarítmicas), o en los puntos de salto de las funciones definidas a trozos.
                         </p>
                         
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6 mb-6">
+                            <div className="bg-emerald-50 p-5 rounded-lg border border-emerald-200 shadow-sm">
+                                <h5 className="font-bold text-emerald-800 mb-3 flex items-center gap-2"><span className="text-xl">📈</span> Funciones Logarítmicas</h5>
+                                <p className="text-sm text-emerald-900 mb-3">
+                                    Buscamos A.V. en los valores que hacen que el <strong>argumento del logaritmo sea exactamente cero</strong>, ya que el logaritmo se desploma hacia menos infinito cuando se acerca a 0 por la derecha <Latex math="(\lim_{x \to 0^+} \ln x = -\infty)" />.
+                                </p>
+                                <div className="bg-white px-3 py-2 rounded text-center border border-emerald-100 font-semibold text-emerald-800 text-sm overflow-x-auto hide-scrollbar">
+                                    Ej: <Latex math="f(x) = \ln(x-3) \implies \text{A.V. en } x = 3" />
+                                </div>
+                            </div>
+                            <div className="bg-purple-50 p-5 rounded-lg border border-purple-200 shadow-sm">
+                                <h5 className="font-bold text-purple-800 mb-3 flex items-center gap-2"><span className="text-xl">📐</span> Trigonométricas "con trampa"</h5>
+                                <p className="text-sm text-purple-900 mb-3">
+                                    El seno y el coseno no tienen asíntotas. Sin embargo, funciones como la <strong>tangente</strong> o <strong>secante</strong> esconden denominadores en su definición trigonométrica que generan infinitas asíntotas periódicas.
+                                </p>
+                                <div className="bg-white px-3 py-2 rounded text-center border border-purple-100 font-semibold text-purple-800 text-sm overflow-x-auto hide-scrollbar">
+                                    Ej: <Latex math="\tan(x) = \frac{\sin x}{\cos x} \implies \text{A.V. si } \cos x = 0" />
+                                </div>
+                            </div>
+                        </div>
+
                         <div className="bg-red-50 p-5 rounded-lg border border-red-200 text-red-900 flex gap-4 items-start shadow-sm mt-6">
                             <span className="text-3xl">⚠️</span>
                             <div>
