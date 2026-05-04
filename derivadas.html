@@ -1,0 +1,1650 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Derivadas - 1º Bachillerato</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+</head>
+<body class="bg-slate-50">
+<div id="root"></div>
+<script type="text/babel">
+    const { useState, useEffect, useRef } = React;
+
+    // ── Latex ──────────────────────────────────────────────────────────────
+    const Latex = ({ math, display = false }) => {
+        const ref = useRef(null);
+        useEffect(() => {
+            if (window.katex && ref.current) {
+                window.katex.render(math, ref.current, { displayMode: display, throwOnError: false });
+            }
+        }, [math, display]);
+        return <span ref={ref} className={display ? "my-4 block text-center overflow-x-auto hide-scrollbar" : ""} />;
+    };
+
+    // ── SectionCard ────────────────────────────────────────────────────────
+    const SectionCard = ({ id, title, children }) => (
+        <section id={id} className="scroll-mt-24 mb-12 border border-slate-200 rounded-xl bg-white shadow-sm overflow-hidden">
+            <div className="bg-slate-100 p-4 md:p-6 border-b border-slate-200">
+                <h2 className="text-2xl font-bold text-slate-800">{title}</h2>
+            </div>
+            <div className="p-4 md:p-6">{children}</div>
+        </section>
+    );
+
+    // ── SecantTangentViz ───────────────────────────────────────────────────
+    const SecantTangentViz = () => {
+        const [h, setH] = useState(2.0);
+
+        const xA = 1, yA = 1;
+        const xB = xA + h;
+        const yB = xB * xB;
+        const tvm = (yB - yA) / h;          // = 2 + h
+        const derA = 2;                      // f'(1) = 2
+
+        const W = 560, H = 340, PAD = 46;
+        const xMin = -0.3, xMax = 4.5;
+        const yMin = -0.8, yMax = 17;
+
+        const mx = x => PAD + (x - xMin) / (xMax - xMin) * (W - 2 * PAD);
+        const my = y => H - PAD - (y - yMin) / (yMax - yMin) * (H - 2 * PAD);
+
+        // Parabola path
+        let pathD = ''; let first = true;
+        for (let i = 0; i <= 320; i++) {
+            const x = xMin + (i / 320) * (xMax - xMin);
+            const y = x * x;
+            if (y > yMax + 1) { first = true; continue; }
+            pathD += (first ? 'M' : ' L') + ` ${mx(x).toFixed(1)} ${my(y).toFixed(1)}`;
+            first = false;
+        }
+
+        const secY = x => tvm * (x - xA) + yA;
+        const tanY = x => derA * (x - xA) + yA;
+        const isClose = h < 0.25;
+        const bVisible = yB <= yMax + 0.5;
+
+        return (
+            <div className="border border-slate-200 rounded-xl overflow-hidden bg-white mb-8">
+                <div className="bg-slate-100 p-4 border-b border-slate-200">
+                    <h4 className="font-bold text-lg text-slate-700">De la recta secante a la tangente — <span className="font-mono">f(x) = x²</span></h4>
+                </div>
+                <div className="p-4 md:p-6">
+                    <div className="w-full overflow-x-auto hide-scrollbar">
+                        <svg viewBox={`0 0 ${W} ${H}`} className="w-full max-w-[560px] mx-auto block" style={{minWidth:260}}>
+                            {[0,1,2,3,4].map(x => <line key={`gx${x}`} x1={mx(x)} y1={PAD} x2={mx(x)} y2={H-PAD} stroke="#f1f5f9" strokeWidth="1"/>)}
+                            {[0,2,4,6,8,10,12,14,16].map(y => <line key={`gy${y}`} x1={PAD} y1={my(y)} x2={W-PAD} y2={my(y)} stroke="#f1f5f9" strokeWidth="1"/>)}
+                            <line x1={PAD} y1={my(0)} x2={W-PAD} y2={my(0)} stroke="#64748b" strokeWidth="1.5"/>
+                            <line x1={mx(0)} y1={PAD} x2={mx(0)} y2={H-PAD} stroke="#64748b" strokeWidth="1.5"/>
+                            {[1,2,3,4].map(x => <text key={`lx${x}`} x={mx(x)} y={my(0)+15} fontSize="11" fill="#94a3b8" textAnchor="middle">{x}</text>)}
+                            {[2,4,6,8,10,12,14,16].map(y => <text key={`ly${y}`} x={mx(0)-6} y={my(y)+4} fontSize="11" fill="#94a3b8" textAnchor="end">{y}</text>)}
+                            {/* Tangent (orange dashed) */}
+                            <line x1={mx(xMin)} y1={my(tanY(xMin))} x2={mx(xMax)} y2={my(tanY(xMax))} stroke="#f97316" strokeWidth="2" strokeDasharray="8 4" opacity="0.9"/>
+                            {/* Secant (blue) */}
+                            <line x1={mx(xMin)} y1={my(secY(xMin))} x2={mx(xMax)} y2={my(secY(xMax))} stroke="#2563eb" strokeWidth="2.5"/>
+                            {/* Parabola */}
+                            <path d={pathD} fill="none" stroke="#1e293b" strokeWidth="2.5"/>
+                            {/* Point B */}
+                            {bVisible && <circle cx={mx(xB)} cy={my(yB)} r="6" fill="#2563eb" stroke="white" strokeWidth="2"/>}
+                            {/* Point A */}
+                            <circle cx={mx(xA)} cy={my(yA)} r="7" fill="#dc2626" stroke="white" strokeWidth="2.5"/>
+                            <rect x={mx(xA)-60} y={my(yA)-27} width={48} height={17} rx="2" fill="white" fillOpacity="0.85"/>
+                            <text x={mx(xA)-36} y={my(yA)-14} fontSize="12" fontWeight="bold" fill="#dc2626" textAnchor="middle">A(1,1)</text>
+                            {!isClose && bVisible && <>
+                                <rect x={mx(xB)+8} y={my(yB)-26} width={16} height={17} rx="2" fill="white" fillOpacity="0.85"/>
+                                <text x={mx(xB)+16} y={my(yB)-13} fontSize="12" fontWeight="bold" fill="#1d4ed8">B</text>
+                            </>}
+                            {/* Legend — upper left */}
+                            <rect x="52" y="56" width="138" height="48" rx="4" fill="white" fillOpacity="0.85" stroke="#e2e8f0" strokeWidth="1"/>
+                            <line x1="60" y1="72" x2="80" y2="72" stroke="#2563eb" strokeWidth="2.5"/>
+                            <text x="86" y="76" fontSize="11" fill="#2563eb">Recta secante</text>
+                            <line x1="60" y1="88" x2="80" y2="88" stroke="#f97316" strokeWidth="2" strokeDasharray="6 3"/>
+                            <text x="86" y="92" fontSize="11" fill="#f97316">Recta tangente</text>
+                        </svg>
+                    </div>
+
+                    <div className="mt-4 px-1">
+                        <label className="block text-sm font-semibold text-slate-600 mb-2">
+                            Incremento <span className="font-mono font-bold">h = {h.toFixed(2)}</span>
+                            <span className="text-slate-400 font-normal ml-2">(arrastra para acercar B a A)</span>
+                        </label>
+                        <input type="range" min="0.05" max="3" step="0.05" value={h}
+                               onChange={e => setH(parseFloat(e.target.value))} className="w-full accent-blue-600"/>
+                        <div className="flex justify-between text-xs text-slate-400 mt-1">
+                            <span>← h → 0 &nbsp;(B se acerca a A)</span>
+                            <span>h = 3 &nbsp;(B lejos de A) →</span>
+                        </div>
+                    </div>
+
+                    <div className="mt-5 grid grid-cols-3 gap-3">
+                        <div className="bg-slate-50 rounded-lg p-3 border border-slate-200 text-center">
+                            <div className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">h</div>
+                            <div className="text-2xl font-bold text-slate-700">{h.toFixed(4)}</div>
+                        </div>
+                        <div className={`rounded-lg p-3 border text-center transition-colors duration-300 ${isClose ? 'bg-orange-50 border-orange-200' : 'bg-blue-50 border-blue-200'}`}>
+                            <div className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">TVM (pendiente secante)</div>
+                            <div className={`text-2xl font-bold transition-colors duration-300 ${isClose ? 'text-orange-600' : 'text-blue-700'}`}>{tvm.toFixed(4)}</div>
+                        </div>
+                        <div className="bg-orange-50 rounded-lg p-3 border border-orange-200 text-center">
+                            <div className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">f'(1) — tangente</div>
+                            <div className="text-2xl font-bold text-orange-600">2</div>
+                        </div>
+                    </div>
+
+                    <div className={`mt-4 p-4 rounded-lg text-sm font-medium border transition-colors duration-300 ${isClose ? 'bg-orange-50 border-orange-200 text-orange-800' : 'bg-blue-50 border-blue-200 text-blue-800'}`}>
+                        {isClose
+                            ? `¡La secante casi coincide con la tangente! Con h = ${h.toFixed(4)}, TVM = ${tvm.toFixed(4)} ≈ 2 = f'(1).`
+                            : `Con h = ${h.toFixed(2)}: B = (${xB.toFixed(2)}, ${yB.toFixed(2)}). Pendiente secante = TVM = ${tvm.toFixed(4)}. Acerca B a A para ver cómo converge a f'(1) = 2.`
+                        }
+                    </div>
+                </div>
+            </div>
+        );
+    };
+
+    // ── WorkedExample (acordeón) ───────────────────────────────────────────
+    const WorkedExample = ({ title, children }) => {
+        const [open, setOpen] = useState(false);
+        return (
+            <div className="border border-slate-200 rounded-xl overflow-hidden mb-3">
+                <button onClick={() => setOpen(o => !o)}
+                        className="w-full flex items-center justify-between px-5 py-4 bg-slate-50 hover:bg-slate-100 transition-colors text-left gap-3">
+                    <span className="font-semibold text-slate-800 text-base">{title}</span>
+                    <svg className={`w-5 h-5 text-slate-400 shrink-0 transition-transform duration-200 ${open ? 'rotate-180' : ''}`}
+                         fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7"/>
+                    </svg>
+                </button>
+                {open && (
+                    <div className="p-5 border-t border-slate-200 bg-white space-y-3 text-slate-700 text-base leading-relaxed">
+                        {children}
+                    </div>
+                )}
+            </div>
+        );
+    };
+
+    // ── Exercise ───────────────────────────────────────────────────────────
+    const Exercise = ({ number, statement, correctAnswer, hint, solution }) => {
+        const [value, setValue] = useState('');
+        const [attempts, setAttempts] = useState(0);
+        const [status, setStatus] = useState('idle');
+        const [showSolution, setShowSolution] = useState(false);
+
+        const normalize = s => s.trim().replace(',', '.');
+
+        const check = () => {
+            const parsed = parseFloat(normalize(value));
+            if (isNaN(parsed)) { setStatus('wrong'); setAttempts(a => a + 1); return; }
+            if (Math.abs(parsed - correctAnswer) < 0.01) {
+                setStatus('correct');
+            } else {
+                setStatus('wrong');
+                setAttempts(a => a + 1);
+            }
+        };
+
+        const reset = () => { setValue(''); setStatus('idle'); setAttempts(0); setShowSolution(false); };
+
+        return (
+            <div className={`rounded-xl border p-5 mb-4 transition-colors ${status === 'correct' ? 'bg-green-50 border-green-300' : status === 'wrong' ? 'bg-red-50 border-red-200' : 'bg-white border-slate-200'}`}>
+                <div className="flex items-start gap-3 mb-4">
+                    <span className="bg-blue-600 text-white text-sm font-bold w-7 h-7 rounded-full flex items-center justify-center shrink-0 mt-0.5">{number}</span>
+                    <div className="text-slate-800 text-base leading-relaxed">{statement}</div>
+                </div>
+
+                {status !== 'correct' && !showSolution && (
+                    <div className="flex items-center gap-3 flex-wrap">
+                        <input type="text" value={value}
+                               onChange={e => { setValue(e.target.value); setStatus('idle'); }}
+                               onKeyDown={e => e.key === 'Enter' && check()}
+                               placeholder="Tu respuesta..."
+                               className="border border-slate-300 rounded-lg px-3 py-2 text-base w-36 focus:outline-none focus:ring-2 focus:ring-blue-400"/>
+                        <button onClick={check} className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 rounded-lg transition-colors">
+                            Comprobar
+                        </button>
+                        {status === 'wrong' && (
+                            <button onClick={reset} className="text-slate-500 hover:text-slate-700 text-sm underline">Reintentar</button>
+                        )}
+                    </div>
+                )}
+
+                {status === 'correct' && (
+                    <div className="flex items-center gap-2 text-green-700 font-semibold">
+                        <svg className="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7"/>
+                        </svg>
+                        ¡Correcto! La respuesta es {correctAnswer}.
+                    </div>
+                )}
+
+                {status === 'wrong' && (
+                    <div className="mt-2 text-sm font-medium text-red-700">
+                        Respuesta incorrecta.{attempts >= 2 && <span className="ml-1">💡 <strong>Pista:</strong> {hint}</span>}
+                    </div>
+                )}
+
+                {attempts >= 3 && status !== 'correct' && !showSolution && (
+                    <button onClick={() => setShowSolution(true)} className="mt-3 text-sm text-blue-600 hover:text-blue-800 underline font-medium">
+                        Ver solución completa
+                    </button>
+                )}
+
+                {showSolution && (
+                    <div className="mt-4 p-4 rounded-lg bg-white border border-slate-200 text-sm text-slate-700 space-y-2">
+                        <div className="font-bold text-slate-800 mb-1">Solución paso a paso:</div>
+                        {solution}
+                    </div>
+                )}
+            </div>
+        );
+    };
+
+    // ── DerivativeFunctionViz ─────────────────────────────────────────────
+    const DerivativeFunctionViz = () => {
+        const [x0, setX0] = useState(1.0);
+        const slope = 2 * x0;
+        const py = x0 * x0;
+
+        const W = 260, H = 220, PAD = 36;
+        const xMin = -2.8, xMax = 2.8;
+        const yF1 = -0.3, yF2 = 8.5, yD1 = -6, yD2 = 6;
+        const mx  = x => PAD + (x - xMin) / (xMax - xMin) * (W - 2 * PAD);
+        const myF = y => H - PAD - (y - yF1) / (yF2 - yF1) * (H - 2 * PAD);
+        const myD = y => H - PAD - (y - yD1) / (yD2 - yD1) * (H - 2 * PAD);
+
+        let pF = '', firstF = true;
+        for (let i = 0; i <= 240; i++) {
+            const x = xMin + i / 240 * (xMax - xMin), y = x * x;
+            if (y > yF2 + 0.5) { firstF = true; continue; }
+            pF += (firstF ? 'M' : 'L') + `${mx(x).toFixed(1)} ${myF(y).toFixed(1)} `;
+            firstF = false;
+        }
+        let pD = '', firstD = true;
+        for (let i = 0; i <= 240; i++) {
+            const x = xMin + i / 240 * (xMax - xMin), y = 2 * x;
+            if (y > yD2 + 0.5 || y < yD1 - 0.5) { firstD = true; continue; }
+            pD += (firstD ? 'M' : 'L') + `${mx(x).toFixed(1)} ${myD(y).toFixed(1)} `;
+            firstD = false;
+        }
+
+        return (
+            <div className="border border-slate-200 rounded-xl overflow-hidden bg-white mb-8">
+                <div className="bg-slate-100 p-4 border-b border-slate-200">
+                    <h4 className="font-bold text-lg text-slate-700">De la derivada en un punto a la función derivada — <span className="font-mono">f(x) = x²</span></h4>
+                </div>
+                <div className="p-4 md:p-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
+                        <div>
+                            <p className="text-xs font-semibold text-center text-slate-500 uppercase tracking-wide mb-1">f(x) = x² con recta tangente</p>
+                            <svg viewBox={`0 0 ${W} ${H}`} className="w-full block">
+                                <defs><clipPath id="cpF"><rect x={PAD} y={PAD} width={W-2*PAD} height={H-2*PAD}/></clipPath></defs>
+                                {[-2,-1,0,1,2].map(x => <line key={x} x1={mx(x)} y1={PAD} x2={mx(x)} y2={H-PAD} stroke="#f1f5f9" strokeWidth="1"/>)}
+                                {[2,4,6,8].map(y => <line key={y} x1={PAD} y1={myF(y)} x2={W-PAD} y2={myF(y)} stroke="#f1f5f9" strokeWidth="1"/>)}
+                                <line x1={PAD} y1={myF(0)} x2={W-PAD} y2={myF(0)} stroke="#64748b" strokeWidth="1.5"/>
+                                <line x1={mx(0)} y1={PAD} x2={mx(0)} y2={H-PAD} stroke="#64748b" strokeWidth="1.5"/>
+                                {[-2,-1,1,2].map(x => <text key={x} x={mx(x)} y={myF(0)+14} fontSize="10" fill="#94a3b8" textAnchor="middle">{x}</text>)}
+                                {[2,4,6].map(y => <text key={y} x={mx(0)-6} y={myF(y)+4} fontSize="10" fill="#94a3b8" textAnchor="end">{y}</text>)}
+                                <line x1={mx(xMin-1)} y1={myF(slope*(xMin-1-x0)+py)} x2={mx(xMax+1)} y2={myF(slope*(xMax+1-x0)+py)}
+                                      stroke="#f97316" strokeWidth="2" strokeDasharray="7 4" clipPath="url(#cpF)"/>
+                                <path d={pF} fill="none" stroke="#1e293b" strokeWidth="2.5" clipPath="url(#cpF)"/>
+                                <circle cx={mx(x0)} cy={myF(py)} r="6" fill="#dc2626" stroke="white" strokeWidth="2"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <p className="text-xs font-semibold text-center text-slate-500 uppercase tracking-wide mb-1">f'(x) = 2x — función derivada</p>
+                            <svg viewBox={`0 0 ${W} ${H}`} className="w-full block">
+                                <defs><clipPath id="cpD"><rect x={PAD} y={PAD} width={W-2*PAD} height={H-2*PAD}/></clipPath></defs>
+                                {[-2,-1,0,1,2].map(x => <line key={x} x1={mx(x)} y1={PAD} x2={mx(x)} y2={H-PAD} stroke="#f1f5f9" strokeWidth="1"/>)}
+                                {[-4,-2,0,2,4].map(y => <line key={y} x1={PAD} y1={myD(y)} x2={W-PAD} y2={myD(y)} stroke="#f1f5f9" strokeWidth="1"/>)}
+                                <line x1={PAD} y1={myD(0)} x2={W-PAD} y2={myD(0)} stroke="#64748b" strokeWidth="1.5"/>
+                                <line x1={mx(0)} y1={PAD} x2={mx(0)} y2={H-PAD} stroke="#64748b" strokeWidth="1.5"/>
+                                {[-2,-1,1,2].map(x => <text key={x} x={mx(x)} y={myD(0)+14} fontSize="10" fill="#94a3b8" textAnchor="middle">{x}</text>)}
+                                {[-4,-2,2,4].map(y => <text key={y} x={mx(0)-6} y={myD(y)+4} fontSize="10" fill="#94a3b8" textAnchor="end">{y}</text>)}
+                                <path d={pD} fill="none" stroke="#f97316" strokeWidth="2.5" clipPath="url(#cpD)"/>
+                                <line x1={mx(x0)} y1={myD(0)} x2={mx(x0)} y2={myD(slope)} stroke="#dc2626" strokeWidth="1.5" strokeDasharray="4 3" clipPath="url(#cpD)"/>
+                                <circle cx={mx(x0)} cy={myD(slope)} r="6" fill="#dc2626" stroke="white" strokeWidth="2"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <div className="px-1">
+                        <label className="block text-sm font-semibold text-slate-600 mb-1">
+                            Punto: <span className="font-mono font-bold">x = {x0.toFixed(2)}</span>
+                            <span className="text-slate-400 font-normal ml-2">(arrastra para mover el punto)</span>
+                        </label>
+                        <input type="range" min="-2.5" max="2.5" step="0.05" value={x0}
+                               onChange={e => setX0(parseFloat(e.target.value))} className="w-full accent-red-600"/>
+                        <div className="flex justify-between text-xs text-slate-400 mt-1"><span>x = −2.5</span><span>x = 2.5</span></div>
+                    </div>
+                    <div className="mt-3 grid grid-cols-3 gap-2 text-center">
+                        <div className="bg-slate-50 rounded-lg p-2 border border-slate-200">
+                            <div className="text-xs text-slate-500 mb-0.5">x</div>
+                            <div className="text-xl font-bold text-slate-700">{x0.toFixed(2)}</div>
+                        </div>
+                        <div className="bg-orange-50 rounded-lg p-2 border border-orange-200">
+                            <div className="text-xs text-slate-500 mb-0.5">Pendiente tangente</div>
+                            <div className="text-xl font-bold text-orange-600">{slope.toFixed(2)}</div>
+                        </div>
+                        <div className="bg-red-50 rounded-lg p-2 border border-red-200">
+                            <div className="text-xs text-slate-500 mb-0.5">f'(x) = 2x</div>
+                            <div className="text-xl font-bold text-red-600">{slope.toFixed(2)}</div>
+                        </div>
+                    </div>
+                    <div className={`mt-3 p-3 rounded-lg text-sm font-medium border ${Math.abs(slope) < 0.06 ? 'bg-green-50 border-green-200 text-green-800' : slope > 0 ? 'bg-blue-50 border-blue-200 text-blue-800' : 'bg-orange-50 border-orange-200 text-orange-800'}`}>
+                        {Math.abs(slope) < 0.06
+                            ? 'En x = 0 la tangente es horizontal (pendiente 0): es el mínimo de f(x) = x². La derivada valdrá 0 en ese punto.'
+                            : `En x = ${x0.toFixed(2)}: la tangente tiene pendiente ${slope.toFixed(2)}. El punto (${x0.toFixed(2)}, ${slope.toFixed(2)}) está en la gráfica de f'(x) = 2x. ¡Los dos valores coinciden!`}
+                    </div>
+                </div>
+            </div>
+        );
+    };
+
+    // ── DerivativesTable ──────────────────────────────────────────────────
+    const DerivativesTable = () => {
+        const groups = [
+            { label: "Potencias", color: "blue", rows: [
+                ["x^n \\quad (n \\in \\mathbb{R})", "n\\,x^{n-1}", "\\mathbb{R} \\text{ (para } n \\in \\mathbb{N})"],
+                ["\\sqrt{x}", "\\dfrac{1}{2\\sqrt{x}}", "x > 0"],
+            ]},
+            { label: "Exponenciales", color: "green", rows: [
+                ["e^x", "e^x", "\\mathbb{R}"],
+                ["a^x \\quad (a>0,\\; a\\neq 1)", "a^x \\cdot \\ln a", "\\mathbb{R}"],
+            ]},
+            { label: "Logarítmicas", color: "purple", rows: [
+                ["\\ln x", "\\dfrac{1}{x}", "x > 0"],
+                ["\\log_a x \\quad (a>0,\\; a\\neq 1)", "\\dfrac{1}{x \\cdot \\ln a}", "x > 0"],
+            ]},
+            { label: "Trigonométricas", color: "amber", rows: [
+                ["\\operatorname{sen}\\,x", "\\cos x", "\\mathbb{R}"],
+                ["\\cos x", "-\\operatorname{sen}\\,x", "\\mathbb{R}"],
+                ["\\tan x", "\\dfrac{1}{\\cos^2 x}", "x \\neq \\tfrac{\\pi}{2}+k\\pi,\\; k\\in\\mathbb{Z}"],
+            ]},
+        ];
+        const cls = {
+            blue:   { h: "bg-blue-100 text-blue-800",     r: "bg-blue-50" },
+            green:  { h: "bg-green-100 text-green-800",   r: "bg-green-50" },
+            purple: { h: "bg-purple-100 text-purple-800", r: "bg-purple-50" },
+            amber:  { h: "bg-amber-100 text-amber-800",   r: "bg-amber-50" },
+        };
+        return (
+            <div className="border border-slate-200 rounded-xl overflow-hidden mb-8">
+                <div className="bg-slate-100 px-5 py-3 border-b border-slate-200">
+                    <h4 className="font-bold text-slate-700">Tabla de derivadas inmediatas</h4>
+                </div>
+                <div className="overflow-x-auto hide-scrollbar">
+                    <table className="w-full text-sm">
+                        <thead>
+                            <tr className="bg-slate-50 border-b border-slate-200">
+                                <th className="px-4 py-2.5 text-left font-semibold text-slate-600">f(x)</th>
+                                <th className="px-4 py-2.5 text-left font-semibold text-slate-600">f'(x)</th>
+                                <th className="px-4 py-2.5 text-left font-semibold text-slate-600 hidden sm:table-cell">Dom. de derivabilidad</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {groups.map(g => (
+                                <React.Fragment key={g.label}>
+                                    <tr>
+                                        <td colSpan={3} className={`px-4 py-1.5 text-xs font-bold uppercase tracking-wider ${cls[g.color].h}`}>{g.label}</td>
+                                    </tr>
+                                    {g.rows.map(([fx, dfx, dom], i) => (
+                                        <tr key={i} className={`border-b border-slate-100 ${cls[g.color].r}`}>
+                                            <td className="px-4 py-3"><Latex math={fx}/></td>
+                                            <td className="px-4 py-3 font-semibold"><Latex math={dfx}/></td>
+                                            <td className="px-4 py-3 text-slate-500 hidden sm:table-cell"><Latex math={dom}/></td>
+                                        </tr>
+                                    ))}
+                                </React.Fragment>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        );
+    };
+
+    // ── ChainRuleBoxes ────────────────────────────────────────────────────
+    const ChainRuleBoxes = () => {
+        const [fi, setFi] = useState(0);
+        const [step, setStep] = useState(0);
+
+        const funcs = [
+            {
+                label: "(2x+1)⁵",
+                full: "(2x+1)^5",
+                outerLabel: "f(u)=u^5",
+                outerD: "5u^4",
+                outerDIntact: "5(2x+1)^4",
+                innerLabel: "u=g(x)=2x+1",
+                inner: "2x+1",
+                innerD: "2",
+                result: "5(2x+1)^4\\cdot 2=10(2x+1)^4",
+            },
+            {
+                label: "sen(3x²+1)",
+                full: "\\operatorname{sen}(3x^2+1)",
+                outerLabel: "f(u)=\\operatorname{sen}(u)",
+                outerD: "\\cos(u)",
+                outerDIntact: "\\cos(3x^2+1)",
+                innerLabel: "u=g(x)=3x^2+1",
+                inner: "3x^2+1",
+                innerD: "6x",
+                result: "\\cos(3x^2+1)\\cdot 6x",
+            },
+            {
+                label: "e^(x²+x)",
+                full: "e^{x^2+x}",
+                outerLabel: "f(u)=e^u",
+                outerD: "e^u",
+                outerDIntact: "e^{x^2+x}",
+                innerLabel: "u=g(x)=x^2+x",
+                inner: "x^2+x",
+                innerD: "2x+1",
+                result: "e^{x^2+x}\\cdot(2x+1)",
+            },
+            {
+                label: "ln(x³−2)",
+                full: "\\ln(x^3-2)",
+                outerLabel: "f(u)=\\ln(u)",
+                outerD: "\\dfrac{1}{u}",
+                outerDIntact: "\\dfrac{1}{x^3-2}",
+                innerLabel: "u=g(x)=x^3-2",
+                inner: "x^3-2",
+                innerD: "3x^2",
+                result: "\\dfrac{3x^2}{x^3-2}",
+            },
+        ];
+
+        const f = funcs[fi];
+        const STEPS = 4;
+        const stepTitles = [
+            "Identificar las cajas",
+            "Derivar la caja exterior (interior intacta)",
+            "Derivar la caja interior",
+            "Resultado final",
+        ];
+
+        return (
+            <div className="border border-slate-200 rounded-xl overflow-hidden bg-white mb-8">
+                <div className="bg-slate-100 p-4 border-b border-slate-200">
+                    <h4 className="font-bold text-lg text-slate-700">La regla de la cadena — paso a paso</h4>
+                </div>
+                <div className="p-4 md:p-6">
+                    {/* Selector */}
+                    <div className="flex flex-wrap gap-2 mb-5">
+                        {funcs.map((fn, i) => (
+                            <button key={i} onClick={() => { setFi(i); setStep(0); }}
+                                className={`px-3 py-2.5 min-w-[4.5rem] rounded-lg font-semibold border transition-colors ${fi===i?'bg-blue-600 text-white border-blue-600':'bg-white text-slate-700 border-slate-300 hover:border-blue-400'}`}>
+                                <Latex math={fn.full}/>
+                            </button>
+                        ))}
+                    </div>
+
+                    {/* Progress */}
+                    <div className="flex items-center gap-1.5 mb-4">
+                        {Array.from({length: STEPS}).map((_, s) => (
+                            <div key={s} className={`h-2 flex-1 rounded-full transition-colors duration-300 ${s<=step?'bg-blue-500':'bg-slate-200'}`}/>
+                        ))}
+                        <span className="text-xs text-slate-500 ml-1 shrink-0">Paso {step+1}/{STEPS}</span>
+                    </div>
+
+                    {/* Step badge */}
+                    <div className="bg-blue-600 text-white rounded-lg px-4 py-2 text-sm font-bold mb-5">
+                        Paso {step+1}: {stepTitles[step]}
+                    </div>
+
+                    {/* Expression always visible */}
+                    <div className="text-center mb-5 bg-slate-50 rounded-lg py-3 border border-slate-200">
+                        <p className="text-xs text-slate-500 mb-1">Función a derivar:</p>
+                        <Latex math={`\\bigl[${f.full}\\bigr]'`} display={true}/>
+                    </div>
+
+                    {/* Step 0 — Identify */}
+                    {step===0 && (
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div className="bg-blue-50 border-2 border-blue-400 rounded-xl p-5 text-center">
+                                <p className="text-xs font-bold text-blue-700 uppercase tracking-wide mb-3">Caja exterior f(u)</p>
+                                <Latex math={f.outerLabel}/>
+                                <p className="mt-3 text-sm text-blue-600">La función «de fuera»</p>
+                            </div>
+                            <div className="bg-orange-50 border-2 border-orange-400 rounded-xl p-5 text-center">
+                                <p className="text-xs font-bold text-orange-700 uppercase tracking-wide mb-3">Caja interior u = g(x)</p>
+                                <Latex math={f.innerLabel}/>
+                                <p className="mt-3 text-sm text-orange-600">El argumento de f</p>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Step 1 — Outer derivative */}
+                    {step===1 && (
+                        <div className="space-y-4">
+                            <div className="bg-blue-50 border border-blue-300 rounded-xl p-5">
+                                <p className="text-sm font-bold text-blue-700 mb-4">Derivamos la exterior tratando la interior como una variable u:</p>
+                                <div className="flex flex-wrap items-center gap-3">
+                                    <Latex math={f.outerLabel}/>
+                                    <span className="text-2xl text-slate-400">→</span>
+                                    <span className="text-blue-700 font-semibold"><Latex math={`f'(u)=${f.outerD}`}/></span>
+                                    <span className="text-2xl text-slate-400">→</span>
+                                    <span className="bg-blue-200 text-blue-900 font-bold px-3 py-1 rounded-lg"><Latex math={f.outerDIntact}/></span>
+                                </div>
+                            </div>
+                            <div className="bg-slate-50 border border-slate-200 rounded-lg p-4 text-sm text-slate-600">
+                                <strong>Clave:</strong> sustituimos u por <span className="bg-orange-100 px-2 py-0.5 rounded"><Latex math={f.inner}/></span>, pero sin derivarla todavía.
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Step 2 — Inner derivative */}
+                    {step===2 && (
+                        <div className="bg-orange-50 border border-orange-300 rounded-xl p-5">
+                            <p className="text-sm font-bold text-orange-700 mb-4">Derivamos la caja interior por separado:</p>
+                            <div className="flex flex-wrap items-center gap-3">
+                                <Latex math={f.innerLabel}/>
+                                <span className="text-2xl text-slate-400">→</span>
+                                <span className="bg-orange-200 text-orange-900 font-bold px-3 py-1 rounded-lg"><Latex math={`g'(x)=${f.innerD}`}/></span>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Step 3 — Result */}
+                    {step===3 && (
+                        <div className="bg-green-50 border-2 border-green-400 rounded-xl p-5">
+                            <p className="text-sm font-bold text-green-700 mb-4">Multiplicamos: exterior' · interior'</p>
+                            <div className="flex flex-wrap items-center justify-center gap-3">
+                                <span className="bg-blue-100 text-blue-800 font-bold px-3 py-2 rounded-lg border border-blue-300"><Latex math={f.outerDIntact}/></span>
+                                <span className="text-xl font-bold text-slate-500">·</span>
+                                <span className="bg-orange-100 text-orange-800 font-bold px-3 py-2 rounded-lg border border-orange-300"><Latex math={f.innerD}/></span>
+                            </div>
+                            <div className="mt-4 pt-4 border-t border-green-300 text-center">
+                                <p className="text-xs text-slate-500 mb-1">Resultado:</p>
+                                <Latex math={`\\bigl[${f.full}\\bigr]'=${f.result}`} display={true}/>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Navigation */}
+                    <div className="flex justify-between mt-5">
+                        <button onClick={() => setStep(s => Math.max(0,s-1))} disabled={step===0}
+                                className="px-4 py-2 rounded-lg border font-semibold text-sm transition-colors disabled:opacity-40 disabled:cursor-not-allowed border-slate-300 text-slate-700 hover:bg-slate-50">
+                            ← Anterior
+                        </button>
+                        <button onClick={() => setStep(s => Math.min(STEPS-1,s+1))} disabled={step===STEPS-1}
+                                className="px-4 py-2 rounded-lg font-semibold text-sm transition-colors disabled:opacity-40 disabled:cursor-not-allowed bg-blue-600 hover:bg-blue-700 text-white">
+                            Siguiente →
+                        </button>
+                    </div>
+                </div>
+            </div>
+        );
+    };
+
+    // ── DerivabilityGallery ───────────────────────────────────────────────
+    const DerivabilityGallery = () => {
+        const [fi, setFi] = useState(0);
+        const W = 320, H = 200, PAD = 36;
+
+        const cases = [
+            { btnTex:"f(x)=x^2",        heading:"f(x) = x²  en  x = 0",         xMin:-2.2,xMax:2.2,yMin:-0.5,yMax:4.5, yTicks:[1,2,3,4], continuous:true,  derivable:true,  deriv:"0",  leftD:null,  rightD:null,  type:"par",  noteColor:"green", note:"Caso de referencia: f es derivable en x = 0. La recta tangente existe y tiene pendiente 0 (horizontal)." },
+            { btnTex:"|x|",              heading:"f(x) = |x|  en  x = 0",         xMin:-2.2,xMax:2.2,yMin:-0.3,yMax:2.5, yTicks:[1,2],    continuous:true,  derivable:false, deriv:null, leftD:"−1", rightD:"+1", type:"abs",  noteColor:"red",   note:"Punto anguloso: f es continua pero NO derivable. Las derivadas laterales existen pero son distintas: f'(0⁻) = −1 ≠ +1 = f'(0⁺)." },
+            { btnTex:"\\sqrt[3]{x}",     heading:"f(x) = ∛x  en  x = 0",          xMin:-2.5,xMax:2.5,yMin:-1.6,yMax:1.6, yTicks:[-1,1],   continuous:true,  derivable:false, deriv:null, leftD:null,  rightD:null,  type:"cbrt", noteColor:"red",   note:"Tangente vertical: f es continua pero NO derivable. La pendiente tiende a +∞ cuando x → 0; no existe derivada finita." },
+            { btnLabel:"Salto en x = 0", heading:"Función con salto en x = 0",     xMin:-2.2,xMax:2.2,yMin:-1.5,yMax:2.5, yTicks:[-1,1,2], continuous:false, derivable:false, deriv:null, leftD:null,  rightD:null,  type:"jump", noteColor:"red",   note:"Discontinuidad: f no es continua en x = 0 (salto de 0 a 1). Sin continuidad, no puede haber derivada." },
+        ];
+
+        const c = cases[fi];
+        const mx = x => PAD + (x-c.xMin)/(c.xMax-c.xMin)*(W-2*PAD);
+        const my = y => H-PAD-(y-c.yMin)/(c.yMax-c.yMin)*(H-2*PAD);
+
+        const buildPath = (fn, xL, xR) => {
+            let d='', first=true;
+            for(let i=0;i<=300;i++){
+                const x=xL+(i/300)*(xR-xL), y=fn(x);
+                if(!isFinite(y)||y>c.yMax+1||y<c.yMin-1){first=true;continue;}
+                d+=(first?'M':'L')+`${mx(x).toFixed(1)} ${my(y).toFixed(1)} `;
+                first=false;
+            }
+            return d;
+        };
+
+        const curve = () => {
+            if(c.type==='par') return (
+                <>
+                    <line x1={mx(c.xMin)} y1={my(0)} x2={mx(c.xMax)} y2={my(0)} stroke="#f97316" strokeWidth="2" strokeDasharray="7 4" clipPath="url(#dgC)"/>
+                    <path d={buildPath(x=>x*x,c.xMin,c.xMax)} fill="none" stroke="#2563eb" strokeWidth="2.5" clipPath="url(#dgC)"/>
+                    <circle cx={mx(0)} cy={my(0)} r="6" fill="#dc2626" stroke="white" strokeWidth="2"/>
+                    <text x={mx(0.15)} y={my(0)-10} fontSize="11" fill="#f97316" fontWeight="bold">f'(0) = 0</text>
+                </>
+            );
+            if(c.type==='abs') return (
+                <>
+                    <line x1={mx(c.xMin)} y1={my(-c.xMin)} x2={mx(0)} y2={my(0)} stroke="#f97316" strokeWidth="2" strokeDasharray="7 4" clipPath="url(#dgC)"/>
+                    <line x1={mx(0)} y1={my(0)} x2={mx(c.xMax)} y2={my(c.xMax)} stroke="#f97316" strokeWidth="2" strokeDasharray="7 4" clipPath="url(#dgC)"/>
+                    <path d={buildPath(x=>Math.abs(x),c.xMin,c.xMax)} fill="none" stroke="#2563eb" strokeWidth="2.5" clipPath="url(#dgC)"/>
+                    <circle cx={mx(0)} cy={my(0)} r="6" fill="#dc2626" stroke="white" strokeWidth="2"/>
+                    <text x={mx(-1.6)} y={my(1.3)+13} fontSize="10" fill="#f97316">m = −1</text>
+                    <text x={mx(0.5)} y={my(0.7)+13} fontSize="10" fill="#f97316">m = +1</text>
+                </>
+            );
+            if(c.type==='cbrt'){
+                const cb=x=>Math.sign(x)*Math.pow(Math.abs(x),1/3);
+                return (
+                    <>
+                        <line x1={mx(0)} y1={PAD} x2={mx(0)} y2={H-PAD} stroke="#f97316" strokeWidth="2" strokeDasharray="7 4"/>
+                        <path d={buildPath(cb,c.xMin,-0.01)} fill="none" stroke="#2563eb" strokeWidth="2.5" clipPath="url(#dgC)"/>
+                        <path d={buildPath(cb,0.01,c.xMax)} fill="none" stroke="#2563eb" strokeWidth="2.5" clipPath="url(#dgC)"/>
+                        <circle cx={mx(0)} cy={my(0)} r="6" fill="#dc2626" stroke="white" strokeWidth="2"/>
+                        <text x={mx(0.15)} y={my(0.65)} fontSize="11" fill="#f97316">tang. vert.</text>
+                    </>
+                );
+            }
+            if(c.type==='jump') return (
+                <>
+                    <path d={buildPath(x=>x,c.xMin,-0.01)} fill="none" stroke="#2563eb" strokeWidth="2.5" clipPath="url(#dgC)"/>
+                    <path d={buildPath(x=>x+1,0,c.xMax)} fill="none" stroke="#2563eb" strokeWidth="2.5" clipPath="url(#dgC)"/>
+                    <circle cx={mx(0)} cy={my(0)} r="6" fill="white" stroke="#2563eb" strokeWidth="2.5"/>
+                    <circle cx={mx(0)} cy={my(1)} r="6" fill="#dc2626" stroke="white" strokeWidth="2"/>
+                    <text x={mx(0.15)} y={my(0.5)} fontSize="11" fill="#dc2626">¡salto!</text>
+                </>
+            );
+        };
+
+        const noteClass = c.noteColor==='green'
+            ? 'bg-green-50 border-green-300 text-green-800'
+            : 'bg-red-50 border-red-300 text-red-800';
+
+        return (
+            <div className="border border-slate-200 rounded-xl overflow-hidden bg-white mb-8">
+                <div className="bg-slate-100 p-4 border-b border-slate-200">
+                    <h4 className="font-bold text-lg text-slate-700">Los 4 escenarios: continua, derivable, o ninguna de las dos</h4>
+                </div>
+                <div className="p-4 md:p-6">
+                    {/* Selector */}
+                    <div className="flex flex-wrap gap-2 mb-5">
+                        {cases.map((cas,i) => (
+                            <button key={i} onClick={()=>setFi(i)}
+                                className={`px-3 py-2.5 min-w-[4rem] rounded-lg font-semibold border transition-colors ${fi===i?'bg-blue-600 text-white border-blue-600':'bg-white text-slate-700 border-slate-300 hover:border-blue-400'}`}>
+                                {cas.btnTex ? <Latex math={cas.btnTex}/> : cas.btnLabel}
+                            </button>
+                        ))}
+                    </div>
+
+                    {/* Graph */}
+                    <p className="text-xs font-semibold text-center text-slate-500 uppercase tracking-wide mb-1">{c.heading}</p>
+                    <svg viewBox={`0 0 ${W} ${H}`} className="w-full max-w-sm mx-auto block mb-4">
+                        <defs><clipPath id="dgC"><rect x={PAD} y={PAD} width={W-2*PAD} height={H-2*PAD}/></clipPath></defs>
+                        {[-2,-1,1,2].map(x=><line key={`gx${x}`} x1={mx(x)} y1={PAD} x2={mx(x)} y2={H-PAD} stroke="#f1f5f9" strokeWidth="1"/>)}
+                        {c.yTicks.map(y=><line key={`gy${y}`} x1={PAD} y1={my(y)} x2={W-PAD} y2={my(y)} stroke="#f1f5f9" strokeWidth="1"/>)}
+                        <line x1={PAD} y1={my(0)} x2={W-PAD} y2={my(0)} stroke="#64748b" strokeWidth="1.5"/>
+                        <line x1={mx(0)} y1={PAD} x2={mx(0)} y2={H-PAD} stroke="#64748b" strokeWidth="1.5"/>
+                        {[-2,-1,1,2].map(x=><text key={`lx${x}`} x={mx(x)} y={my(0)+14} fontSize="10" fill="#94a3b8" textAnchor="middle">{x}</text>)}
+                        {c.yTicks.filter(y=>y!==0).map(y=><text key={`ly${y}`} x={mx(0)-6} y={my(y)+4} fontSize="10" fill="#94a3b8" textAnchor="end">{y}</text>)}
+                        {curve()}
+                    </svg>
+
+                    {/* Status cards */}
+                    <div className="grid grid-cols-2 gap-3 mb-3">
+                        <div className={`rounded-xl p-4 text-center border-2 ${c.continuous?'bg-green-50 border-green-400':'bg-red-50 border-red-400'}`}>
+                            <p className="text-xs font-bold uppercase tracking-wide mb-1 text-slate-600">Continua en x = 0</p>
+                            <p className={`text-xl font-bold ${c.continuous?'text-green-700':'text-red-700'}`}>{c.continuous?'✓ Sí':'✗ No'}</p>
+                        </div>
+                        <div className={`rounded-xl p-4 text-center border-2 ${c.derivable?'bg-green-50 border-green-400':'bg-red-50 border-red-400'}`}>
+                            <p className="text-xs font-bold uppercase tracking-wide mb-1 text-slate-600">Derivable en x = 0</p>
+                            <p className={`text-xl font-bold ${c.derivable?'text-green-700':'text-red-700'}`}>{c.derivable?'✓ Sí':'✗ No'}</p>
+                        </div>
+                    </div>
+
+                    {/* f'(0) card */}
+                    {c.deriv && (
+                        <div className="bg-orange-50 rounded-xl p-3 text-center border border-orange-200 mb-3">
+                            <p className="text-xs font-bold uppercase tracking-wide mb-1 text-slate-600">Derivada f'(0)</p>
+                            <p className="text-xl font-bold text-orange-600">{c.deriv}</p>
+                        </div>
+                    )}
+
+                    {/* Lateral deriv cards */}
+                    {c.leftD && (
+                        <div className="grid grid-cols-2 gap-3 mb-3">
+                            <div className="bg-orange-50 rounded-xl p-3 text-center border border-orange-200">
+                                <p className="text-xs font-bold uppercase tracking-wide mb-1 text-slate-600">f'(0⁻)</p>
+                                <p className="text-xl font-bold text-orange-600">{c.leftD}</p>
+                            </div>
+                            <div className="bg-orange-50 rounded-xl p-3 text-center border border-orange-200">
+                                <p className="text-xs font-bold uppercase tracking-wide mb-1 text-slate-600">f'(0⁺)</p>
+                                <p className="text-xl font-bold text-orange-600">{c.rightD}</p>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Note */}
+                    <div className={`p-4 rounded-xl border text-sm font-medium ${noteClass}`}>{c.note}</div>
+                </div>
+            </div>
+        );
+    };
+
+    // ── App ────────────────────────────────────────────────────────────────
+    function App() {
+        const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+        useEffect(() => {
+            window.scrollTo(0, 0);
+            if (window.location.hash) window.history.replaceState(null, null, window.location.pathname);
+        }, []);
+
+        const toggleMenu = () => setMobileMenuOpen(m => !m);
+        const closeMenu = () => setMobileMenuOpen(false);
+
+        return (
+            <div className="min-h-screen bg-slate-50 text-slate-800 font-sans pb-20 lg:pb-0">
+
+                {/* Navbar */}
+                <header className="fixed top-0 left-0 right-0 h-16 bg-blue-600 text-white shadow-md z-50 flex items-center px-4 lg:px-6">
+                    <div className="flex items-center gap-4 w-full max-w-[1600px] mx-auto">
+                        <button onClick={toggleMenu} className="lg:hidden p-2 -ml-2 rounded-lg hover:bg-blue-700 transition-colors focus:outline-none">
+                            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16"/>
+                            </svg>
+                        </button>
+                        <div>
+                            <h2 className="text-xs font-semibold tracking-wider text-blue-200 uppercase hidden sm:block">Matemáticas I - 1º Bachillerato</h2>
+                            <h1 className="text-lg sm:text-xl font-bold">Tema 11: Derivadas</h1>
+                        </div>
+                    </div>
+                </header>
+
+                <div className="pt-16 flex max-w-[1600px] mx-auto">
+
+                    {/* Sidebar */}
+                    <aside className={`fixed inset-y-0 left-0 pt-16 w-72 bg-white border-r border-slate-200 z-40 transform transition-transform duration-300 lg:translate-x-0 ${mobileMenuOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full'} lg:sticky lg:top-16 lg:h-[calc(100vh-4rem)]`}>
+                        <div className="h-full overflow-y-auto p-6 hide-scrollbar">
+                            <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4 pl-2">Índice del Tema</h3>
+                            <nav className="space-y-1">
+                                <a href="#sec-1" onClick={closeMenu} className="block px-4 py-2.5 rounded-lg font-semibold text-slate-700 hover:bg-slate-100 hover:text-blue-600 transition-colors">1. Tasas de variación. Derivada en un punto</a>
+                                <a href="#sec-2" onClick={closeMenu} className="block px-4 py-2.5 rounded-lg font-semibold text-slate-700 hover:bg-slate-100 hover:text-blue-600 transition-colors">2. Función derivada</a>
+                                <a href="#sec-3" onClick={closeMenu} className="block px-4 py-2.5 rounded-lg font-semibold text-slate-700 hover:bg-slate-100 hover:text-blue-600 transition-colors">3. Derivada de la composición de funciones</a>
+                                <a href="#sec-4" onClick={closeMenu} className="block px-4 py-2.5 rounded-lg font-semibold text-slate-700 hover:bg-slate-100 hover:text-blue-600 transition-colors">4. Continuidad y derivabilidad</a>
+                            </nav>
+                        </div>
+                    </aside>
+
+                    {mobileMenuOpen && <div onClick={closeMenu} className="fixed inset-0 bg-slate-900/50 z-30 lg:hidden backdrop-blur-sm"/>}
+
+                    {/* Main */}
+                    <main className="flex-1 p-4 md:p-8 lg:p-10 min-w-0 max-w-5xl">
+
+                        {/* Intro */}
+                        <div className="mb-12">
+                            <h2 className="text-3xl font-bold text-slate-800 mb-6">¿Qué es una derivada?</h2>
+                            <p className="text-lg text-slate-700 mb-4">
+                                Imagina que vas en coche y miras el velocímetro: te indica no dónde estás, sino <strong>cómo de rápido cambia tu posición</strong> en ese instante. Esa idea —medir la velocidad de cambio de una magnitud en un momento concreto— es exactamente lo que captura la derivada. En matemáticas, dada una función <Latex math="f(x)" />, su derivada en un punto nos dice cuánto varía (y cómo de rápido lo hace) al pasar por ese punto.
+                            </p>
+                            <p className="text-lg text-slate-700 mb-4">
+                                Geométricamente, la derivada de <Latex math="f" /> en un punto <Latex math="x = a" /> es la <strong>pendiente de la recta tangente</strong> a la curva en ese punto. Si la pendiente es positiva, la función crece; si es negativa, decrece; si es cero, la función tiene un máximo o un mínimo local.
+                            </p>
+                            <p className="text-lg text-slate-700">
+                                A lo largo de este tema aprenderemos a calcular derivadas usando la definición formal (como límite de una tasa de variación), a derivar familias de funciones mediante reglas y tablas, y a aplicar la <strong>regla de la cadena</strong> para funciones compuestas. Cerraremos el tema estudiando la relación entre continuidad y derivabilidad.
+                            </p>
+                        </div>
+
+                        {/* ══ SECCIÓN 1 ══════════════════════════════════════════════ */}
+                        <SectionCard id="sec-1" title="1. Tasas de variación. Derivada de una función en un punto">
+
+                            {/* 1.1 TVM */}
+                            <h3 className="text-xl font-bold text-slate-800 mb-3">1.1 Tasa de variación media (TVM)</h3>
+
+                            <p className="text-lg text-slate-700 mb-4">
+                                Imagina que <Latex math="f(t)" /> describe el espacio recorrido por un coche en el instante <Latex math="t" />.
+                                Si a las <Latex math="t = a" /> segundos el coche está en <Latex math="f(a)" /> metros y a las <Latex math="t = b" /> está en <Latex math="f(b)" /> metros,
+                                la <strong>velocidad media</strong> en ese intervalo es el cociente entre la variación de <Latex math="f" /> y la variación de <Latex math="t" />.
+                                Esta misma idea se aplica a cualquier función y recibe el nombre de <strong>tasa de variación media</strong>.
+                            </p>
+
+                            <div className="bg-blue-50 p-6 rounded-lg mb-6 border-l-4 border-blue-500">
+                                <h4 className="font-bold text-blue-800 mb-3 text-lg">Definición: Tasa de Variación Media</h4>
+                                <p className="text-lg text-slate-700 mb-2">
+                                    La <strong>tasa de variación media</strong> de <Latex math="f" /> en el intervalo <Latex math="[a,\, b]" /> es:
+                                </p>
+                                <Latex math="\text{TVM}_{[a,\,b]} \;=\; \frac{f(b) - f(a)}{b - a}" display={true} />
+                                <p className="text-lg text-slate-700 mb-2">
+                                    Si escribimos <Latex math="b = a + h" /> (con <Latex math="h \neq 0" />), la fórmula equivalente es:
+                                </p>
+                                <Latex math="\text{TVM} \;=\; \frac{f(a+h) - f(a)}{h}" display={true} />
+                            </div>
+
+                            <div className="bg-white border border-slate-200 rounded-xl p-5 mb-6">
+                                <h4 className="font-semibold text-slate-700 mb-2">Interpretación geométrica</h4>
+                                <p className="text-lg text-slate-700">
+                                    Los puntos <Latex math="A = (a,\, f(a))" /> y <Latex math="B = (b,\, f(b))" /> pertenecen a la curva.
+                                    La <strong>recta secante</strong> que pasa por <Latex math="A" /> y <Latex math="B" /> tiene exactamente la pendiente:
+                                </p>
+                                <Latex math="m_{\text{sec}} \;=\; \frac{f(b) - f(a)}{b - a} \;=\; \text{TVM}_{[a,b]}" display={true} />
+                                <p className="text-lg text-slate-700">Por tanto, la TVM es la <strong>pendiente de la recta secante</strong>.</p>
+                            </div>
+
+                            {/* 1.2 Derivative */}
+                            <h3 className="text-xl font-bold text-slate-800 mb-3 mt-8 pt-6 border-t border-slate-100">1.2 Tasa de variación instantánea: la derivada</h3>
+
+                            <p className="text-lg text-slate-700 mb-4">
+                                La TVM mide el cambio <em>promedio</em> en <Latex math="[a, b]" />. Pero, ¿qué pasa si queremos saber
+                                el ritmo de cambio <em>exacto</em> en el instante <Latex math="x = a" />? La idea clave es hacer el intervalo
+                                cada vez más pequeño: dejar que <Latex math="h \to 0" />.
+                                Cuando <Latex math="h \to 0" />, el punto <Latex math="B" /> se acerca a <Latex math="A" /> y la recta secante
+                                tiende a la <strong>recta tangente</strong>. El valor al que converge la TVM, si existe, es la <strong>derivada de <Latex math="f" /> en <Latex math="x = a" /></strong>.
+                            </p>
+
+                            <div className="bg-blue-50 p-6 rounded-lg mb-6 border-l-4 border-blue-500">
+                                <h4 className="font-bold text-blue-800 mb-3 text-lg">Definición: Derivada en un punto</h4>
+                                <p className="text-lg text-slate-700 mb-3">
+                                    Se dice que <Latex math="f" /> es <strong>derivable en <Latex math="x = a" /></strong> si existe el siguiente límite finito.
+                                    Ese límite se llama <strong>derivada de <Latex math="f" /> en <Latex math="a" /></strong> y se denota <Latex math="f'(a)" />:
+                                </p>
+                                <Latex math="f'(a) \;=\; \lim_{h \to 0} \frac{f(a+h) - f(a)}{h}" display={true} />
+                                <p className="text-lg text-slate-700 mb-3">
+                                    Formulación equivalente (sustituyendo <Latex math="x = a + h" />, de modo que <Latex math="h = x - a" /> y cuando <Latex math="h \to 0" /> se tiene <Latex math="x \to a" />):
+                                </p>
+                                <Latex math="f'(a) \;=\; \lim_{x \to a} \frac{f(x) - f(a)}{x - a}" display={true} />
+                            </div>
+
+                            <div className="bg-white border border-slate-200 rounded-xl p-5 mb-6">
+                                <h4 className="font-semibold text-slate-700 mb-3">Interpretación geométrica y notaciones</h4>
+                                <p className="text-lg text-slate-700 mb-3">
+                                    <strong>Geométricamente:</strong> <Latex math="f'(a)" /> es la <strong>pendiente de la recta tangente</strong> a la curva <Latex math="y = f(x)" /> en el punto <Latex math="(a,\, f(a))" />.
+                                </p>
+                                <p className="text-lg text-slate-700 mb-2"><strong>Notaciones equivalentes:</strong></p>
+                                <Latex math="f'(a) \qquad y'(a) \qquad \left.\frac{df}{dx}\right|_{x=a} \qquad \left[Df(x)\right]_{x=a}" display={true} />
+                            </div>
+
+                            {/* Visualization */}
+                            <h3 className="text-xl font-bold text-slate-800 mb-3 mt-8 pt-6 border-t border-slate-100">Visualización interactiva</h3>
+                            <p className="text-lg text-slate-700 mb-4">
+                                Mueve el slider para acercar B a A y observa cómo la pendiente de la secante (azul) converge hacia la pendiente de la tangente (naranja discontinua), que es <Latex math="f'(1) = 2" />.
+                            </p>
+                            <SecantTangentViz />
+
+                            {/* Worked examples */}
+                            <h3 className="text-xl font-bold text-slate-800 mb-3 mt-8 pt-6 border-t border-slate-100">Ejemplos resueltos</h3>
+                            <p className="text-lg text-slate-700 mb-4">Pulsa sobre cada ejemplo para ver la solución paso a paso.</p>
+
+                            <WorkedExample title={<>Ejemplo 1: cálculo de <Latex math="f'(2)"/> para <Latex math="f(x)=x^2"/> usando la definición</>}>
+                                <p><strong>Paso 1.</strong> Aplicamos la definición:</p>
+                                <Latex math="f'(2) = \lim_{h \to 0} \frac{f(2+h) - f(2)}{h}" display={true} />
+                                <p><strong>Paso 2.</strong> Calculamos <Latex math="f(2+h)" /> y <Latex math="f(2)" />:</p>
+                                <Latex math="f(2+h) = (2+h)^2 = 4 + 4h + h^2 \qquad f(2) = 4" display={true} />
+                                <p><strong>Paso 3.</strong> Sustituimos y simplificamos el numerador:</p>
+                                <Latex math="f'(2) = \lim_{h \to 0} \frac{4 + 4h + h^2 - 4}{h} = \lim_{h \to 0} \frac{4h + h^2}{h}" display={true} />
+                                <p><strong>Paso 4.</strong> Factorizamos <Latex math="h" /> en el numerador y cancelamos:</p>
+                                <Latex math="= \lim_{h \to 0} \frac{h(4 + h)}{h} = \lim_{h \to 0} (4 + h)" display={true} />
+                                <p><strong>Paso 5.</strong> Tomamos el límite:</p>
+                                <Latex math="f'(2) = 4 + 0 = \boxed{4}" display={true} />
+                                <p className="text-slate-500 italic text-sm">La pendiente de la tangente a y = x² en el punto (2, 4) es 4.</p>
+                            </WorkedExample>
+
+                            <WorkedExample title={<>Ejemplo 2: cálculo de <Latex math="f'(a)"/> para <Latex math="f(x)=3x+2"/> usando la definición</>}>
+                                <p><strong>Paso 1.</strong> Aplicamos la definición:</p>
+                                <Latex math="f'(a) = \lim_{h \to 0} \frac{f(a+h) - f(a)}{h}" display={true} />
+                                <p><strong>Paso 2.</strong> Calculamos <Latex math="f(a+h)" /> y <Latex math="f(a)" />:</p>
+                                <Latex math="f(a+h) = 3(a+h)+2 = 3a+3h+2 \qquad f(a) = 3a+2" display={true} />
+                                <p><strong>Paso 3.</strong> Sustituimos. Los términos sin <Latex math="h" /> se cancelan:</p>
+                                <Latex math="f'(a) = \lim_{h \to 0} \frac{(3a+3h+2) - (3a+2)}{h} = \lim_{h \to 0} \frac{3h}{h} = \lim_{h \to 0} 3" display={true} />
+                                <p><strong>Paso 4.</strong> El límite de una constante es esa constante:</p>
+                                <Latex math="f'(a) = \boxed{3}" display={true} />
+                                <p className="text-slate-500 italic text-sm">Para cualquier función lineal f(x) = mx + b, la derivada es siempre la pendiente m. Aquí m = 3.</p>
+                            </WorkedExample>
+
+                            <WorkedExample title={<>Ejemplo 3: cálculo de <Latex math="f'(a)"/> para <Latex math="f(x)=1/x"/> usando la definición <Latex math="(a\neq 0)"/></>}>
+                                <p><strong>Paso 1.</strong> Aplicamos la definición:</p>
+                                <Latex math="f'(a) = \lim_{h \to 0} \dfrac{\dfrac{1}{a+h} - \dfrac{1}{a}}{h}" display={true} />
+                                <p><strong>Paso 2.</strong> Operamos la resta de fracciones del numerador:</p>
+                                <Latex math="\frac{1}{a+h} - \frac{1}{a} = \frac{a - (a+h)}{a(a+h)} = \frac{-h}{a(a+h)}" display={true} />
+                                <p><strong>Paso 3.</strong> Sustituimos en la definición y cancelamos <Latex math="h" />:</p>
+                                <Latex math="f'(a) = \lim_{h \to 0} \frac{-h}{a(a+h) \cdot h} = \lim_{h \to 0} \frac{-1}{a(a+h)}" display={true} />
+                                <p><strong>Paso 4.</strong> Tomamos el límite:</p>
+                                <Latex math="f'(a) = \frac{-1}{a \cdot a} = \boxed{-\dfrac{1}{a^2}}" display={true} />
+                                <p className="text-slate-500 italic text-sm">El signo negativo refleja que 1/x es decreciente en todo su dominio (x ≠ 0).</p>
+                            </WorkedExample>
+
+                            {/* Exercises */}
+                            <h3 className="text-xl font-bold text-slate-800 mb-3 mt-8 pt-6 border-t border-slate-100">Ejercicios de autoevaluación</h3>
+                            <p className="text-lg text-slate-700 mb-5">
+                                Escribe tu respuesta (puedes usar coma <strong>,</strong> o punto <strong>.</strong> como separador decimal) y pulsa <strong>Comprobar</strong>.
+                                Tras dos intentos fallidos aparece una pista; tras tres puedes ver la solución completa.
+                            </p>
+
+                            <Exercise
+                                number={1}
+                                statement={<>Calcula la <strong>tasa de variación media</strong> de <Latex math="f(x) = x^2" /> en el intervalo <Latex math="[1,\; 3]" />.</>}
+                                correctAnswer={4}
+                                hint="Aplica TVM = [f(3) − f(1)] / (3 − 1). Recuerda: f(3) = 9, f(1) = 1."
+                                solution={<><p><Latex math="\text{TVM}_{[1,3]} = \dfrac{f(3)-f(1)}{3-1} = \dfrac{9-1}{2} = \dfrac{8}{2} = 4" /></p></>}
+                            />
+
+                            <Exercise
+                                number={2}
+                                statement={<>Calcula la <strong>tasa de variación media</strong> de <Latex math="f(x) = x^3" /> en el intervalo <Latex math="[0,\; 2]" />.</>}
+                                correctAnswer={4}
+                                hint="Aplica TVM = [f(2) − f(0)] / (2 − 0). Recuerda: f(2) = 8, f(0) = 0."
+                                solution={<><p><Latex math="\text{TVM}_{[0,2]} = \dfrac{f(2)-f(0)}{2-0} = \dfrac{8-0}{2} = \dfrac{8}{2} = 4" /></p></>}
+                            />
+
+                            <Exercise
+                                number={3}
+                                statement={<>Usa la <strong>definición de derivada</strong> para calcular <Latex math="f'(3)" /> siendo <Latex math="f(x) = x^2" />.</>}
+                                correctAnswer={6}
+                                hint="f'(3) = lim [((3+h)²−9)/h]. Desarrolla (3+h)² = 9+6h+h², cancela el 9 y factoriza h en el numerador."
+                                solution={
+                                    <>
+                                        <p><Latex math="\displaystyle f'(3) = \lim_{h \to 0} \dfrac{(3+h)^2 - 9}{h} = \lim_{h \to 0} \dfrac{9+6h+h^2-9}{h} = \lim_{h \to 0} \dfrac{h(6+h)}{h} = \lim_{h \to 0}(6+h) = 6" /></p>
+                                    </>
+                                }
+                            />
+
+                            <Exercise
+                                number={4}
+                                statement={<>Usa la <strong>definición de derivada</strong> para calcular <Latex math="f'(0)" /> siendo <Latex math="f(x) = x^2 + 3x" />.</>}
+                                correctAnswer={3}
+                                hint="f'(0) = lim [f(h)−f(0)]/h = lim [h²+3h]/h. Factoriza h en el numerador."
+                                solution={
+                                    <>
+                                        <p><Latex math="\displaystyle f'(0) = \lim_{h \to 0} \dfrac{f(h)-f(0)}{h} = \lim_{h \to 0} \dfrac{h^2+3h}{h} = \lim_{h \to 0} \dfrac{h(h+3)}{h} = \lim_{h \to 0}(h+3) = 3" /></p>
+                                    </>
+                                }
+                            />
+
+                            <Exercise
+                                number={5}
+                                statement={<>Un objeto se mueve siguiendo la ley <Latex math="s(t) = t^2 + 2t" /> metros. Calcula su <strong>velocidad instantánea</strong> en <Latex math="t = 2" /> s usando la definición de derivada.</>}
+                                correctAnswer={6}
+                                hint="Calcula s'(2) = lim [s(2+h)−s(2)]/h. Halla s(2) = 8, luego desarrolla s(2+h) = (2+h)²+2(2+h)."
+                                solution={
+                                    <>
+                                        <p><Latex math="s(2+h) = (2+h)^2+2(2+h) = 4+4h+h^2+4+2h = 8+6h+h^2" /></p>
+                                        <p><Latex math="\displaystyle s'(2) = \lim_{h \to 0} \dfrac{(8+6h+h^2)-8}{h} = \lim_{h \to 0} \dfrac{h(6+h)}{h} = \lim_{h \to 0}(6+h) = 6 \ \text{m/s}" /></p>
+                                    </>
+                                }
+                            />
+
+                        </SectionCard>
+
+                        {/* ══ SECCIÓN 2 ══════════════════════════════════════════════ */}
+                        <SectionCard id="sec-2" title="2. Función derivada">
+
+                            {/* 2.1 */}
+                            <h3 className="text-xl font-bold text-slate-800 mb-3">2.1 De la derivada en un punto a la función derivada</h3>
+
+                            <p className="text-lg text-slate-700 mb-4">
+                                En el Epígrafe 1 aprendimos a calcular la derivada de <Latex math="f"/> en un punto concreto: el resultado era un <strong>número</strong>. Por ejemplo, para <Latex math="f(x)=x^2"/> obtuvimos <Latex math="f'(2)=4"/>. Pero si aplicamos la definición para un <Latex math="x"/> genérico obtenemos <Latex math="f'(x)=2x"/>: ya no es un número, es una <strong>función</strong>. La <em>función derivada</em> asigna a cada punto su pendiente de tangente.
+                            </p>
+
+                            <div className="bg-slate-50 border border-slate-200 rounded-xl p-5 mb-5">
+                                <p className="font-semibold text-slate-800 mb-2">Diferencia clave:</p>
+                                <ul className="space-y-1 text-slate-700 text-base list-disc list-inside">
+                                    <li><Latex math="f'(a)"/> es un <strong>número</strong>: la pendiente de la tangente en el punto concreto <Latex math="x=a"/>.</li>
+                                    <li><Latex math="f'(x)"/> es una <strong>función</strong>: asigna a cada <Latex math="x"/> del dominio la pendiente de la tangente en ese punto.</li>
+                                </ul>
+                            </div>
+
+                            <div className="bg-blue-50 p-6 rounded-lg mb-6 border-l-4 border-blue-500">
+                                <h4 className="font-bold text-blue-800 mb-3 text-lg">Definición: Función derivada</h4>
+                                <p className="text-lg text-slate-700 mb-3">
+                                    La <strong>función derivada</strong> de <Latex math="f"/> es la función <Latex math="f'(x)"/> definida por:
+                                </p>
+                                <Latex math="f'(x) = \lim_{h \to 0} \dfrac{f(x+h)-f(x)}{h}" display={true}/>
+                                <p className="text-lg text-slate-700">
+                                    Su dominio es el conjunto de puntos en los que ese límite existe y es finito. Se denota también <Latex math="y'"/>, <Latex math="\dfrac{df}{dx}"/> o <Latex math="Df(x)"/>.
+                                </p>
+                            </div>
+
+                            <h3 className="text-xl font-bold text-slate-800 mb-3 mt-8 pt-6 border-t border-slate-100">Visualización interactiva</h3>
+                            <p className="text-lg text-slate-700 mb-4">
+                                Mueve el slider y observa cómo la pendiente de la tangente (izquierda, naranja) coincide exactamente con el valor de <Latex math="f'(x)=2x"/> en ese mismo punto (derecha).
+                            </p>
+                            <DerivativeFunctionViz/>
+
+                            {/* 2.2 */}
+                            <h3 className="text-xl font-bold text-slate-800 mb-3 mt-8 pt-6 border-t border-slate-100">2.2 Reglas básicas de derivación</h3>
+
+                            <p className="text-lg text-slate-700 mb-4">
+                                Calcular derivadas desde la definición es tedioso. Las siguientes reglas —que se deducen de ella— permiten derivar directamente las funciones más habituales.
+                            </p>
+
+                            <div className="bg-blue-50 p-6 rounded-lg mb-5 border-l-4 border-blue-500">
+                                <h4 className="font-bold text-blue-800 mb-4 text-lg">Reglas elementales</h4>
+                                <div className="space-y-5">
+                                    {[
+                                        ["1","Constante", "(c)' = 0", "Una función constante no varía, su tasa de cambio es siempre cero."],
+                                        ["2","Potencia", "(x^n)' = n\\cdot x^{n-1} \\quad (n\\in\\mathbb{R})", "Válida para cualquier exponente real: entero, fraccionario o negativo."],
+                                        ["3","Suma y resta", "(f\\pm g)' = f'\\pm g'", "La derivada de una suma es la suma de las derivadas."],
+                                        ["4","Producto por escalar", "(k\\cdot f)' = k\\cdot f' \\quad (k\\in\\mathbb{R})", "Un factor constante «sale» fuera de la derivada."],
+                                    ].map(([num, name, formula, note]) => (
+                                        <div key={num} className="flex items-start gap-3">
+                                            <span className="bg-blue-600 text-white text-xs font-bold w-6 h-6 rounded flex items-center justify-center shrink-0 mt-0.5">{num}</span>
+                                            <div>
+                                                <p className="font-semibold text-slate-800">{name}</p>
+                                                <Latex math={formula} display={true}/>
+                                                <p className="text-sm text-slate-600 -mt-1">{note}</p>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+
+                            <div className="bg-white border border-slate-200 rounded-xl p-5 mb-6">
+                                <p className="font-semibold text-slate-700 mb-2">Ejemplo inmediato: derivar cualquier polinomio</p>
+                                <Latex math="f(x)=3x^4-2x^2+7 \;\Rightarrow\; f'(x)=12x^3-4x" display={true}/>
+                                <p className="text-sm text-slate-600">La constante 7 desaparece (regla 1); a cada potencia se aplica la regla 2 seguida de la regla 4.</p>
+                            </div>
+
+                            {/* 2.3 */}
+                            <h3 className="text-xl font-bold text-slate-800 mb-3 mt-8 pt-6 border-t border-slate-100">2.3 Regla del producto</h3>
+
+                            <p className="text-lg text-slate-700 mb-4">
+                                La derivada del producto de dos funciones <strong>no</strong> es el producto de sus derivadas. La regla correcta es:
+                            </p>
+
+                            <div className="bg-blue-50 p-6 rounded-lg mb-5 border-l-4 border-blue-500">
+                                <h4 className="font-bold text-blue-800 mb-3 text-lg">Regla del producto</h4>
+                                <Latex math="(f\cdot g)' = f'\cdot g + f\cdot g'" display={true}/>
+                                <div className="mt-2 inline-flex items-center gap-2 bg-white rounded-lg px-4 py-2 border border-blue-200">
+                                    <span className="text-sm text-slate-600 font-medium">Mnemotécnica:</span>
+                                    <span className="text-sm font-bold text-blue-700">"prima · segunda + primera · prima"</span>
+                                </div>
+                            </div>
+
+                            {/* 2.4 */}
+                            <h3 className="text-xl font-bold text-slate-800 mb-3 mt-8 pt-6 border-t border-slate-100">2.4 Regla del cociente</h3>
+
+                            <p className="text-lg text-slate-700 mb-4">
+                                Para cocientes, la regla es (válida donde <Latex math="g(x)\neq 0"/>):
+                            </p>
+
+                            <div className="bg-blue-50 p-6 rounded-lg mb-5 border-l-4 border-blue-500">
+                                <h4 className="font-bold text-blue-800 mb-3 text-lg">Regla del cociente</h4>
+                                <Latex math="\left(\dfrac{f}{g}\right)' = \dfrac{f'\cdot g - f\cdot g'}{g^2}" display={true}/>
+                                <div className="mt-2 inline-flex items-center gap-2 bg-white rounded-lg px-4 py-2 border border-blue-200">
+                                    <span className="text-sm text-slate-600 font-medium">Mnemotécnica:</span>
+                                    <span className="text-sm font-bold text-blue-700">"prima · segunda − primera · prima, entre segunda al cuadrado"</span>
+                                </div>
+                                <p className="text-sm text-slate-600 mt-3">El orden de la resta importa: <Latex math="f'g - fg'"/>, no al revés.</p>
+                            </div>
+
+                            {/* 2.5 */}
+                            <h3 className="text-xl font-bold text-slate-800 mb-3 mt-8 pt-6 border-t border-slate-100">2.5 Tabla de derivadas inmediatas</h3>
+
+                            <p className="text-lg text-slate-700 mb-4">
+                                La siguiente tabla recoge las derivadas de las funciones elementales. Es el <strong>punto de partida</strong> para derivar cualquier expresión más compleja.
+                            </p>
+                            <DerivativesTable/>
+
+                            {/* Ejemplos */}
+                            <h3 className="text-xl font-bold text-slate-800 mb-3 mt-8 pt-6 border-t border-slate-100">Ejemplos resueltos</h3>
+                            <p className="text-lg text-slate-700 mb-4">Pulsa sobre cada ejemplo para ver la solución paso a paso.</p>
+
+                            <WorkedExample title={<>Ejemplo 1: Polinomio: <Latex math="f(x)=3x^4-2x^2+5x-1"/></>}>
+                                <p>Aplicamos la regla de la potencia (R2), del escalar (R4) y de la suma (R3) término a término:</p>
+                                <Latex math="f'(x)=3\cdot 4x^3 - 2\cdot 2x + 5\cdot 1 - 0 = 12x^3-4x+5" display={true}/>
+                                <p className="text-slate-500 italic text-sm">La constante −1 desaparece al derivar (su derivada es 0).</p>
+                            </WorkedExample>
+
+                            <WorkedExample title={<>Ejemplo 2: Funciones de la tabla: <Latex math="f(x)=\sqrt{x}+e^x-2\ln x"/></>}>
+                                <p><strong>Paso 1.</strong> Reescribimos <Latex math="\sqrt{x}=x^{1/2}"/> para aplicar la regla de la potencia.</p>
+                                <p><strong>Paso 2.</strong> Derivamos término a término usando la tabla de inmediatas:</p>
+                                <Latex math="f'(x)=\tfrac{1}{2}x^{-1/2}+e^x-\dfrac{2}{x}=\dfrac{1}{2\sqrt{x}}+e^x-\dfrac{2}{x}" display={true}/>
+                            </WorkedExample>
+
+                            <WorkedExample title={<>Ejemplo 3: Regla del producto: <Latex math="f(x)=x^3(2x-1)"/></>}>
+                                <p>Identificamos <Latex math="u=x^3"/>, <Latex math="v=2x-1"/>; luego <Latex math="u'=3x^2"/>, <Latex math="v'=2"/>.</p>
+                                <Latex math="f'(x)=3x^2(2x-1)+x^3\cdot 2=6x^3-3x^2+2x^3=8x^3-3x^2" display={true}/>
+                                <p className="text-slate-500 italic text-sm">Comprobación: desarrollando primero f(x) = 2x⁴ − x³ y derivando directamente se obtiene el mismo resultado. ✓</p>
+                            </WorkedExample>
+
+                            <WorkedExample title={<>Ejemplo 4: Regla del cociente: <Latex math="f(x)=(x^2+1)/(x-1)"/></>}>
+                                <p>Sea <Latex math="u=x^2+1"/>, <Latex math="v=x-1"/>; entonces <Latex math="u'=2x"/>, <Latex math="v'=1"/>.</p>
+                                <Latex math="f'(x)=\dfrac{2x(x-1)-(x^2+1)\cdot 1}{(x-1)^2}=\dfrac{2x^2-2x-x^2-1}{(x-1)^2}=\dfrac{x^2-2x-1}{(x-1)^2}" display={true}/>
+                            </WorkedExample>
+
+                            <WorkedExample title={<>Ejemplo 5: Aplicación: recta tangente a <Latex math="f(x)=x^3-2x"/> en <Latex math="x=1"/></>}>
+                                <p><strong>Paso 1.</strong> Punto de tangencia: <Latex math="f(1)=1-2=-1"/>. Punto: <Latex math="(1,\,-1)"/>.</p>
+                                <p><strong>Paso 2.</strong> Pendiente: <Latex math="f'(x)=3x^2-2 \;\Rightarrow\; f'(1)=3-2=1"/>.</p>
+                                <p><strong>Paso 3.</strong> Ecuación punto-pendiente <Latex math="y-y_0=m(x-x_0)"/>:</p>
+                                <Latex math="y-(-1)=1\cdot(x-1)\;\Longrightarrow\; \boxed{y=x-2}" display={true}/>
+                            </WorkedExample>
+
+                            {/* Ejercicios */}
+                            <h3 className="text-xl font-bold text-slate-800 mb-3 mt-8 pt-6 border-t border-slate-100">Ejercicios de autoevaluación</h3>
+                            <p className="text-lg text-slate-700 mb-5">
+                                Escribe tu respuesta (coma o punto como decimal) y pulsa <strong>Comprobar</strong>.
+                                Tras dos intentos fallidos aparece una pista; tras tres puedes ver la solución completa.
+                            </p>
+
+                            <Exercise
+                                number={6}
+                                statement={<>Calcula <Latex math="f'(2)"/> siendo <Latex math="f(x)=2x^3-5x+1"/>.</>}
+                                correctAnswer={19}
+                                hint="f'(x) = 6x² − 5. Evalúa en x = 2: 6·4 − 5."
+                                solution={<><p><Latex math="f'(x)=6x^2-5\;\Rightarrow\; f'(2)=6\cdot4-5=24-5=19"/></p></>}
+                            />
+
+                            <Exercise
+                                number={7}
+                                statement={<>Calcula <Latex math="f'(4)"/> siendo <Latex math="f(x)=\sqrt{x}"/>. Da el resultado en decimal.</>}
+                                correctAnswer={0.25}
+                                hint="Escribe √x = x^(1/2). Entonces f'(x) = (1/2)·x^(−1/2) = 1/(2√x). Evalúa en x = 4."
+                                solution={<><p><Latex math="f'(x)=\dfrac{1}{2\sqrt{x}}\;\Rightarrow\; f'(4)=\dfrac{1}{2\cdot 2}=\dfrac{1}{4}=0{,}25"/></p></>}
+                            />
+
+                            <Exercise
+                                number={8}
+                                statement={<>Calcula <Latex math="f'(0)"/> siendo <Latex math="f(x)=e^x"/>.</>}
+                                correctAnswer={1}
+                                hint="La derivada de eˣ es ella misma: f'(x) = eˣ. ¿Cuánto vale e⁰?"
+                                solution={<><p><Latex math="f'(x)=e^x\;\Rightarrow\; f'(0)=e^0=1"/></p></>}
+                            />
+
+                            <Exercise
+                                number={9}
+                                statement={<>Usa la regla del producto para calcular <Latex math="f'(1)"/> siendo <Latex math="f(x)=x^2\cdot(x+3)"/>.</>}
+                                correctAnswer={9}
+                                hint="u = x², v = x+3, u' = 2x, v' = 1. Aplica (u·v)' = u'v + uv' y evalúa en x = 1."
+                                solution={<>
+                                    <p><Latex math="f'(x)=2x(x+3)+x^2\cdot 1=2x^2+6x+x^2=3x^2+6x"/></p>
+                                    <p><Latex math="f'(1)=3+6=9"/></p>
+                                </>}
+                            />
+
+                            <Exercise
+                                number={10}
+                                statement={<>Usa la regla del cociente para calcular <Latex math="f'(0)"/> siendo <Latex math="f(x)=\dfrac{2x+1}{x-1}"/>.</>}
+                                correctAnswer={-3}
+                                hint="u = 2x+1, v = x−1, u' = 2, v' = 1. Aplica (u/v)' = (u'v − uv')/v² y evalúa en x = 0."
+                                solution={<>
+                                    <p><Latex math="f'(x)=\dfrac{2(x-1)-(2x+1)\cdot 1}{(x-1)^2}=\dfrac{2x-2-2x-1}{(x-1)^2}=\dfrac{-3}{(x-1)^2}"/></p>
+                                    <p><Latex math="f'(0)=\dfrac{-3}{(-1)^2}=-3"/></p>
+                                </>}
+                            />
+
+                            <Exercise
+                                number={11}
+                                statement={<>¿Cuál es la pendiente de la recta tangente a <Latex math="y=\operatorname{sen}\,x"/> en <Latex math="x=0"/>?</>}
+                                correctAnswer={1}
+                                hint="La derivada de sen x es cos x. Evalúa cos(0)."
+                                solution={<><p><Latex math="y'=\cos x\;\Rightarrow\; y'(0)=\cos 0=1"/></p></>}
+                            />
+
+                        </SectionCard>
+
+                        {/* ══ SECCIÓN 3 ══════════════════════════════════════════════ */}
+                        <SectionCard id="sec-3" title="3. Derivada de la composición de funciones">
+
+                            {/* 3.1 */}
+                            <h3 className="text-xl font-bold text-slate-800 mb-3">3.1 Recordatorio: composición de funciones</h3>
+
+                            <p className="text-lg text-slate-700 mb-4">
+                                Dadas dos funciones <Latex math="f"/> y <Latex math="g"/>, la <strong>función compuesta</strong> <Latex math="f\circ g"/> se obtiene aplicando primero <Latex math="g"/> y luego <Latex math="f"/>: el resultado de <Latex math="g"/> «entra» como argumento de <Latex math="f"/>.
+                            </p>
+
+                            <div className="bg-slate-50 border border-slate-200 rounded-xl p-5 mb-6">
+                                <p className="font-semibold text-slate-700 mb-2">Ejemplo rápido:</p>
+                                <p className="text-slate-700 mb-3">Si <Latex math="f(x)=x^2"/> y <Latex math="g(x)=x+1"/>:</p>
+                                <Latex math="(f\circ g)(x)=f(g(x))=f(x+1)=(x+1)^2" display={true}/>
+                                <p className="text-slate-700">Aquí <Latex math="g"/> es la <strong>función interior</strong> (se aplica primero) y <Latex math="f"/> es la <strong>función exterior</strong> (envuelve el resultado).</p>
+                            </div>
+
+                            {/* 3.2 */}
+                            <h3 className="text-xl font-bold text-slate-800 mb-3 mt-8 pt-6 border-t border-slate-100">3.2 La regla de la cadena</h3>
+
+                            <p className="text-lg text-slate-700 mb-4">
+                                <strong>Intuición:</strong> si <Latex math="u"/> cambia el doble de rápido que <Latex math="x"/>, e <Latex math="y"/> cambia el triple de rápido que <Latex math="u"/>, entonces <Latex math="y"/> cambia <strong>seis veces</strong> más rápido que <Latex math="x"/>. Las tasas de variación se <em>encadenan</em> multiplicándose.
+                            </p>
+
+                            <div className="bg-blue-50 p-6 rounded-lg mb-6 border-l-4 border-blue-500">
+                                <h4 className="font-bold text-blue-800 mb-4 text-lg">Regla de la cadena</h4>
+                                <p className="text-lg text-slate-700 mb-2">Si <Latex math="y=f(u)"/> y <Latex math="u=g(x)"/>, en notación de Leibniz:</p>
+                                <Latex math="\frac{dy}{dx}=\frac{dy}{du}\cdot\frac{du}{dx}" display={true}/>
+                                <p className="text-lg text-slate-700 mb-2">En notación con <Latex math="f'"/> y <Latex math="g'"/>:</p>
+                                <Latex math="(f\circ g)'(x)=f'(g(x))\cdot g'(x)" display={true}/>
+                                <div className="mt-3 bg-white rounded-lg px-4 py-3 border border-blue-200 text-sm text-slate-700">
+                                    La notación de Leibniz ayuda a recordar la regla: las <Latex math="du"/> se «cancelan» (aunque no sean fracciones literales, la intuición es correcta).
+                                </div>
+                            </div>
+
+                            {/* 3.3 */}
+                            <h3 className="text-xl font-bold text-slate-800 mb-3 mt-8 pt-6 border-t border-slate-100">3.3 La analogía de las cajas</h3>
+
+                            <p className="text-lg text-slate-700 mb-4">
+                                Para aplicar la regla de forma mecánica, conviene ver cada función compuesta como <strong>cajas anidadas</strong>: una caja exterior que contiene a una caja interior.
+                            </p>
+
+                            <div className="bg-blue-50 p-6 rounded-lg mb-6 border-l-4 border-blue-500">
+                                <h4 className="font-bold text-blue-800 mb-4 text-lg">Procedimiento: «de fuera hacia dentro, multiplicando»</h4>
+                                <ol className="space-y-3 list-none">
+                                    {[
+                                        ["1","Identifica la caja exterior f(u) y la caja interior u = g(x)."],
+                                        ["2","Deriva la caja exterior dejando la interior intacta: f'(u)."],
+                                        ["3","Deriva la caja interior: g'(x)."],
+                                        ["4","Multiplica ambas derivadas: [f(g(x))]' = f'(g(x))·g'(x)."],
+                                    ].map(([n,txt]) => (
+                                        <li key={n} className="flex items-start gap-3 text-slate-700">
+                                            <span className="bg-blue-600 text-white text-xs font-bold w-6 h-6 rounded-full flex items-center justify-center shrink-0 mt-0.5">{n}</span>
+                                            <span>{txt}</span>
+                                        </li>
+                                    ))}
+                                </ol>
+                            </div>
+
+                            <h3 className="text-xl font-bold text-slate-800 mb-3 mt-8 pt-6 border-t border-slate-100">Visualización interactiva</h3>
+                            <p className="text-lg text-slate-700 mb-4">
+                                Selecciona una función y avanza paso a paso para ver cómo se aplica la regla de las cajas.
+                            </p>
+                            <ChainRuleBoxes/>
+
+                            {/* 3.4 */}
+                            <h3 className="text-xl font-bold text-slate-800 mb-3 mt-8 pt-6 border-t border-slate-100">3.4 Casos típicos y error frecuente</h3>
+
+                            <p className="text-lg text-slate-700 mb-4">
+                                Aplicando la regla de la cadena a cada función de la tabla de inmediatas del Epígrafe 2 se obtienen estos patrones:
+                            </p>
+
+                            <div className="border border-slate-200 rounded-xl overflow-hidden mb-6">
+                                <div className="bg-slate-100 px-5 py-3 border-b border-slate-200">
+                                    <h4 className="font-bold text-slate-700">Patrones con la regla de la cadena</h4>
+                                </div>
+                                <div className="overflow-x-auto hide-scrollbar">
+                                    <table className="w-full text-sm">
+                                        <thead>
+                                            <tr className="bg-slate-50 border-b border-slate-200">
+                                                <th className="px-4 py-2.5 text-left font-semibold text-slate-600">Función</th>
+                                                <th className="px-4 py-2.5 text-left font-semibold text-slate-600">Derivada (aplicando la cadena)</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {[
+                                                ["[f(x)]^n","n\\cdot[f(x)]^{n-1}\\cdot f'(x)"],
+                                                ["\\sqrt{f(x)}","\\dfrac{f'(x)}{2\\sqrt{f(x)}}"],
+                                                ["\\operatorname{sen}(f(x))","\\cos(f(x))\\cdot f'(x)"],
+                                                ["\\cos(f(x))","-\\operatorname{sen}(f(x))\\cdot f'(x)"],
+                                                ["e^{f(x)}","e^{f(x)}\\cdot f'(x)"],
+                                                ["\\ln(f(x))","\\dfrac{f'(x)}{f(x)}"],
+                                            ].map(([fx,dfx],i) => (
+                                                <tr key={i} className={`border-b border-slate-100 ${i%2===0?'bg-white':'bg-slate-50'}`}>
+                                                    <td className="px-4 py-3"><Latex math={fx}/></td>
+                                                    <td className="px-4 py-3 font-semibold"><Latex math={dfx}/></td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <div className="bg-red-50 border-l-4 border-red-500 rounded-xl p-5 mb-6">
+                                <h4 className="font-bold text-red-800 mb-4 text-base">Error frecuente: olvidar la derivada de la caja interior</h4>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <div className="bg-white rounded-lg p-4 border-2 border-red-300">
+                                        <p className="text-xs font-bold text-red-700 uppercase mb-2">Incorrecto</p>
+                                        <Latex math="\bigl[(x^2+1)^5\bigr]'=5(x^2+1)^4" display={true}/>
+                                        <p className="text-sm text-red-700">Falta multiplicar por <Latex math="(x^2+1)'"/></p>
+                                    </div>
+                                    <div className="bg-white rounded-lg p-4 border-2 border-green-400">
+                                        <p className="text-xs font-bold text-green-700 uppercase mb-2">Correcto</p>
+                                        <Latex math="\bigl[(x^2+1)^5\bigr]'=5(x^2+1)^4\cdot 2x" display={true}/>
+                                        <p className="text-sm text-green-700">La interior es <Latex math="x^2+1"/>, su derivada es <Latex math="2x"/>.</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Ejemplos */}
+                            <h3 className="text-xl font-bold text-slate-800 mb-3 mt-8 pt-6 border-t border-slate-100">Ejemplos resueltos</h3>
+                            <p className="text-lg text-slate-700 mb-4">Pulsa sobre cada ejemplo para ver la solución paso a paso.</p>
+
+                            <WorkedExample title={<>Ejemplo 1: <Latex math="f(x)=(2x+1)^5"/></>}>
+                                <p>Exterior: <Latex math="u^5"/>. Interior: <Latex math="u=2x+1"/>.</p>
+                                <p><strong>Exterior derivada</strong> (interior intacta): <Latex math="5(2x+1)^4"/>.</p>
+                                <p><strong>Interior derivada:</strong> <Latex math="(2x+1)'=2"/>.</p>
+                                <Latex math="f'(x)=5(2x+1)^4\cdot 2=\boxed{10(2x+1)^4}" display={true}/>
+                            </WorkedExample>
+
+                            <WorkedExample title={<>Ejemplo 2: <Latex math="f(x)=\operatorname{sen}(3x^2)"/></>}>
+                                <p>Exterior: <Latex math="\operatorname{sen}(u)"/>. Interior: <Latex math="u=3x^2"/>.</p>
+                                <p><strong>Exterior derivada:</strong> <Latex math="\cos(3x^2)"/>.</p>
+                                <p><strong>Interior derivada:</strong> <Latex math="(3x^2)'=6x"/>.</p>
+                                <Latex math="f'(x)=\cos(3x^2)\cdot 6x=\boxed{6x\cos(3x^2)}" display={true}/>
+                            </WorkedExample>
+
+                            <WorkedExample title={<>Ejemplo 3: <Latex math="f(x)=e^{x^2+1}"/></>}>
+                                <p>Exterior: <Latex math="e^u"/>. Interior: <Latex math="u=x^2+1"/>.</p>
+                                <p><strong>Exterior derivada:</strong> la derivada de <Latex math="e^u"/> es <Latex math="e^u"/> → con interior intacta: <Latex math="e^{x^2+1}"/>.</p>
+                                <p><strong>Interior derivada:</strong> <Latex math="(x^2+1)'=2x"/>.</p>
+                                <Latex math="f'(x)=e^{x^2+1}\cdot 2x=\boxed{2xe^{x^2+1}}" display={true}/>
+                            </WorkedExample>
+
+                            <WorkedExample title={<>Ejemplo 4: <Latex math="f(x)=\sqrt{\cos x}"/></>}>
+                                <p>Reescribimos: <Latex math="f(x)=(\cos x)^{1/2}"/>. Exterior: <Latex math="u^{1/2}"/>. Interior: <Latex math="u=\cos x"/>.</p>
+                                <p><strong>Exterior derivada:</strong> <Latex math="\tfrac{1}{2}(\cos x)^{-1/2}=\dfrac{1}{2\sqrt{\cos x}}"/>.</p>
+                                <p><strong>Interior derivada:</strong> <Latex math="(\cos x)'=-\operatorname{sen}\,x"/>.</p>
+                                <Latex math="f'(x)=\dfrac{1}{2\sqrt{\cos x}}\cdot(-\operatorname{sen}\,x)=\boxed{-\dfrac{\operatorname{sen}\,x}{2\sqrt{\cos x}}}" display={true}/>
+                            </WorkedExample>
+
+                            <WorkedExample title={<>Ejemplo 5: <Latex math="f(x)=x\cdot e^{x^2}"/> (producto + cadena)</>}>
+                                <p>Aplicamos primero la <strong>regla del producto</strong> con <Latex math="u=x"/> y <Latex math="v=e^{x^2}"/>:</p>
+                                <Latex math="f'(x)=1\cdot e^{x^2}+x\cdot\bigl[e^{x^2}\bigr]'" display={true}/>
+                                <p>Para <Latex math="\bigl[e^{x^2}\bigr]'"/> usamos la <strong>regla de la cadena</strong> (exterior <Latex math="e^u"/>, interior <Latex math="x^2"/>):</p>
+                                <Latex math="\bigl[e^{x^2}\bigr]'=e^{x^2}\cdot 2x" display={true}/>
+                                <p>Resultado:</p>
+                                <Latex math="f'(x)=e^{x^2}+2x^2 e^{x^2}=\boxed{e^{x^2}(1+2x^2)}" display={true}/>
+                            </WorkedExample>
+
+                            {/* Ejercicios */}
+                            <h3 className="text-xl font-bold text-slate-800 mb-3 mt-8 pt-6 border-t border-slate-100">Ejercicios de autoevaluación</h3>
+                            <p className="text-lg text-slate-700 mb-5">
+                                Escribe tu respuesta y pulsa <strong>Comprobar</strong>. Tras dos intentos fallidos aparece una pista; tras tres puedes ver la solución.
+                            </p>
+
+                            <Exercise
+                                number={12}
+                                statement={<>Calcula <Latex math="f'(0)"/> siendo <Latex math="f(x)=(2x-1)^3"/>.</>}
+                                correctAnswer={6}
+                                hint="f'(x) = 3(2x−1)²·2 = 6(2x−1)². Evalúa en x = 0: 6·(−1)² = 6."
+                                solution={<><p><Latex math="f'(x)=3(2x-1)^2\cdot 2=6(2x-1)^2\;\Rightarrow\; f'(0)=6\cdot(-1)^2=6"/></p></>}
+                            />
+
+                            <Exercise
+                                number={13}
+                                statement={<>Calcula <Latex math="f'(0)"/> siendo <Latex math="f(x)=e^{3x}"/>.</>}
+                                correctAnswer={3}
+                                hint="Cadena: exterior eᵘ, interior 3x. f'(x) = e^(3x)·3. Evalúa en x = 0: e⁰·3 = 3."
+                                solution={<><p><Latex math="f'(x)=e^{3x}\cdot 3\;\Rightarrow\; f'(0)=e^0\cdot 3=3"/></p></>}
+                            />
+
+                            <Exercise
+                                number={14}
+                                statement={<>Calcula <Latex math="f'(0)"/> siendo <Latex math="f(x)=\ln(e^x+1)"/>. Da el resultado en decimal.</>}
+                                correctAnswer={0.5}
+                                hint="Cadena: exterior ln(u), interior eˣ+1. f'(x) = eˣ/(eˣ+1). Evalúa en x = 0: 1/(1+1) = 0,5."
+                                solution={<><p><Latex math="f'(x)=\dfrac{e^x}{e^x+1}\;\Rightarrow\; f'(0)=\dfrac{1}{1+1}=0{,}5"/></p></>}
+                            />
+
+                            <Exercise
+                                number={15}
+                                statement={<>Calcula <Latex math="f'(1)"/> siendo <Latex math="f(x)=(x^2+1)^3"/>.</>}
+                                correctAnswer={24}
+                                hint="f'(x) = 3(x²+1)²·2x = 6x(x²+1)². Evalúa en x = 1: 6·1·(1+1)² = 6·4 = 24."
+                                solution={<><p><Latex math="f'(x)=3(x^2+1)^2\cdot 2x=6x(x^2+1)^2\;\Rightarrow\; f'(1)=6\cdot 4=24"/></p></>}
+                            />
+
+                            <Exercise
+                                number={16}
+                                statement={<>Combina producto y cadena para calcular <Latex math="f'(1)"/> siendo <Latex math="f(x)=x\cdot(x^2+1)^2"/>.</>}
+                                correctAnswer={12}
+                                hint="u = x, v = (x²+1)², u' = 1, v' = 4x(x²+1) (cadena). Aplica (uv)' = u'v+uv' y evalúa en x = 1."
+                                solution={<>
+                                    <p><Latex math="f'(x)=(x^2+1)^2+x\cdot 4x(x^2+1)=(x^2+1)(5x^2+1)"/></p>
+                                    <p><Latex math="f'(1)=2\cdot 6=12"/></p>
+                                </>}
+                            />
+
+                            <Exercise
+                                number={17}
+                                statement={<>Combina cociente y cadena para calcular <Latex math="f'(0)"/> siendo <Latex math="f(x)=\dfrac{e^{2x}}{e^x+1}"/>. Da el resultado en decimal.</>}
+                                correctAnswer={0.75}
+                                hint="u = e^(2x) (derivada: 2e^(2x), cadena), v = eˣ+1 (derivada: eˣ). Aplica (u/v)' y evalúa en x = 0."
+                                solution={<>
+                                    <p><Latex math="f'(x)=\dfrac{2e^{2x}(e^x+1)-e^{2x}\cdot e^x}{(e^x+1)^2}=\dfrac{e^{2x}(e^x+2)}{(e^x+1)^2}"/></p>
+                                    <p><Latex math="f'(0)=\dfrac{1\cdot 3}{4}=\dfrac{3}{4}=0{,}75"/></p>
+                                </>}
+                            />
+
+                        </SectionCard>
+
+                        {/* ══ SECCIÓN 4 ══════════════════════════════════════════════ */}
+                        <SectionCard id="sec-4" title="4. Continuidad y derivabilidad">
+
+                            {/* 4.1 Repaso continuidad */}
+                            <h3 className="text-xl font-bold text-slate-800 mb-3">4.1 Continuidad: recordatorio</h3>
+                            <div className="bg-blue-50 border border-blue-200 rounded-xl p-5 mb-6">
+                                <p className="font-semibold text-blue-900 mb-4">Una función es <strong>continua en <Latex math="x=a"/></strong> si se cumplen las tres condiciones:</p>
+                                <ol className="space-y-3 mb-5">
+                                    <li className="flex gap-3 items-start">
+                                        <span className="shrink-0 w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center text-xs font-bold">1</span>
+                                        <p className="text-slate-700"><Latex math="f(a)"/> está definida. Es decir, <Latex math="a"/> pertenece al dominio de <Latex math="f"/>.</p>
+                                    </li>
+                                    <li className="flex gap-3 items-start">
+                                        <span className="shrink-0 w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center text-xs font-bold">2</span>
+                                        <p className="text-slate-700">Existe <Latex math="\displaystyle\lim_{x\to a}f(x)"/>. Es decir, los límites laterales coinciden y son finitos.</p>
+                                    </li>
+                                    <li className="flex gap-3 items-start">
+                                        <span className="shrink-0 w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center text-xs font-bold">3</span>
+                                        <p className="text-slate-700">Ambos valores son iguales: <Latex math="\displaystyle\lim_{x\to a}f(x)=f(a)"/>.</p>
+                                    </li>
+                                </ol>
+                                <div className="border-t border-blue-200 pt-4">
+                                    <p className="text-blue-900 text-sm font-medium mb-1">En resumen:</p>
+                                    <Latex math="\lim_{x \to a} f(x) = f(a)" display={true}/>
+                                </div>
+                            </div>
+
+                            {/* 4.2 Teorema */}
+                            <h3 className="text-xl font-bold text-slate-800 mb-3 mt-8 pt-6 border-t border-slate-100">4.2 Teorema fundamental</h3>
+                            <div className="bg-blue-600 text-white rounded-xl p-5 mb-4">
+                                <p className="font-bold text-lg mb-1">Teorema</p>
+                                <p>Si <Latex math="f"/> es derivable en <Latex math="x=a"/>, entonces <Latex math="f"/> es continua en <Latex math="x=a"/>.</p>
+                            </div>
+                            <div className="bg-amber-50 border-l-4 border-amber-400 rounded-xl p-5 mb-6">
+                                <p className="font-bold text-amber-900 mb-1">El recíproco es falso</p>
+                                <p className="text-amber-800">Una función puede ser continua sin ser derivable. El contraejemplo clásico es <Latex math="f(x)=|x|"/> en <Latex math="x=0"/>: es continua pero tiene un <em>punto anguloso</em>.</p>
+                            </div>
+
+                            {/* 4.3 Motivación: |x| */}
+                            <h3 className="text-xl font-bold text-slate-800 mb-3 mt-8 pt-6 border-t border-slate-100">4.3 El problema de <Latex math="f(x)=|x|"/></h3>
+                            <p className="text-lg text-slate-700 mb-4">
+                                La función <Latex math="f(x)=|x|"/> es continua en <Latex math="x=0"/>, pero tiene un <strong>vértice abrupto</strong>. Si intentamos calcular la derivada:
+                            </p>
+                            <div className="bg-slate-50 rounded-xl p-5 mb-4 border border-slate-200">
+                                <p className="text-slate-700 mb-2 font-medium">Aproximando por la izquierda (<Latex math="h \to 0^-"/>):</p>
+                                <Latex math="f'(0^-)=\lim_{h\to 0^-}\frac{|0+h|-|0|}{h}=\lim_{h\to 0^-}\frac{|h|}{h}=\lim_{h\to 0^-}\frac{-h}{h}=-1" display={true}/>
+                                <p className="text-slate-700 mb-2 mt-3 font-medium">Aproximando por la derecha (<Latex math="h \to 0^+"/>):</p>
+                                <Latex math="f'(0^+)=\lim_{h\to 0^+}\frac{|h|}{h}=\lim_{h\to 0^+}\frac{h}{h}=+1" display={true}/>
+                                <p className="text-red-700 font-semibold mt-3">Como <Latex math="f'(0^-)\neq f'(0^+)"/>, la función <strong>no es derivable</strong> en <Latex math="x=0"/>.</p>
+                            </div>
+                            <p className="text-lg text-slate-700 mb-6">Este razonamiento generaliza a cualquier función: para decidir si <Latex math="f"/> es derivable en un punto, basta comparar las <strong>derivadas laterales</strong>.</p>
+
+                            {/* 4.4 Derivadas laterales */}
+                            <h3 className="text-xl font-bold text-slate-800 mb-3 mt-8 pt-6 border-t border-slate-100">4.4 Derivadas laterales</h3>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-5">
+                                <div className="bg-orange-50 border border-orange-200 rounded-xl p-5">
+                                    <p className="font-bold text-orange-800 mb-2">Derivada lateral izquierda</p>
+                                    <Latex math="f'(a^-)=\lim_{h\to 0^-}\dfrac{f(a+h)-f(a)}{h}" display={true}/>
+                                </div>
+                                <div className="bg-orange-50 border border-orange-200 rounded-xl p-5">
+                                    <p className="font-bold text-orange-800 mb-2">Derivada lateral derecha</p>
+                                    <Latex math="f'(a^+)=\lim_{h\to 0^+}\dfrac{f(a+h)-f(a)}{h}" display={true}/>
+                                </div>
+                            </div>
+                            <div className="bg-blue-50 border border-blue-200 rounded-xl p-5 mb-6">
+                                <p className="font-bold text-blue-900 mb-2">Criterio de derivabilidad</p>
+                                <p className="text-blue-800"><Latex math="f"/> es derivable en <Latex math="x=a"/> <strong>si y solo si</strong> <Latex math="f'(a^-)=f'(a^+)"/>. En ese caso, ese valor común es <Latex math="f'(a)"/>.</p>
+                            </div>
+
+                            {/* Galería interactiva */}
+                            <DerivabilityGallery/>
+
+                            {/* 4.5 Tipos de no-derivabilidad */}
+                            <h3 className="text-xl font-bold text-slate-800 mb-3 mt-8 pt-6 border-t border-slate-100">4.5 Tipos de no-derivabilidad</h3>
+                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+                                <div className="bg-red-50 border border-red-200 rounded-xl p-4">
+                                    <p className="font-bold text-red-800 mb-1">Punto anguloso</p>
+                                    <p className="text-red-700 text-sm">La función es continua pero las derivadas laterales son distintas. La gráfica forma un <em>vértice</em>.</p>
+                                    <p className="text-red-700 text-sm mt-2">Ejemplo: <Latex math="f(x)=|x|"/> en <Latex math="x=0"/>.</p>
+                                </div>
+                                <div className="bg-red-50 border border-red-200 rounded-xl p-4">
+                                    <p className="font-bold text-red-800 mb-1">Discontinuidad</p>
+                                    <p className="text-red-700 text-sm">Si <Latex math="f"/> no es continua en <Latex math="x=a"/>, tampoco puede ser derivable (por el teorema).</p>
+                                    <p className="text-red-700 text-sm mt-2">Ejemplo: función a escalones con salto.</p>
+                                </div>
+                                <div className="bg-red-50 border border-red-200 rounded-xl p-4">
+                                    <p className="font-bold text-red-800 mb-1">Tangente vertical</p>
+                                    <p className="text-red-700 text-sm">La derivada lateral tiende a <Latex math="\pm\infty"/>. La recta tangente existe pero es vertical.</p>
+                                    <p className="text-red-700 text-sm mt-2">Ejemplo: <Latex math="f(x)=\sqrt[3]{x}"/> en <Latex math="x=0"/>.</p>
+                                </div>
+                            </div>
+
+                            {/* 4.6 Método para funciones a trozos */}
+                            <h3 className="text-xl font-bold text-slate-800 mb-3 mt-8 pt-6 border-t border-slate-100">4.6 Método para funciones a trozos</h3>
+                            <p className="text-lg text-slate-700 mb-4">Para estudiar la derivabilidad de una función definida a trozos en el punto de unión <Latex math="x=a"/>:</p>
+                            <ol className="space-y-3 mb-6">
+                                <li className="flex gap-3 items-start">
+                                    <span className="shrink-0 w-7 h-7 rounded-full bg-blue-600 text-white flex items-center justify-center text-sm font-bold">1</span>
+                                    <div>
+                                        <p className="font-semibold text-slate-800">Comprobar continuidad</p>
+                                        <p className="text-slate-700">Verifica que <Latex math="f(a^-)=f(a^+)=f(a)"/>. Si no es continua, tampoco es derivable (fin).</p>
+                                    </div>
+                                </li>
+                                <li className="flex gap-3 items-start">
+                                    <span className="shrink-0 w-7 h-7 rounded-full bg-blue-600 text-white flex items-center justify-center text-sm font-bold">2</span>
+                                    <div>
+                                        <p className="font-semibold text-slate-800">Calcular derivadas laterales</p>
+                                        <p className="text-slate-700">Deriva cada tramo por separado y evalúa en <Latex math="x=a"/>.</p>
+                                    </div>
+                                </li>
+                                <li className="flex gap-3 items-start">
+                                    <span className="shrink-0 w-7 h-7 rounded-full bg-blue-600 text-white flex items-center justify-center text-sm font-bold">3</span>
+                                    <div>
+                                        <p className="font-semibold text-slate-800">Comparar</p>
+                                        <p className="text-slate-700">Si <Latex math="f'(a^-)=f'(a^+)"/>, la función es derivable y ese valor común es <Latex math="f'(a)"/>. Si difieren, hay un punto anguloso.</p>
+                                    </div>
+                                </li>
+                            </ol>
+
+                            {/* Ejemplos */}
+                            <h3 className="text-xl font-bold text-slate-800 mb-3 mt-8 pt-6 border-t border-slate-100">Ejemplos resueltos</h3>
+                            <p className="text-lg text-slate-700 mb-4">Pulsa sobre cada ejemplo para ver la solución paso a paso.</p>
+
+                            <WorkedExample title={<>Ejemplo 1: <Latex math="f(x)=|x|"/> es continua pero no derivable en <Latex math="x=0"/></>}>
+                                <p><strong>Continuidad.</strong> <Latex math="f(0)=0"/>. <Latex math="\displaystyle\lim_{x\to 0^-}(-x)=0"/> y <Latex math="\displaystyle\lim_{x\to 0^+}x=0"/>. Los tres valores coinciden: <Latex math="f"/> es continua en <Latex math="x=0"/>.</p>
+                                <p><strong>Derivabilidad.</strong></p>
+                                <Latex math="f'(0^-)=\lim_{h\to 0^-}\frac{|h|}{h}=\lim_{h\to 0^-}\frac{-h}{h}=-1" display={true}/>
+                                <Latex math="f'(0^+)=\lim_{h\to 0^+}\frac{|h|}{h}=\lim_{h\to 0^+}\frac{h}{h}=+1" display={true}/>
+                                <p>Como <Latex math="f'(0^-)\neq f'(0^+)"/>, la función <strong>no es derivable</strong> en <Latex math="x=0"/>. Hay un punto anguloso.</p>
+                            </WorkedExample>
+
+                            <WorkedExample title={<>Ejemplo 2: hallar <Latex math="a"/> y <Latex math="b"/> para que <Latex math="f"/> sea derivable en <Latex math="x=1"/></>}>
+                                <p>Sea <Latex math="f(x)=\begin{cases}ax+b & \text{si } x\leq 1\\ x^2 & \text{si } x>1\end{cases}"/>.</p>
+                                <p><strong>Paso 1 &ndash; Continuidad en <Latex math="x=1"/>:</strong></p>
+                                <Latex math="f(1^-)=a+b;\quad f(1^+)=1" display={true}/>
+                                <Latex math="\Rightarrow\quad a+b=1 \qquad (1)" display={true}/>
+                                <p><strong>Paso 2 &ndash; Derivadas laterales:</strong></p>
+                                <Latex math="f'(1^-)=a;\quad f'(1^+)=2\cdot 1=2" display={true}/>
+                                <Latex math="\Rightarrow\quad a=2 \qquad (2)" display={true}/>
+                                <p><strong>Resultado:</strong> De (2): <Latex math="a=2"/>. Sustituyendo en (1): <Latex math="b=1-2=-1"/>. Con <Latex math="a=2"/> y <Latex math="b=-1"/> la función es derivable en <Latex math="x=1"/> y <Latex math="f'(1)=2"/>.</p>
+                            </WorkedExample>
+
+                            <WorkedExample title={<>Ejemplo 3: función a trozos con potencia cúbica</>}>
+                                <p>Sea <Latex math="f(x)=\begin{cases}x^3 & \text{si } x\leq 1\\ 3x-2 & \text{si } x>1\end{cases}"/>. Estudia la derivabilidad en <Latex math="x=1"/>.</p>
+                                <p><strong>Paso 1 &ndash; Continuidad:</strong></p>
+                                <Latex math="f(1^-)=1^3=1;\quad f(1^+)=3(1)-2=1" display={true}/>
+                                <p>Ambos coinciden con <Latex math="f(1)=1"/>: la función es continua.</p>
+                                <p><strong>Paso 2 &ndash; Derivadas laterales:</strong></p>
+                                <Latex math="f'(1^-)=(x^3)'\big|_{x=1}=3x^2\big|_{x=1}=3" display={true}/>
+                                <Latex math="f'(1^+)=(3x-2)'=3" display={true}/>
+                                <p><strong>Conclusión:</strong> <Latex math="f'(1^-)=f'(1^+)=3"/> &rarr; <Latex math="f"/> es derivable en <Latex math="x=1"/> y <Latex math="f'(1)=3"/>.</p>
+                            </WorkedExample>
+
+                            <WorkedExample title={<>Ejemplo 4: análisis completo de <Latex math="f"/> en <Latex math="x=0"/></>}>
+                                <p>Sea <Latex math="f(x)=\begin{cases}1 & \text{si } x\leq 0\\ x+1 & \text{si } x>0\end{cases}"/>. Estudia continuidad y derivabilidad en <Latex math="x=0"/>.</p>
+                                <p><strong>Continuidad:</strong></p>
+                                <Latex math="f(0)=1;\quad f(0^-)=1;\quad f(0^+)=0+1=1" display={true}/>
+                                <p>Los tres valores coinciden: <Latex math="f"/> es continua en <Latex math="x=0"/>.</p>
+                                <p><strong>Derivadas laterales:</strong></p>
+                                <Latex math="f'(0^-)=(1)'=0;\quad f'(0^+)=(x+1)'=1" display={true}/>
+                                <p><Latex math="f'(0^-)\neq f'(0^+)"/> &rarr; <Latex math="f"/> <strong>no es derivable</strong> en <Latex math="x=0"/>. Hay un punto anguloso aunque la gráfica parezca suave.</p>
+                            </WorkedExample>
+
+                            <WorkedExample title={<>Ejemplo 5: puntos no derivables de <Latex math="f(x)=|x^2-4|"/></>}>
+                                <p>Reescribimos: <Latex math="|x^2-4|=|(x-2)(x+2)|"/>. El módulo introduce vértices donde el interior se anula: <Latex math="x^2-4=0\Rightarrow x=\pm 2"/>.</p>
+                                <p><strong>Análisis en <Latex math="x=2"/>:</strong></p>
+                                <Latex math="f'(2^-)=\bigl(4-x^2\bigr)'\big|_{x=2}=-2x\big|_{x=2}=-4" display={true}/>
+                                <Latex math="f'(2^+)=\bigl(x^2-4\bigr)'\big|_{x=2}=2x\big|_{x=2}=+4" display={true}/>
+                                <p>Como <Latex math="-4\neq+4"/>, hay un <strong>punto anguloso</strong> en <Latex math="x=2"/>. Por simetría, ocurre lo mismo en <Latex math="x=-2"/>.</p>
+                                <p><strong>Conclusión:</strong> <Latex math="f(x)=|x^2-4|"/> no es derivable en <Latex math="x=-2"/> ni en <Latex math="x=2"/>.</p>
+                            </WorkedExample>
+
+                            {/* Ejercicios */}
+                            <h3 className="text-xl font-bold text-slate-800 mb-3 mt-8 pt-6 border-t border-slate-100">Ejercicios</h3>
+                            <div className="space-y-4">
+
+                                <Exercise
+                                    number={18}
+                                    statement={<>Sea <Latex math="f(x)=\begin{cases}ax+2 & x\leq 1\\ x^2+5 & x>1\end{cases}"/>. Halla <Latex math="a"/> para que <Latex math="f"/> sea continua en <Latex math="x=1"/>.</>}
+                                    hint="Iguala f(1⁻) = f(1⁺): escribe la expresión del tramo izquierdo en x = 1 y la del tramo derecho, y despeja a."
+                                    solution={<><Latex math="f(1^-)=a\cdot 1+2=a+2"/>; <Latex math="f(1^+)=1+5=6"/>. Igualando: <Latex math="a+2=6\Rightarrow a=4"/>.</>}
+                                    correctAnswer={4}
+                                />
+
+                                <Exercise
+                                    number={19}
+                                    statement={<>Sea <Latex math="f(x)=\begin{cases}x^2+2x & x\leq 2\\ ax+b & x>2\end{cases}"/>. Para que <Latex math="f"/> sea derivable en <Latex math="x=2"/>, ¿cuánto vale <Latex math="a"/>?</>}
+                                    hint="La derivada del tramo izquierdo en x = 2 debe coincidir con la del tramo derecho (que es a). Deriva x²+2x y evalúa en x = 2."
+                                    solution={<><Latex math="f'(2^-)=(x^2+2x)'\big|_{x=2}=(2x+2)\big|_{x=2}=6"/>. Para derivabilidad: <Latex math="a=f'(2^-)=6"/>.</>}
+                                    correctAnswer={6}
+                                />
+
+                                <Exercise
+                                    number={20}
+                                    statement={<>Sea <Latex math="f(x)=\begin{cases}x^2 & x\leq 0\\ 1-\tfrac{x}{2} & x>0\end{cases}"/>. Calcula <Latex math="f'(0^+)"/>.</>}
+                                    hint="Deriva el tramo x > 0 y evalúa en x = 0."
+                                    solution={<>Para <Latex math="x>0"/>: <Latex math="f(x)=1-x/2"/>, luego <Latex math="f'(x)=-1/2"/>. Por tanto <Latex math="f'(0^+)=-0{,}5"/>.</>}
+                                    correctAnswer={-0.5}
+                                />
+
+                                <Exercise
+                                    number={21}
+                                    statement={<>Sea <Latex math="f(x)=\begin{cases}ax-1 & x\leq 2\\ x^2-3x+3 & x>2\end{cases}"/>. Halla <Latex math="a"/> para que <Latex math="f"/> sea continua en <Latex math="x=2"/>.</>}
+                                    hint="Calcula f(2⁺) sustituyendo x = 2 en x² − 3x + 3, y después iguala con f(2⁻) = 2a − 1."
+                                    solution={<><Latex math="f(2^+)=4-6+3=1"/>; <Latex math="f(2^-)=2a-1"/>. Igualando: <Latex math="2a-1=1\Rightarrow a=1"/>.</>}
+                                    correctAnswer={1}
+                                />
+
+                                <Exercise
+                                    number={22}
+                                    statement={<>Sea <Latex math="f(x)=\begin{cases}x^2+a & x\leq 2\\ 5x-3 & x>2\end{cases}"/>. Halla <Latex math="a"/> para que <Latex math="f"/> sea continua en <Latex math="x=2"/>.</>}
+                                    hint="Calcula f(2⁺) = 5·2 − 3 y después iguala con f(2⁻) = 4 + a."
+                                    solution={<><Latex math="f(2^+)=10-3=7"/>; <Latex math="f(2^-)=4+a"/>. Igualando: <Latex math="4+a=7\Rightarrow a=3"/>.</>}
+                                    correctAnswer={3}
+                                />
+
+                                <Exercise
+                                    number={23}
+                                    statement={<>Sea <Latex math="f(x)=\begin{cases}3x^2-6x & x\leq 2\\ ax+b & x>2\end{cases}"/>. Para que <Latex math="f"/> sea derivable en <Latex math="x=2"/>, ¿cuánto vale <Latex math="a"/>?</>}
+                                    hint="Deriva el tramo izquierdo en x = 2; ese valor debe coincidir con la pendiente a del tramo derecho."
+                                    solution={<><Latex math="f'(2^-)=(3x^2-6x)'\big|_{x=2}=(6x-6)\big|_{x=2}=6"/>. Para derivabilidad: <Latex math="a=6"/>.</>}
+                                    correctAnswer={6}
+                                />
+
+                                <Exercise
+                                    number={24}
+                                    statement={<>¿En qué valor de <Latex math="x"/> <strong>no es derivable</strong> <Latex math="f(x)=|2x-6|"/>?</>}
+                                    hint="Una función con valor absoluto no es derivable donde su interior se anula. Resuelve 2x − 6 = 0."
+                                    solution={<><Latex math="|2x-6|"/> tiene un punto anguloso donde <Latex math="2x-6=0"/>, es decir, <Latex math="x=3"/>. En ese punto: <Latex math="f'(3^-)=-2"/> y <Latex math="f'(3^+)=+2"/>, distintos, luego <Latex math="f"/> no es derivable en <Latex math="x=3"/>.</>}
+                                    correctAnswer={3}
+                                />
+
+                            </div>
+
+                        </SectionCard>
+
+                    </main>
+                </div>
+            </div>
+        );
+    }
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+</body>
+</html>
