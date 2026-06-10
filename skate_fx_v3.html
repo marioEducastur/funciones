@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>f(x) SKATE v3 — el skatepark de las funciones</title>
+<title>f(x) SKATE v7 — el skatepark de las funciones</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Bungee&family=Space+Grotesk:wght@400;500;700&family=STIX+Two+Text:ital,wght@0,500;1,500;1,600&display=swap" rel="stylesheet">
 <style>
@@ -34,6 +34,19 @@
   #vel .val{color:var(--neon)}
   #dist .val{color:var(--ink)}
   #score .val{color:var(--gold);text-shadow:0 0 14px rgba(255,210,90,.45)}
+  #slope .val{font-size:20px}
+  #slopeArrow{display:inline-block;margin-right:7px;transition:transform .12s linear}
+  #lesson{position:absolute;inset:0;display:none;align-items:center;justify-content:center;
+    background:rgba(10,4,26,.72);z-index:8}
+  .lpanel{width:min(430px,92vw);background:linear-gradient(170deg,rgba(58,34,104,.97),rgba(26,14,52,.98));
+    border:1px solid rgba(255,79,163,.45);border-radius:18px;padding:20px 22px;text-align:center;
+    box-shadow:0 18px 50px rgba(5,0,20,.6)}
+  .lpanel .ltitle{font-family:"Bungee",cursive;color:#ff4fa3;font-size:17px;margin-bottom:10px;
+    text-shadow:0 0 14px rgba(255,79,163,.5)}
+  .lpanel .lbody{font-size:14px;line-height:1.55;margin-bottom:10px}
+  .lpanel .lbody b{color:var(--neon);font-style:normal}
+  .lpanel svg{width:100%;height:auto;background:rgba(10,4,26,.5);border-radius:10px;margin-bottom:12px}
+  .lpanel .btn{font-size:14px;padding:10px 28px}
   #lives{margin-top:6px;font-size:15px;letter-spacing:5px;color:var(--rose)}
   #modeBadge{margin-top:4px;display:inline-block;font-family:"Bungee";font-size:10px;
     padding:2px 9px;border-radius:99px;border:1px solid rgba(255,210,90,.5);color:var(--gold)}
@@ -131,6 +144,8 @@
   <div class="hud-left">
     <div class="stat" id="vel"><div class="lab">velocidad</div><div class="val">0,0<small>m/s</small></div></div>
     <div class="stat" id="dist"><div class="lab">distancia</div><div class="val">0<small>m</small></div></div>
+    <div class="stat" id="slope"><div class="lab">pendiente</div>
+      <div class="val"><span id="slopeArrow">➜</span><span id="slopeVal">0</span></div></div>
   </div>
   <div class="hud-right">
     <div class="stat" id="score"><div class="lab">puntos</div><div class="val">0</div></div>
@@ -146,6 +161,13 @@
   <div class="hint">La <i>x</i> de cada fórmula se mide en metros <b>desde donde estás ahora</b>. Mira tu velocidad antes de elegir.</div>
   <div id="cards"></div>
 </div>
+
+<div id="lesson"><div class="lpanel">
+  <div class="ltitle">⚡ Física exprés</div>
+  <div class="lbody" id="lessonBody"></div>
+  <div id="lessonSVG"></div>
+  <button class="btn" id="lessonBtn">Seguir</button>
+</div></div>
 
 <div class="screen" id="menu">
   <h1><span class="fx">f(x)</span> SKATE</h1>
@@ -404,7 +426,7 @@ function genCards(){
 }
 
 /* ---- minigráfica SVG (solo modo fácil) ---- */
-function cardSVG(seg){
+function cardSVG(seg, stopU){
   const N = 48, pts = [];
   let mn = 0, mx = 0;
   for (let i = 0; i <= N; i++){
@@ -420,12 +442,19 @@ function cardSVG(seg){
   let coins = "";
   for (const c of seg.coins)
     coins += `<circle cx="${X(c.u).toFixed(1)}" cy="${(Y(seg.f(c.u)) - 4).toFixed(1)}" r="3.4" fill="#ffd25a"/>`;
+  let stop = "";
+  if (stopU != null){
+    const sx = X(stopU).toFixed(1), sy = Y(seg.f(stopU)).toFixed(1);
+    stop = `<circle cx="${sx}" cy="${sy}" r="5.5" fill="none" stroke="#ff4fa3" stroke-width="2"
+        style="filter:drop-shadow(0 0 4px rgba(255,79,163,.8))"/>
+      <circle cx="${sx}" cy="${sy}" r="2.2" fill="#ff4fa3"/>`;
+  }
   return `<svg viewBox="0 0 ${w} ${h}" xmlns="http://www.w3.org/2000/svg">
     <line x1="8" y1="${Y(0).toFixed(1)}" x2="${w - 8}" y2="${Y(0).toFixed(1)}"
       stroke="rgba(244,236,255,.22)" stroke-dasharray="3 4" stroke-width="1"/>
     <path d="${d}" fill="none" stroke="#5ff2e6" stroke-width="2.4"
       stroke-linecap="round" style="filter:drop-shadow(0 0 4px rgba(95,242,230,.7))"/>
-    <circle cx="8" cy="${Y(0).toFixed(1)}" r="3.6" fill="#e0588c"/>${coins}
+    <circle cx="8" cy="${Y(0).toFixed(1)}" r="3.6" fill="#e0588c"/>${coins}${stop}
   </svg>`;
 }
 
@@ -471,7 +500,8 @@ addEventListener("keydown", e => {
   if (state === "choose" && ["1", "2", "3"].includes(e.key)) chooseCard(+e.key - 1);
   if (state === "menu" && (e.key === "Enter" || e.key === " ")) startGame(mode);
   if (state === "over" && e.key === "Enter") startGame(mode);
-  if (e.key === "Escape" && (state === "play" || state === "choose")) toMenu();
+  if (state === "lesson" && (e.key === "Enter" || e.key === " ")) continueLesson();
+  if (e.key === "Escape" && (state === "play" || state === "choose" || state === "lesson")) toMenu();
 });
 
 /* ================= avisos ================= */
@@ -490,13 +520,16 @@ function startGame(m){
   segs = [];
   addSeg(lineSeg(-0.35, 80));                   // gran bajada inicial: coge velocidad
   player = { x: 1, y: trackY(1), v: 1.5, dir: 1,
-    air: false, vx: 0, vy: 0, spin: 0, spinRate: 0, airTime: 0, launchAng: 0, landCool: 0 };
+    air: false, vx: 0, vy: 0, spin: 0, spinRate: 0, airTime: 0, launchAng: 0, landCool: 0,
+    lowY: trackY(1), vLow: 1.5 };
   cameraY = player.y;
   score = 0; coinsTaken = 0; trickPts = 0; lives = 3;
   stuckT = 0; shakeT = 0; lastChoiceX = 0;
   unlockedSine = false; unlockedCubic = false;
   particles = [];
   timeScale = 1; timeTarget = 1;
+  clearTimeout(lessonTimer);
+  document.getElementById("lesson").style.display = "none";
   state = "play";
   document.getElementById("menu").style.display = "none";
   document.getElementById("over").style.display = "none";
@@ -508,6 +541,8 @@ function startGame(m){
 }
 function toMenu(){
   state = "menu";
+  clearTimeout(lessonTimer);
+  document.getElementById("lesson").style.display = "none";
   document.getElementById("hud").style.display = "none";
   choiceEl.style.display = "none";
   document.getElementById("vignette").style.opacity = 0;
@@ -524,19 +559,66 @@ function updateLives(){
   document.getElementById("lives").textContent = "⬤ ".repeat(lives).trim() || "—";
 }
 
-function fail(msg){
+/* ================= física exprés (pausa pedagógica) ================= */
+let lessonNext = "play", lessonTimer = null;
+function buildLesson(kind){
+  const seg = trackSegAt(player.x);
+  const stopU = clamp(player.x - seg.x0, 0, seg.L);
+  const last = segs[segs.length - 1];
+  const endX = last.x0 + last.L;
+  let peak = player.y;
+  for (let i = 0; i <= 100; i++)
+    peak = Math.max(peak, trackY(player.x + (endX - player.x) * i / 100));
+  const hNeed = peak - player.lowY;
+  const hGot = player.vLow * player.vLow / (2 * G);
+  const climbed = Math.max(player.y - player.lowY, 0);
+  let body;
+  if (kind === "flat"){
+    body = `Te paraste en una zona casi llana: sin pendiente negativa que tire de ti,
+      la <b>fricción</b> acaba ganando siempre. Para recuperar velocidad necesitas bajar.`;
+  } else {
+    body = `En tu punto más bajo llevabas <b>${fmtNum(player.vLow, 1)} m/s</b>.
+      Esa energía da para subir como mucho <b>h = v²/(2g) ≈ ${fmtNum(hGot, 1)} m</b>
+      (y la fricción aún descuenta).<br>
+      La pista te pedía subir <b>${fmtNum(hNeed, 1)} m</b>.
+      Subiste ${fmtNum(climbed, 1)} m… y ahí te quedaste.`;
+  }
+  document.getElementById("lessonBody").innerHTML = body;
+  document.getElementById("lessonSVG").innerHTML = cardSVG(seg, stopU);
+}
+function showLesson(next){
+  lessonNext = next;
+  state = "lesson";
+  document.getElementById("lesson").style.display = "flex";
+  clearTimeout(lessonTimer);
+  lessonTimer = setTimeout(continueLesson, 8000);
+}
+function continueLesson(){
+  clearTimeout(lessonTimer);
+  document.getElementById("lesson").style.display = "none";
+  if (lessonNext === "over") gameOver(); else state = "play";
+}
+document.getElementById("lessonBtn").addEventListener("click", continueLesson);
+
+function fail(msg, kind){
   lives--; updateLives(); sndFail();
   shakeT = reduceMotion ? 0 : 0.45;
-  if (lives <= 0){ gameOver(); return; }
-  toast(msg + " · rampa de rescate · " + MINUS + "1 vida", "bad");
-  const here = trackSegAt(player.x);
-  here.L = Math.max(player.x - here.x0, 0.5);
-  segs = segs.filter(s => s.x0 <= player.x);
-  addSeg(lineSeg(-0.5, 30));
-  lastChoiceX = segs[segs.length - 1].x0;
-  player.x = lastChoiceX + 0.3;
-  player.y = trackY(player.x);
-  player.dir = 1; player.v = 2.5; player.air = false; stuckT = 0;
+  buildLesson(kind || "climb");                 // captura los datos ANTES del rescate
+  toast(msg + " · " + MINUS + "1 vida", "bad");
+  if (lives > 0){
+    const here = trackSegAt(player.x);
+    here.L = Math.max(player.x - here.x0, 0.5);
+    segs = segs.filter(s => s.x0 <= player.x);
+    addSeg(lineSeg(-0.5, 30));
+    lastChoiceX = segs[segs.length - 1].x0;
+    player.x = lastChoiceX + 0.3;
+    player.y = trackY(player.x);
+    player.dir = 1; player.v = 2.5; player.air = false; stuckT = 0;
+    player.lowY = player.y; player.vLow = player.v;
+    showLesson("play");
+  } else {
+    showLesson("over");
+  }
 }
 
 function gameOver(){
@@ -558,14 +640,22 @@ function gameOver(){
 function launch(){
   const s = trackSlope(player.x);
   const root = Math.sqrt(1 + s * s);
-  player.vx = player.dir * player.v / root;
-  player.vy = player.dir * player.v * s / root;
+  let vx = player.dir * player.v / root;
+  let vy = player.dir * player.v * s / root;
+  // "ollie" moderado: inclinación e impulso a la mitad, punto intermedio entre
+  // el salto puramente tangente del principio y el vuelo grande de la v6.
+  const tilt = player.dir * clamp((player.v - 10) * 0.007, 0.02, 0.15);
+  const c = Math.cos(tilt), sn = Math.sin(tilt);
+  const nvx = vx * c - vy * sn;
+  const nvy = vx * sn + vy * c;
+  player.vx = nvx;
+  player.vy = nvy + clamp((player.v - 10) * 0.06, 0, 1.1);
   player.air = true;
   player.airTime = 0; player.spin = 0;
   player.spinRate = clamp(4.5 + player.v * 0.1, 4.5, 9);
   player.launchAng = Math.atan(-s);
   sndJump();
-  spawnSparks(player.x, player.y + 0.2, "#5ff2e6", 10);
+  spawnSparks(player.x, player.y + 0.2, "#39ff5e", 10);
 }
 function land(){
   const s = trackSlope(player.x);
@@ -579,10 +669,10 @@ function land(){
   // pirueta según el tiempo de vuelo
   const t = player.airTime;
   let name = null, pts = 0;
-  if (t >= 1.6){ name = "¡900 ROTATION!"; pts = 250; }
-  else if (t >= 1.1){ name = "¡FLIP 720!"; pts = 160; }
-  else if (t >= 0.7){ name = "¡KICKFLIP 360!"; pts = 90; }
-  else if (t >= 0.35){ name = "¡OLLIE!"; pts = 30; }
+  if (t >= 1.3){ name = "¡900 ROTATION!"; pts = 250; }
+  else if (t >= 0.9){ name = "¡FLIP 720!"; pts = 160; }
+  else if (t >= 0.55){ name = "¡KICKFLIP 360!"; pts = 90; }
+  else if (t >= 0.3){ name = "¡OLLIE!"; pts = 30; }
   if (name){
     trickPts += pts;
     toast(`${name} +${pts}`, "trick");
@@ -631,23 +721,27 @@ function physics(dt){
     player.x += player.dir * ds / root;
     player.x = Math.max(player.x, 0.2);
     player.y = trackY(player.x);
+    if (player.y < player.lowY){ player.lowY = player.y; player.vLow = player.v; }
     const segAfter = trackSegAt(player.x);
 
-    // despegue 1: cresta curva (la pista se hunde más rápido de lo que cae el skater)
+    // despegue 1: cresta curva — solo con inercia de verdad y curvatura clara
     const c = trackCurv(player.x);
-    if (player.landCool === 0 && c < 0 && player.v > 5 &&
-        player.v * player.v * (-c) / (1 + s * s) > G * 1.05){
+    if (player.landCool === 0 && c < 0 && player.v > 11 &&
+        player.v * player.v * (-c) / (1 + s * s) > G * 1.15){
       launch();
     }
-    // despegue 2: "kink" entre tramos (el nuevo tramo cae de golpe)
-    else if (player.landCool === 0 && segAfter !== segBefore && player.dir > 0 && player.v > 6.5){
+    // despegue 2: quiebro brusco real entre tramos — el suelo se hunde de golpe.
+    // Una bajada que empalma con otra bajada parecida NO lanza.
+    else if (player.landCool === 0 && segAfter !== segBefore && player.dir > 0 && player.v > 12){
       const sNew = segAfter.df(0);
-      if (prevSlope - sNew > 0.18) launch();
+      if (prevSlope - sNew > 0.5 && prevSlope > -0.35) launch();
     }
+    if (!player.air && segAfter !== segBefore && player.v > 8)
+      spawnSparks(player.x, player.y + 0.1, "#ffd25a", 6);   // grind en la costura
 
     // atascado / retroceso
     if (player.v < 0.4 && state === "play"){ stuckT += dt; } else stuckT = 0;
-    if (stuckT > 1.0){ fail("¡Atascado!"); return; }
+    if (stuckT > 1.0){ fail("¡Atascado!", "flat"); return; }
     if (player.dir < 0 && player.x <= lastChoiceX + 0.25 && state === "play"){
       fail("¡Sin velocidad para subir!"); return;
     }
@@ -695,11 +789,13 @@ function spawnSparks(wx, wy, col, n){
 }
 function trailParticles(dt){
   if (reduceMotion || player.v < 6) return;
+  const col = player.air ? "#7dff8e"
+    : player.v < 12 ? "#5ff2e6" : player.v < 20 ? "#39ff5e" : "#ffffff";
   const n = Math.min(3, Math.floor(player.v / 8));
   for (let i = 0; i < n; i++)
     particles.push({ x: player.x + rand(-.3, .1), y: player.y + rand(0, .25),
       vx: -player.dir * rand(1, 3), vy: rand(.5, 2),
-      life: rand(.25, .55), t: 0, col: player.air ? "#e0588c" : "#5ff2e6", r: rand(1, 2.2) });
+      life: rand(.25, .55), t: 0, col, r: rand(1, 2.2) });
 }
 
 /* ================= dibujo ================= */
@@ -853,13 +949,16 @@ function draw(now){
     ctx.translate(px, py); ctx.rotate(ang);
     if (player.dir < 0) ctx.scale(-1, 1);
     ctx.lineCap = "round";
-    // tabla
+    // tabla dorada con brillo
+    ctx.shadowColor = "#ffd25a"; ctx.shadowBlur = 10;
     ctx.strokeStyle = "#ffd25a"; ctx.lineWidth = 3.4;
     ctx.beginPath(); ctx.moveTo(-10, -3); ctx.lineTo(10, -3); ctx.stroke();
-    ctx.fillStyle = "#1d1030";
+    ctx.shadowBlur = 0;
+    ctx.fillStyle = "#ffffff";
     ctx.beginPath(); ctx.arc(-6, 0, 2.4, 0, 7); ctx.arc(6, 0, 2.4, 0, 7); ctx.fill();
-    // cuerpo
-    ctx.strokeStyle = "#1d1030"; ctx.lineWidth = 3;
+    // cuerpo en verde fosforito
+    ctx.shadowColor = "#39ff5e"; ctx.shadowBlur = 14;
+    ctx.strokeStyle = "#39ff5e"; ctx.lineWidth = 3;
     if (player.air){
       ctx.beginPath();                          // agarra la tabla: postura encogida
       ctx.moveTo(-5, -4); ctx.lineTo(-2, -9); ctx.lineTo(0, -12);
@@ -870,7 +969,7 @@ function draw(now){
       ctx.moveTo(2, -17); ctx.lineTo(7, -5);
       ctx.moveTo(2, -17); ctx.lineTo(-5, -22);
       ctx.stroke();
-      ctx.fillStyle = "#1d1030";
+      ctx.fillStyle = "#b6ffc4";
       ctx.beginPath(); ctx.arc(5, -23, 3.6, 0, 7); ctx.fill();
     } else {
       ctx.beginPath();
@@ -882,9 +981,10 @@ function draw(now){
       ctx.moveTo(3, -21); ctx.lineTo(-4, -18);
       ctx.moveTo(3, -21); ctx.lineTo(9, -16);
       ctx.stroke();
-      ctx.fillStyle = "#1d1030";
+      ctx.fillStyle = "#b6ffc4";
       ctx.beginPath(); ctx.arc(6, -27, 3.6, 0, 7); ctx.fill();
     }
+    ctx.shadowBlur = 0;
     ctx.restore();
   }
   ctx.restore();
@@ -912,6 +1012,19 @@ function loop(now){
         player.v.toFixed(1).replace(".", ",") + "<small>m/s</small>";
       document.querySelector("#dist .val").innerHTML =
         Math.round(player.x) + "<small>m</small>";
+      const slopeVal = document.getElementById("slopeVal");
+      const slopeArrow = document.getElementById("slopeArrow");
+      const slopeBox = document.querySelector("#slope .val");
+      if (player.air){
+        slopeVal.textContent = "vuelo";
+        slopeArrow.style.transform = `rotate(${Math.atan2(-player.vy, player.vx || 0.01)}rad)`;
+        slopeBox.style.color = "#ffd25a";
+      } else {
+        const sN = trackSlope(player.x);
+        slopeVal.textContent = (sN < 0 ? MINUS : "+") + fmtNum(sN, 2);
+        slopeArrow.style.transform = `rotate(${Math.atan(-sN)}rad)`;
+        slopeBox.style.color = sN <= 0 ? "var(--neon)" : "#ff6fae";
+      }
       document.querySelector("#score .val").textContent = totalScore();
     }
   }
